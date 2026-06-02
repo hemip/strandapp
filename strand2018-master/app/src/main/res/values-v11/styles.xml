@@ -1,0 +1,10 @@
+<resources>
+    <style name="MyTheme" parent="android:Theme.Holo.Light">
+       <item name="android:actionBarStyle">@style/MyActionBarStyle</item>
+    </style>
+
+    <style name="MyActionBarStyle" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:displayOptions">showHome</item>
+    </style>
+</resources>
+

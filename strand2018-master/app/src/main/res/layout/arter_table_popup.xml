@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical" >
+
+    <CheckBox
+        android:id="@+id/geoCB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Geo" />
+
+    <CheckBox
+        android:id="@+id/supraCB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Supra" />
+
+    <CheckBox
+        android:id="@+id/extraCB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Extra" />
+
+    <CheckBox
+        android:id="@+id/driftCB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Driftvall" />
+    
+</LinearLayout>

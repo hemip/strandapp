@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/actmain"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:baselineAligned="false"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.20"
+            android:orientation="vertical" >
+
+            
+            
+               <TextView
+                android:id="@+id/hydroT"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="#C6E2FF"
+                android:gravity="center"
+                android:text="Hydrolitoral" />
+    
+                         
+            <TextView
+                android:id="@+id/geoT"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="#FFDAB9"
+                android:gravity="center"
+                android:text="Geolitoral" />
+            
+           <TextView
+                android:id="@+id/supraT"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="#E5E5E5"
+                android:gravity="center"
+                android:text="Supralitoral" />
+            
+               
+               <TextView
+                android:id="@+id/extraT"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="#F8FFFF"
+                android:gravity="center"
+                android:text="Extralitoral" />
+
+  
+            <TextView
+                android:id="@+id/tradT"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="#9CBA7F"
+                android:gravity="center"
+                android:text="Träd" />
+
+            <TextView
+                android:id="@+id/buskT"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="#BCED91"
+                android:gravity="center"
+                android:text="Buskar" />
+
+            <TextView
+                android:id="@+id/driftT"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="#D9D9F3"
+                android:gravity="center"
+                android:text="Driftvallar" />
+
+            <TextView
+                android:id="@+id/deponiT"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="#FFE7BA"
+                android:gravity="center"
+                android:text="Deponi" />
+
+            <TextView
+                android:id="@+id/habitatT"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="#FFFF7E"
+                android:gravity="center"
+                android:text="Habitat" />
+
+            <TextView
+                android:id="@+id/ovrigtT"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="#C6C3B5"
+                android:gravity="center"
+                android:text="Övrigt" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/contentPane"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.80"
+            android:background="#F0FFFF"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dip"
+                android:text="Välj zon till vänster"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+        </LinearLayout>
+    </LinearLayout>
+
+ 
+</LinearLayout>

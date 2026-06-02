@@ -1,0 +1,800 @@
+﻿{
+  "meta": {
+    "id": "havsstrand-basic-data",
+    "version": "0.1.0",
+    "source": "strand2018-master",
+    "generated_at": "2026-04-27",
+    "language": "sv-SE",
+    "platform": "android",
+    "notes": [
+      "Bas framtagen från den gamla appen.",
+      "Endpoint-URL:er är placeholders och ska ersättas från riktig miljö.",
+      "JSON-strukturen är tänkt som startpunkt för en konfigurationsdriven React Native-app."
+    ]
+  },
+  "endpoints": {
+    "basic_data_url": "https://example.org/havsstrand/basic_data.json",
+    "data_upload_url": "https://example.org/havsstrand/api/upload-data",
+    "photo_upload_url": "https://example.org/havsstrand/api/upload-photo"
+  },
+  "bootstrap_resources": [
+    {
+      "id": "provyteunderlag",
+      "type": "csv",
+      "target_path": "basic_data/utlagg/data.csv",
+      "description": "Årets utlägg och provyteunderlag"
+    },
+    {
+      "id": "artlista_trad",
+      "type": "csv",
+      "target_path": "basic_data/artlistor/strandinventering_arter_trad.csv"
+    },
+    {
+      "id": "artlista_buskar",
+      "type": "csv",
+      "target_path": "basic_data/artlistor/strandinventering_arter_buskar.csv"
+    },
+    {
+      "id": "artlista_graminider",
+      "type": "csv",
+      "target_path": "basic_data/artlistor/strandinventering_arter_graminider.csv"
+    },
+    {
+      "id": "artlista_lavar",
+      "type": "csv",
+      "target_path": "basic_data/artlistor/strandinventering_arter_lavar.csv"
+    },
+    {
+      "id": "artlista_mossor",
+      "type": "csv",
+      "target_path": "basic_data/artlistor/strandinventering_arter_mossor.csv"
+    },
+    {
+      "id": "artlista_orter",
+      "type": "csv",
+      "target_path": "basic_data/artlistor/strandinventering_arter_orter.csv"
+    },
+    {
+      "id": "artlista_ris",
+      "type": "csv",
+      "target_path": "basic_data/artlistor/strandinventering_arter_ris.csv"
+    },
+    {
+      "id": "artlista_ormbunkar",
+      "type": "csv",
+      "target_path": "basic_data/artlistor/strandinventering_arter_ormbunkar.csv"
+    },
+    {
+      "id": "artlista_alla",
+      "type": "csv",
+      "target_path": "basic_data/artlistor/strandinventering_arter_alla.csv"
+    }
+  ],
+  "lists": {
+    "inventeringstyper": [
+      { "value": "normal", "label": "Inventeras, beträds" },
+      { "value": "distans", "label": "Avståndsinventera" },
+      { "value": "markera_klar", "label": "Markera klar" },
+      { "value": "ej_inventerad", "label": "Inventeras ej" }
+    ],
+    "inventeringsroller": [
+      { "value": "master", "label": "Master" },
+      { "value": "hjalpare", "label": "Hjälpare" }
+    ],
+    "inventerarantal": [
+      { "value": "1", "label": "1 inventerare" },
+      { "value": "2", "label": "2 inventerare" },
+      { "value": "3", "label": "3 inventerare" }
+    ],
+    "standard_bildtyper": [
+      { "value": "ut", "label": "1. UT - vybild utåt" },
+      { "value": "left", "label": "2. Vä - vybild från vänster" },
+      { "value": "upp", "label": "3. UPP - vybild uppåt" },
+      { "value": "right", "label": "4. Hö - vybild från höger" },
+      { "value": "sup", "label": "5. SUP - gräns geo/supra" },
+      { "value": "slut", "label": "6. SLUT - ovan transekten" }
+    ],
+    "marktyper": [
+      { "value": "10", "label": "Åker - Träda/ingen synbar markanv." },
+      { "value": "11", "label": "Åker- Nyligen markbearbetad/harvad/sådd" },
+      { "value": "12", "label": "Åker- Annuella grödor" },
+      { "value": "13", "label": "Åker- Slåttervall" },
+      { "value": "14", "label": "Åker- Betad vall" },
+      { "value": "15", "label": "Åker- Energiskog" },
+      { "value": "16", "label": "Åker- Frukt/Bärodling" },
+      { "value": "20", "label": "Anlagd - Ingen synbar markanv." },
+      { "value": "21", "label": "Anlagd - Kolonilottsodling" },
+      { "value": "22", "label": "Anlagd - Rekreation (anläggning)" },
+      { "value": "23", "label": "Anlagd - Bostadstomt Enskilt eller få (<= 5)" },
+      { "value": "24", "label": "Anlagd - Tätortsbebyggelse flera bostadshus (>5)" },
+      { "value": "25", "label": "Anlagd - Jordbruksbebyggelse Byggnader, gårdsplaner" },
+      { "value": "26", "label": "Anlagd - Industriverksamhet" },
+      { "value": "27", "label": "Anlagd - Transport" },
+      { "value": "28", "label": "Anlagd - Pågående exploatering/väg/bygge" },
+      { "value": "30", "label": "Skog - Pot. skogsbruk, inga avverkningsspår" },
+      { "value": "31", "label": "Skog - Skogsbruk" },
+      { "value": "32", "label": "Skog - Skogsbruk, hänsynsyta" },
+      { "value": "33", "label": "Skog - Hygge" },
+      { "value": "34", "label": "Skog - Fröplantage" },
+      { "value": "35", "label": "Skog - Kraftledningsgata" },
+      { "value": "36", "label": "Skog - Skogsbete (+skogsbruk)" },
+      { "value": "37", "label": "Skog - Rekreation (+skogsbruk)" },
+      { "value": "38", "label": "Skog - Nyligen skogsplanterad åker" },
+      { "value": "40", "label": "Övrig - Ingen synbar markanvändning" },
+      { "value": "41", "label": "Övrig - Djurhållnig, naturmark" },
+      { "value": "42", "label": "Övrig - Djurhållning, kultiverad/gödslad mark" },
+      { "value": "43", "label": "Övrig - Slåtter/gräsklippning" },
+      { "value": "44", "label": "Övrig - Rekreation" },
+      { "value": "45", "label": "Övrig - Bostadstomt" },
+      { "value": "46", "label": "Övrig - Täkt" },
+      { "value": "50", "label": "Vatten" }
+    ],
+    "rekreationstyper": [
+      { "value": "1", "label": "Badplats" },
+      { "value": "2", "label": "Golfbana" },
+      { "value": "3", "label": "Camping" },
+      { "value": "4", "label": "Slalombacke" },
+      { "value": "5", "label": "Annan motionsanläggning" },
+      { "value": "6", "label": "Park" },
+      { "value": "7", "label": "Annan rekreationsyta" }
+    ],
+    "rojningstyper": [
+      { "value": "1", "label": "Ingen avverkning/röjning" },
+      { "value": "2", "label": "Kraftig utglesning av stora träd" },
+      { "value": "3", "label": "Svag utglesning av stora träd" },
+      { "value": "4", "label": "Kraftig utglesning av små träd" },
+      { "value": "5", "label": "Kraftig utglesning av buskar" },
+      { "value": "6", "label": "Svag utglesning av buskar" }
+    ],
+    "rojningstid": [
+      { "value": "00", "label": "Innevarande säsong" },
+      { "value": "01", "label": "Föregående växtsäsong" },
+      { "value": "02", "label": "2 år sedan" },
+      { "value": "05", "label": "3-5 år sedan" }
+    ],
+    "vagexponering": [
+      { "value": "1", "label": "Ultraskyddat" },
+      { "value": "2", "label": "Extremt skyddat" },
+      { "value": "3", "label": "Mycket skyddat" },
+      { "value": "4", "label": "Skyddat" },
+      { "value": "5", "label": "Moderat exponerat" },
+      { "value": "6", "label": "Exponerat" },
+      { "value": "7", "label": "Mycket exponerat" },
+      { "value": "8", "label": "Extremt exponerat" }
+    ],
+    "strandtyper": [
+      { "value": "1", "label": "Klippa/Häll" },
+      { "value": "2", "label": "Block/Grus" },
+      { "value": "3", "label": "Sand" },
+      { "value": "4", "label": "Strandäng/Våtmark" },
+      { "value": "5", "label": "Konstruerad" }
+    ],
+    "kusttyper": [
+      { "value": "1", "label": "Fastland" },
+      { "value": "2", "label": "Öar (>2 ha)" },
+      { "value": "3", "label": "Skär (<2 ha och >0,1 ha)" },
+      { "value": "4", "label": "Grund (<0,1 ha)" }
+    ],
+    "tradforekomst": [
+      { "value": "1", "label": "Trädlös" },
+      { "value": "2", "label": "Enstaka träd" },
+      { "value": "3", "label": "Skog (>0,25 ha)" }
+    ],
+    "ja_nej": [
+      { "value": "1", "label": "Ja" },
+      { "value": "0", "label": "Nej" }
+    ],
+    "ej_inventerad_orsak": [
+      { "value": "5", "label": "Tillfälligt vattentäckt >30 cm" },
+      { "value": "6", "label": "Otillgänglig våtmark" },
+      { "value": "7", "label": "Åkermark annuell gröda" },
+      { "value": "8", "label": "Slåttermark" },
+      { "value": "9", "label": "Otillgänglig åkerholme" },
+      { "value": "10", "label": "Ö mindre än 0,1 ha" },
+      { "value": "11", "label": "Otillgänglig brant mark" },
+      { "value": "12", "label": "Otillgänglig rasrisk" },
+      { "value": "13", "label": "Tomt bebyggt industri" },
+      { "value": "14", "label": "Beträdnadsförbud" },
+      { "value": "15", "label": "Annan orsak ange skriftligt på blå lapp" },
+      { "value": "16", "label": "Utanför ÄBO (endast ÄBO)" },
+      { "value": "17", "label": "Utanför aktuellt markslag (endast Lill-Nills myr)" }
+    ],
+    "habitat_no_entries": [
+      { "value": "Bebyggd strand", "label": "Bebyggd strand" },
+      { "value": "Påverkad av gräv/pirbygge/muddring", "label": "Påverkad av gräv/pirbygge/muddring" },
+      { "value": "Avverkning kraftig utglesning av träd", "label": "Avverkning kraftig utglesning av träd" },
+      { "value": "Hydrologi påverkad (ex. reglering)", "label": "Hydrologi påverkad (ex. reglering)" },
+      { "value": "Området exploaterat eller bebyggt", "label": "Området exploaterat eller bebyggt" },
+      { "value": "Ej naturlig skog", "label": "Ej naturlig skog" },
+      { "value": "Naturlig skog, men ålderskriterie ej uppfyllt", "label": "Naturlig skog, men ålderskriterie ej uppfyllt" }
+    ],
+    "habitat_procent": [
+      { "value": "Ej aktuellt", "label": "Ej aktuellt" },
+      { "value": "<10%", "label": "<10%" },
+      { "value": "10-30%", "label": "10-30%" },
+      { "value": ">30%", "label": ">30%" }
+    ],
+    "habitat_grov_dod_ved": [
+      { "value": "Ej aktuellt", "label": "Ej aktuellt" },
+      { "value": "< 10m³/ha", "label": "< 10m³/ha" },
+      { "value": ">10m³/ha", "label": ">10m³/ha" }
+    ],
+    "habitat_skog_succession": [
+      { "value": "Ej aktuellt", "label": "Ej aktuellt" },
+      { "value": "Enbart busk-/lövbård", "label": "Enbart busk-/lövbård" },
+      { "value": "Busk-, löv- och barrskog", "label": "Busk-, löv- och barrskog" }
+    ],
+    "habitat_betesregim": [
+      { "value": "Ej aktuellt", "label": "Ej aktuellt" },
+      { "value": "Ingen betespåverkan", "label": "Ingen betespåverkan" },
+      { "value": "Tamdjur", "label": "Tamdjur" },
+      { "value": "Vilda djur/fåglar", "label": "Vilda djur/fåglar" }
+    ],
+    "habitat_betestryck": [
+      { "value": "Ej aktuellt", "label": "Ej aktuellt" },
+      { "value": "Ingen betestryck", "label": "Ingen betestryck" },
+      { "value": "Lågt betestryck (>30% av ytan)", "label": "Lågt betestryck (>30% av ytan)" },
+      { "value": "Medel (30-70% ytan)", "label": "Medel (30-70% ytan)" },
+      { "value": "Välbetat (<70% ytan)", "label": "Välbetat (<70% ytan)" }
+    ],
+    "artkategorier": [
+      { "value": "trad", "label": "Trädarter", "resource": "strandinventering_arter_trad.csv", "entry_mode": "tree_table" },
+      { "value": "buskar", "label": "Buskarter", "resource": "strandinventering_arter_buskar.csv", "entry_mode": "buske_table" },
+      { "value": "orter", "label": "Örter", "resource": "strandinventering_arter_orter.csv", "entry_mode": "arter_table" },
+      { "value": "ris", "label": "Ris", "resource": "strandinventering_arter_ris.csv", "entry_mode": "arter_table" },
+      { "value": "graminider", "label": "Graminider", "resource": "strandinventering_arter_graminider.csv", "entry_mode": "arter_table" },
+      { "value": "ormbunkar", "label": "Ormbunkar", "resource": "strandinventering_arter_ormbunkar.csv", "entry_mode": "arter_table" },
+      { "value": "mossor", "label": "Mossor", "resource": "strandinventering_arter_mossor.csv", "entry_mode": "arter_table" },
+      { "value": "lavar", "label": "Lavar", "resource": "strandinventering_arter_lavar.csv", "entry_mode": "arter_table" },
+      { "value": "geo", "label": "Geolitoral", "resource": "strandinventering_arter_alla.csv", "entry_mode": "species_observation" },
+      { "value": "supra", "label": "Supralitoral", "resource": "strandinventering_arter_alla.csv", "entry_mode": "species_observation" },
+      { "value": "extra", "label": "Extralitoral", "resource": "strandinventering_arter_alla.csv", "entry_mode": "species_observation" },
+      { "value": "strandvall", "label": "Strandvall", "resource": "strandinventering_arter_alla.csv", "entry_mode": "species_observation" }
+    ],
+    "deponi_kategorier": [
+      { "id": "1", "label": "Tång (m2)" },
+      { "id": "2", "label": "Gren/kvist/ved (m2)" },
+      { "id": "3", "label": "Annan vegetation (m2)" },
+      { "id": "4", "label": "Sågat/bearbetat virke (m)" },
+      { "id": "5", "label": "Bryggdelar (m2)" },
+      { "id": "6", "label": "Fiskenät (m)" },
+      { "id": "7", "label": "Fisklina (m)" },
+      { "id": "8", "label": "Plastflöten/bojar (n)" },
+      { "id": "9", "label": "Annat fiskerelaterat (n)" },
+      { "id": "10", "label": "Plastlådor (n)" },
+      { "id": "11", "label": "Petflaskor (n)" },
+      { "id": "12", "label": "Plastdunkar (n)" },
+      { "id": "13", "label": "Plastpåsar (n)" },
+      { "id": "14", "label": "Annan plast (m2)" },
+      { "id": "15", "label": "Oljespill (m2)" },
+      { "id": "16", "label": "Byggavfall (m2)" },
+      { "id": "17", "label": "Grävmassor (m2)" },
+      { "id": "18", "label": "Sten (m2)" },
+      { "id": "19", "label": "Metallskrot (m2)" },
+      { "id": "20", "label": "Övrigt (m2)" }
+    ]
+  },
+  "global_fields": [
+    {
+      "id": "lagnummer",
+      "label": "Lagnummer",
+      "type": "integer",
+      "required": true,
+      "validation": { "min": 10, "max": 100 }
+    },
+    {
+      "id": "inventerare",
+      "label": "Inventerare",
+      "type": "text",
+      "required": false
+    },
+    {
+      "id": "ruta",
+      "label": "Ruta",
+      "type": "dataset_select",
+      "required": true,
+      "dataset": "provyteunderlag",
+      "value_key": "ruta",
+      "display_key": "ruta"
+    },
+    {
+      "id": "provyta",
+      "label": "Provyta",
+      "type": "dataset_select",
+      "required": true,
+      "dataset": "provyteunderlag",
+      "value_key": "provyta",
+      "display_key": "provyta",
+      "filters": [
+        {
+          "source_field": "ruta",
+          "dataset_key": "ruta"
+        }
+      ]
+    },
+    {
+      "id": "pyid",
+      "label": "Provytans ID",
+      "type": "dataset_value",
+      "required": true,
+      "dataset": "provyteunderlag",
+      "value_key": "pyid",
+      "lookup_by": ["ruta", "provyta"]
+    },
+    {
+      "id": "inventeringstyp",
+      "label": "Inventeringstyp",
+      "type": "select",
+      "required": true,
+      "list_id": "inventeringstyper"
+    },
+    {
+      "id": "inventering_roll",
+      "label": "Roll i inventeringen",
+      "type": "select",
+      "required": true,
+      "list_id": "inventeringsroller"
+    },
+    {
+      "id": "antal_inventerare",
+      "label": "Antal inventerare",
+      "type": "select",
+      "required": true,
+      "list_id": "inventerarantal"
+    },
+    {
+      "id": "inventering_uuid",
+      "label": "Inventeringstillfälle UUID",
+      "type": "inventory_uuid",
+      "required": true
+    },
+    {
+      "id": "bla_lapp",
+      "label": "Blå lapp",
+      "type": "multiline_text",
+      "required": false,
+      "global_action": true
+    }
+  ],
+  "tabs": [
+    {
+      "id": "oversikt",
+      "label": "Översikt",
+      "sections": [
+        {
+          "id": "provyta_val",
+          "label": "Val av provyta",
+          "fields": [
+            "lagnummer",
+            "inventerare",
+            "ruta",
+            "provyta",
+            "pyid",
+            "inventeringstyp",
+            "inventering_roll",
+            "antal_inventerare",
+            "inventering_uuid"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "start_bilder",
+      "label": "Start & bilder",
+      "sections": [
+        {
+          "id": "riktning_och_startpunkt",
+          "label": "Riktning och startpunkt",
+          "fields": [
+            {
+              "id": "riktning",
+              "label": "Transektens riktning",
+              "type": "integer",
+              "unit": "grader",
+              "required": false
+            },
+            {
+              "id": "startpunkt",
+              "label": "Startpunkt",
+              "type": "gps_capture",
+              "required": false,
+              "outputs": ["startPEast", "startPNorth", "gps_accuracy", "gps_timestamp"]
+            }
+          ]
+        },
+        {
+          "id": "standardbilder",
+          "label": "Standardbilder",
+          "fields": [
+            {
+              "id": "standardfoton",
+              "label": "Standardfoton",
+              "type": "photo_set",
+              "required": false,
+              "list_id": "standard_bildtyper",
+              "storage_category": "standard"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hydro",
+      "label": "Hydrolitoral",
+      "sections": [
+        {
+          "id": "hydro_bas",
+          "label": "Hydrodata",
+          "fields": [
+            { "id": "brygga", "label": "Brygga", "type": "boolean_select", "list_id": "ja_nej" },
+            { "id": "vasslen", "label": "Längd vassbälte", "type": "integer", "unit": "m" },
+            { "id": "vasstathet", "label": "Vasstäthet", "type": "integer", "unit": "%" },
+            { "id": "exponering", "label": "Vågexponering", "type": "select", "list_id": "vagexponering" },
+            { "id": "strandtyp", "label": "Strandtyp", "type": "select", "list_id": "strandtyper" },
+            { "id": "kusttyp", "label": "Kusttyp", "type": "select", "list_id": "kusttyper" },
+            { "id": "vattendjup", "label": "Vattendjup", "type": "integer", "unit": "dm" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "geo",
+      "label": "Geolitoral",
+      "sections": [
+        {
+          "id": "geo_bas",
+          "label": "Geolitoral",
+          "fields": [
+            { "id": "lutninggeo", "label": "Lutning geolitoral", "type": "integer", "unit": "grader" },
+            { "id": "marktypgeo", "label": "Marktyp", "type": "select", "list_id": "marktyper" },
+            { "id": "vegtackningfaltgeo", "label": "Total fältskiktstäckning", "type": "integer", "unit": "%" },
+            { "id": "tradtackninggeo", "label": "Total trädtäckning", "type": "integer", "unit": "%" },
+            { "id": "slutlengeo", "label": "Geolitoral slutlängd", "type": "decimal", "unit": "m" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "supra",
+      "label": "Supralitoral",
+      "sections": [
+        {
+          "id": "supra_bas",
+          "label": "Supralitoral",
+          "fields": [
+            { "id": "lutningsupra", "label": "Lutning supralitoral", "type": "integer", "unit": "grader" },
+            { "id": "marktypsupra", "label": "Marktyp", "type": "select", "list_id": "marktyper" },
+            { "id": "vegtackningfaltsupra", "label": "Total fältskiktstäckning", "type": "integer", "unit": "%" },
+            { "id": "tradtackningsupra", "label": "Total trädtäckning", "type": "integer", "unit": "%" },
+            { "id": "slutlensupra", "label": "Supralitoral slutlängd", "type": "decimal", "unit": "m" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "extra",
+      "label": "Extralitoral",
+      "sections": [
+        {
+          "id": "extra_bas",
+          "label": "Extralitoral",
+          "fields": [
+            { "id": "lutningextra", "label": "Lutning extralitoral", "type": "integer", "unit": "grader" },
+            { "id": "marktypextra", "label": "Marktyp", "type": "select", "list_id": "marktyper" },
+            { "id": "vegtackningfaltextra", "label": "Total fältskiktstäckning", "type": "integer", "unit": "%" },
+            { "id": "tradtackningextra", "label": "Trädtäckning extralitoral", "type": "integer", "unit": "%" },
+            { "id": "slutlenovan", "label": "Extralitoral slutlängd", "type": "decimal", "unit": "m" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ovrigt",
+      "label": "Övrigt",
+      "sections": [
+        {
+          "id": "ovrigt_bas",
+          "label": "Övriga parametrar",
+          "fields": [
+            { "id": "rekreation", "label": "Rekreation", "type": "select", "list_id": "rekreationstyper" },
+            { "id": "rojning", "label": "Röjning", "type": "select", "list_id": "rojningstyper" },
+            { "id": "rojningtid", "label": "Röjningstid", "type": "select", "list_id": "rojningstid" },
+            { "id": "klippamax", "label": "Högsta klippan i transekten", "type": "integer", "unit": "m" },
+            { "id": "stangsel", "label": "Stängsel", "type": "boolean_select", "list_id": "ja_nej" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "substrat",
+      "label": "Substrat",
+      "sections": [
+        {
+          "id": "substratmatris",
+          "label": "Substratfördelning",
+          "fields": [
+            {
+              "id": "substrat",
+              "label": "Substratmatris",
+              "type": "matrix_percent",
+              "required": false,
+              "columns": ["hydro", "geo", "supra", "extra"],
+              "rows": [
+                "organiskt",
+                "lera",
+                "sand",
+                "grus",
+                "sten",
+                "block",
+                "hall",
+                "artificiell"
+              ],
+              "sum_rule": "per_column_must_equal_100"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "arter",
+      "label": "Arter",
+      "sections": [
+        {
+          "id": "arter_kategorier",
+          "label": "Artkategorier",
+          "fields": [
+            {
+              "id": "arter_kategori_val",
+              "label": "Artkategori",
+              "type": "resource_picker",
+              "list_id": "artkategorier"
+            },
+            {
+              "id": "arter_data",
+              "label": "Arter",
+              "type": "art_table",
+              "modes": {
+                "arter_table": {
+                  "columns": ["namn", "geo", "supra", "extra", "drift"]
+                },
+                "tree_table": {
+                  "columns": ["avstand", "art", "diameter", "antal"]
+                },
+                "buske_table": {
+                  "columns": ["avstand", "art", "bredd", "langd", "tathet"]
+                },
+                "species_observation": {
+                  "columns": ["namn"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trad",
+      "label": "Träd",
+      "sections": [
+        {
+          "id": "trad_bas",
+          "label": "Träd",
+          "fields": [
+            { "id": "tradforekomst", "label": "Trädförekomst", "type": "select", "list_id": "tradforekomst" },
+            {
+              "id": "tradarter",
+              "label": "Trädarter",
+              "type": "art_table",
+              "category": "trad",
+              "columns": ["avstand", "art", "diameter", "antal"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "buskar",
+      "label": "Buskar",
+      "sections": [
+        {
+          "id": "buskar_bas",
+          "label": "Buskar",
+          "fields": [
+            { "id": "busktackning", "label": "Total busktäckning", "type": "integer", "unit": "%" },
+            {
+              "id": "buskarter",
+              "label": "Buskarter",
+              "type": "art_table",
+              "category": "buskar",
+              "columns": ["avstand", "art", "bredd", "langd", "tathet"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "habitat",
+      "label": "Habitat",
+      "sections": [
+        {
+          "id": "habitat_ovan",
+          "label": "Habitat ovan",
+          "fields": [
+            { "id": "ovanhabitat", "label": "Habitat ovanför stranden", "type": "select", "list_id": "habitat_ovan" },
+            { "id": "kriterieovan", "label": "Orsak om ej habitat", "type": "select", "list_id": "habitat_no_entries" },
+            { "id": "marktypovan", "label": "Marktyp ovan", "type": "select", "list_id": "marktyper" }
+          ]
+        },
+        {
+          "id": "habitat_tabell",
+          "label": "Habitat i transekten",
+          "fields": [
+            {
+              "id": "habitat_rows",
+              "label": "Habitatrader",
+              "type": "repeater",
+              "item_schema": {
+                "fields": [
+                  { "id": "kod", "label": "Kod", "type": "text" },
+                  { "id": "namn", "label": "Namn", "type": "text" },
+                  { "id": "utbredning", "label": "M.K.", "type": "text" },
+                  { "id": "start", "label": "Start", "type": "decimal", "unit": "m" },
+                  { "id": "slut", "label": "Slut", "type": "decimal", "unit": "m" },
+                  { "id": "kriterie", "label": "Kriterie", "type": "text" },
+                  { "id": "fagelskramma", "label": "Fågelskrämma inom 50 m", "type": "boolean" },
+                  { "id": "siktrojning", "label": "Siktröjning", "type": "boolean" },
+                  { "id": "busktackning", "label": "Busktäckning", "type": "select", "list_id": "habitat_procent" },
+                  { "id": "krontackning", "label": "Krontäckning", "type": "select", "list_id": "habitat_procent" },
+                  { "id": "grov_dod_ved", "label": "Grov död ved", "type": "select", "list_id": "habitat_grov_dod_ved" },
+                  { "id": "skog_succession", "label": "Skogssuccession", "type": "select", "list_id": "habitat_skog_succession" },
+                  { "id": "betesregim", "label": "Betesregim", "type": "select", "list_id": "habitat_betesregim" },
+                  { "id": "betestryck", "label": "Betestryck", "type": "select", "list_id": "habitat_betestryck" }
+                ]
+              }
+            },
+            {
+              "id": "dynerblottadsand",
+              "label": "Blottad sand i dyner",
+              "type": "text",
+              "required": false
+            },
+            {
+              "id": "dynhabitat_rows",
+              "label": "Dynhabitat",
+              "type": "repeater",
+              "item_schema": {
+                "fields": [
+                  { "id": "kod", "label": "Kod", "type": "select", "list_id": "dynhabitat" },
+                  { "id": "namn", "label": "Namn", "type": "text" },
+                  { "id": "utbredning", "label": "M.K.", "type": "text" },
+                  { "id": "langd", "label": "Längd", "type": "decimal", "unit": "m" },
+                  { "id": "kriterie", "label": "Kriterie", "type": "text" }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "deponi",
+      "label": "Deponi",
+      "sections": [
+        {
+          "id": "deponi_tabell",
+          "label": "Deponi",
+          "fields": [
+            {
+              "id": "deponi_rows",
+              "label": "Deponiobjekt",
+              "type": "fixed_repeater",
+              "fixed_items_list_id": "deponi_kategorier",
+              "item_schema": {
+                "fields": [
+                  { "id": "kategori", "label": "Deponityp", "type": "text", "readonly": true },
+                  { "id": "varde", "label": "Mängd", "type": "text" },
+                  { "id": "foton", "label": "Foton", "type": "photo_array", "storage_category": "deponi" }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drift",
+      "label": "Drift",
+      "sections": [
+        {
+          "id": "driftfoton",
+          "label": "Driftfoton",
+          "fields": [
+            {
+              "id": "driftfoton_standard",
+              "label": "Driftfoton",
+              "type": "photo_set",
+              "list": [
+                { "value": "drift1", "label": "Driftfoto 1" },
+                { "value": "drift2", "label": "Driftfoto 2" }
+              ],
+              "storage_category": "drift"
+            }
+          ]
+        },
+        {
+          "id": "vallar",
+          "label": "Driftvallar",
+          "fields": [
+            {
+              "id": "vallar_rows",
+              "label": "Vallar",
+              "type": "repeater",
+              "item_schema": {
+                "fields": [
+                  { "id": "driftnummer", "label": "Driftnr", "type": "text" },
+                  { "id": "position", "label": "Position", "type": "text" },
+                  { "id": "bredd", "label": "Bredd", "type": "text" },
+                  { "id": "hojd", "label": "Höjd", "type": "text" },
+                  { "id": "langd", "label": "Längd", "type": "text" },
+                  { "id": "tang_procent", "label": "Tång (%)", "type": "text" },
+                  { "id": "gren", "label": "Gren", "type": "text" },
+                  { "id": "vegetation", "label": "Vegetation", "type": "text" },
+                  { "id": "plast", "label": "Plast", "type": "text" },
+                  { "id": "ovrigt_skrap", "label": "Övrigt skräp", "type": "text" },
+                  { "id": "annueller", "label": "Annueller", "type": "text" },
+                  { "id": "perenner", "label": "Perenner", "type": "text" }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ej_inventerad",
+      "label": "Ej inventerad",
+      "sections": [
+        {
+          "id": "ej_inventerad_bas",
+          "label": "Orsak och dokumentation",
+          "fields": [
+            { "id": "orsak", "label": "Orsak", "type": "select", "list_id": "ej_inventerad_orsak" },
+            {
+              "id": "ingen_inventering_foto",
+              "label": "Dokumentationsbild",
+              "type": "photo_single",
+              "storage_category": "ej_inventerad"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "extra_bilder",
+      "label": "Extra bilder",
+      "sections": [
+        {
+          "id": "extra_bildlista",
+          "label": "Extra bilder",
+          "fields": [
+            {
+              "id": "extra_images",
+              "label": "Extra bilder",
+              "type": "photo_repeater",
+              "storage_category": "extra",
+              "item_schema": {
+                "fields": [
+                  { "id": "file_name", "label": "Filnamn", "type": "text", "readonly": true },
+                  { "id": "kommentar", "label": "Kommentar", "type": "text" },
+                  { "id": "tag", "label": "Tag", "type": "text" }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+

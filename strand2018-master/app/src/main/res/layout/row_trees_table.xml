@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tableRow"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" 
+    >
+
+    <TextView
+        android:id="@+id/avst"
+        android:layout_height="wrap_content"
+        android:gravity= "left"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+         android:layout_width="0dp"
+         android:layout_weight="1"
+         android:background="@drawable/cell_shape"
+        android:text="TextView" />
+
+    <TextView
+        android:id="@+id/art"
+         android:layout_height="wrap_content"
+        android:gravity= "center"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+         android:layout_width="0dp"
+         android:layout_weight="1"
+         android:background="@drawable/cell_shape"
+        android:text="TextView" />
+
+    <TextView
+        android:id="@+id/diameter"
+        android:layout_height="wrap_content"
+        android:gravity= "center"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+         android:layout_width="0dp"
+         android:layout_weight="1"
+         android:background="@drawable/cell_shape"
+        android:text="TextView" />
+    <TextView
+        android:id="@+id/antal"
+         android:layout_height="wrap_content"
+        android:gravity= "center"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+         android:layout_width="0dp"
+         android:layout_weight="1"
+         android:background="@drawable/cell_shape"
+        android:text="TextView" />
+    
+ 
+</TableRow>

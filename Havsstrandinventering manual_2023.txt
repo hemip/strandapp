@@ -1,0 +1,1623 @@
+
+
+--- PAGE 1 ---
+1 
+Datum: 2023-07-11 
+Version 7.0 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+Instruktion för 
+Havsstrandinventering  
+ 
+Henrik Hedenås, Hans Gardfjell och Åsa Hagner  
+Skoglig Resurshushållning  
+SLU  
+901 83 Umeå 
+ 
+ 
+
+
+--- PAGE 2 ---
+2 
+ 
+ 
+Innehåll 
+ 
+Förändringar tidigare versioner ....................................................................................... 3 
+1. Inventeringens syfte och strandterminologi .................................................................... 4 
+1.1. Inventeringens syfte ................................................................................................. 4 
+1.2. Inventeringens upplägg ............................................................................................ 5 
+1.3. Terminologi och definitioner ................................................................................... 6 
+1.4.  Måttenheter och noggrannhet .................................................................................. 8 
+1.5. Var återfinns olika strandtyper normalt? .................................................................. 9 
+2. Utlägg av inventeringstransekt samt identifiering av strandzoner. ............................... 10 
+2.1. Utlägg av inventeringstransekt ............................................................................... 10 
+2.2. Identifikation av strandzonerna .............................................................................. 10 
+2.2.1. Identifiera transektens startpunkt .................................................................... 11 
+2.2.2. Identifiera geolitoralens slutpunkt ................................................................... 11 
+2.2.3. Identifiera supralitoralens slutpunkt ................................................................ 12 
+2.2.4 Identifiera ifall det finns ett område av extralitoral och var den slutar ............ 13 
+2.3. Kriterier om ”skär” nära land är en egen enhet eller ej. ......................................... 13 
+3. Inventeringsprogrammet Strand .................................................................................... 13 
+3.1. Startvy: Provyteidentitet och inventeringsstatus .................................................... 14 
+3.2. Foto-vy ................................................................................................................ 15 
+3.3. Zonerings-vy .......................................................................................................... 16 
+3.3.1 Hydrolitoral-meny: ........................................................................................... 16 
+3.3.1 Geo-, Supra- och Extralitoral-menyer: ............................................................. 17 
+3.4. Substrat ................................................................................................................. 19 
+3.5. Arter: Inventering av artförekomster ................................................................. 20 
+3.6. Meny för Buskar .................................................................................................... 21 
+3.7.  Meny Trädarter .................................................................................................... 21 
+3.7.1 Klavning (träd ≥10 cm DBH och träd <10 cm DBH) ...................................... 21 
+3.7.2. Klavning av ”stora träd”, ≥10 cm DBH. ......................................................... 22 
+3.7.3. ”Mindre träd” som är ≥1.3m höga men <10 cm DBH klavas. ........................ 22 
+3.7.4.”Små träd” högre än 0,5 men <1.3 m höga räknas. .......................................... 22 
+3.8. Meny Driftvallar Detaljerad beskrivning av driftvallar ..................................... 23 
+3.9. Meny Deponi: Deponering och ackumulerat material (m2) ................................... 24 
+
+--- PAGE 3 ---
+3 
+3.10. Habitat .................................................................................................................. 25 
+3.10.1. Habitat i transekten ........................................................................................ 25 
+3.10.2. Habitat ovan transekten ................................................................................. 26 
+3.10.3.  Icke habitat 9999 -ange kriterier som ej uppfylls ......................................... 26 
+3.10.4. Detaljerad uppdelning av dynhabitat (2100) ................................................. 27 
+3.11. Meny Övrigt ......................................................................................................... 29 
+Referenser .......................................................................................................................... 31 
+Bilaga 1. Vattenståndsvariation ......................................................................................... 32 
+ 
+ 
+Förändringar tidigare versioner 
+ 
+De största ändringar i manualen är relaterade till övergången från pappersprotokoll till 
+”Strand” – det nya insamlingsprogrammet som används sedan 2013. Ordningen i vilken 
+variabler och menyer beskrivs skall följa upplägget och flödet i insamlingsprogrammet.  
+     Vissa moment har förändrats: att ta busktäckning i de olika zonerna har utgått, istället mäts 
+storleken (längd, bredd och täthet) på buskagen och deras position (avstånd) i förhållande till 
+transektens startpunkt.  
+     På klipp/hällstränder används den tydliga zoneringen för att avgöra gränser mellan hydro- 
+och geolitroal, resp mellan geo- och supralitoral, men alla zoner mäts inte (eg. orangea resp 
+kala zonen).  
+     Mått på täckning anges antingen i procent (skattat t ex på zonens yta i transekten), eller 
+som ett mått på area i m2. Täckningen anges i m2 (med en decimal för areor under 1 m2). 
+Riktigt små förekomster (<0,1 m2) registreras som 0,1 m2. Summera arean för resp 
+art/fraktion, med en decimals noggrannhet för areor under 1 m2, därefter med 0,5 m2-
+noggrannhet upp till 3 m2. Är areorna ännu större räcker 1 m2-noggrannhet. 
+     För de Arter som skall frekvensmätas används antingen arean (i m2) som mått på täckning, 
+alternativt att som tidigare räkna antalet plantor/tuvor.  
+     Lundelm (Roegneria canina) är ny på artlistan 2013, Saltgräs och grått saltgräs 
+(Puccinellia capillaris+distans) registreras i grupp. Likaså har vi sammanfört de tre gulaktiga 
+raggmossor som skall registreras på stränder till en grupp (Racomitrium canescens coll.)  
+Från och med 2015 är även cotula, (Cotula coronopifolia) med i artlistan, då den 
+uppmärksammats som en invasiv art på stränder. Sedan 2018 finns styv glasört (Salicornina 
+stricta) att registrera. Jolster (Salix pentandra) är ny som egen art att registrera som trädart 
+(tidigare grupperad tillsammans med ”Pilar-Jolster”). Tillägg 2020: Rörsvingel 
+(Schoedonorus arundinaceaus). 
+Artlistor för 2023 i Bilaga 2, för arter som registreras i Art-. Busk- resp Trädmenyerna. 
+Från 2018 registreras olika fraktioner av skräp i Deponi-menyn. Fraktioner och enheter listas i 
+Bilaga 3. 
+Habitat: statusvariabler införs 2020, vilka avser en bedömningsyta om 0,1 ha för resp 
+habitat/naturtyp. 
+  
+
+--- PAGE 4 ---
+4 
+1. Inventeringens syfte och strandterminologi 
+ 
+1.1. Inventeringens syfte 
+Syftet med den här inventeringen är att skatta total förekomst och status av vissa Natura-
+naturtyper, som förekommer längs Sveriges kust. Informationen samlas in i, och omkring en 
+tio meter bred transekt som sträcker sig genom geo- och supralitoralen samt i vissa fall även 
+ovanför dessa områden, i ett område som vi kallar extralitoral (ej på den egentliga stranden). I 
+figur 1visas schematisk skiss av en strand där de olika delarna är markerade. I tabell 1 ges en 
+överblick över vad vi samlar in uppgifter om, och i vilka delar av inventeringstransekten det 
+sker. De flesta variablerna bedöms inom inventeringstransekten, antingen inom respektive 
+zon, eller för transekten som helhet. Vissa variabler beskriver området utanför transekten, 
+antingen ut i vattnet, eller ovan transektens slut. 
+Tabell 1 Schematisk översikt av variabler som samlas in i Havsstrandsinventeringen, i 
+förhållande till var inom, alt utanför, inventeringstransekten bedömningen av variabeln sker. 
+Inventeringstransekten, som startar vid medelvattenståndet och sträcker genom geo-, supra- 
+och slutar där extralitoralen tar slut.  
+ Utanför 
+hydro 
+Hydro-
+litoral 
+Geolitoral Supralitor
+al 
+Extra-
+litoral 
+Ovan 
+inventerings
+-transekten 
+Kusttyp    
+Strandtyp      
+Vågexponering      
+Trädförekomst   Bara på öar och skär 
+Brygga/pir      
+Djup       
+Längd       
+Lutning       
+Marktyp       
+Fältskikt       
+Trädskikt       
+Substrat       
+Arter (fält- o 
+bottenskikt) 
+      
+Buskarter   Avstånd + abundansmått  
+Trädarter   Avstånd + klavning  
+Driftvallar   Avstånd + detaljerad beskrivning  
+Habitat   Avstånd  
+Statusvariabler   För resp Habitat 0,1 ha  
+Deponi     
+Röjning     
+Röjningstid     
+Rekreation     
+Högsta klippa     
+Stängsel     
+Vassbälte längd   
+Vassbälte täthet   
+   
+
+--- PAGE 5 ---
+ 
+5 
+ 
+1.2. Inventeringens upplägg 
+Inventeringen är en så kallad två-fas skattning baserat på flygbildstolkning som utgör den 
+första fasen och fältinventering som utgör den andra fasen. Den här manualen behandlar 
+fältinventeringen och dess metoder.  
+En första slumpning ger ett antal stränder som skall flygbildtolkas. Därefter, baserat på 
+flygbildstolkningens klassindelning, har ett antal stränder längs Sveriges kust slumpats ut för 
+att fältundersökas. 
+ 
+ 
+ 
+ 
+Figur 1. Skiss av en hypotetisk strand. Den mesta insamlingen  av data sker inom inventeringstransekten vilken 
+inkluderar den del av stranden som oftast är torrlagd men påverkad av vågor och stänk och in i ett området 
+ovanför stranden, kallat extralitoral.. Uppgifter samlas även i området runtomkring själva 
+inventeringstransekten. 
+ 
+Vid fältinventeringen etableras en tio meter bred transekt. Transekten börjar vid 
+medelvattenlinjen och slutar där ett område vi kallar ”extralitoral” övergår i annan naturtyp. 
+Förutom att ingående beskriva själva transekten samlas viss information in om i vilken 
+omgivning transekten finns. Till exempel fotodokumenteras och habitatklassas även området 
+ovanför transekten, och ifall det finns bryggor eller pirar utanför stranden registreras detta.  
+Extra- 
+litoral 
+Inventeringstransekten 
+
+--- PAGE 6 ---
+ 
+6 
+1.3. Terminologi och definitioner 
+Det finns ingen enhetlig definition av en strand. Olika författare har definierat stränder på 
+olika sätt, och samma termer kan på olika stränder betyda delvis olika saker. Inom ramen för 
+MOTH strandinventering kommer vi att inkludera geolitoralen (landstranden), supralitoralen 
+och ett område vi kallar för ”extralitoral” i själva inventeringstransekten (Fig 1.). 
+Supralitoralen är den av stormvågor och stänk påverkade delen, ovanför högvattenlinjen. 
+Extralitoralen är det område som följer ovanför supralitoralen, och ligger inte på den egentliga 
+stranden. Mätningar i denna zon görs bara ifall den träffar fossila sten- och grusvallar, 
+dynområden, havsklippor/klippstrand eller landhöjningsskog. Av praktiska skäl utförs de 
+flesta mätningar och bedömningar inom geolitoralen och supralitoralen. På häll/klippstränder 
+ses en tydlig och ofta annorlunda zonering med det vita bältet, svarta zonen, orangea bältet 
+samt kala zonen, vi har därför valt att använda dessa för att definiera gränser mellan de olika 
+strandzonerna. Definition av termerna följer nedan. 
+Litoralen, stranden, består i denna inventering av följande zoner; hydrolitoralen 
+(vattenstranden), geolitoralen (landstranden) och supralitoralen (Fig. 1).  
+Hydrolitoralen, vattenstranden, är den del av stranden som periodvis torrläggs. Nedåt 
+avgränsas hydrolitoralen av medellågvattenlinjen och uppåt av medelvattenlinjen (se 
+definitioner nedan). 
+Geolitoralen, landstranden, är den sektion av stranden som periodvis översvämmas. På de 
+flesta stränder avgränsas geolitoralen nedåt av medelvattenlinjen och uppåt av 
+medelhögvattenlinjen (Fig. 1). På häll/klippstränder är det ofta svårt att på ett enkelt sätt se 
+var gränsen för medelhögvattenlinjen finns, eftersom (normal-)vågornas påverkan sträcker sig  
+upp ovanför medelhögvattenlinjen. Geolitoralen på klippstränder avgränsas istället uppåt av 
+hur långt vågskvalpet normalt når. Det betyder att geolitoralens höjd på häll/klippstränder är 
+beroende av strandens exponering. Geolitoralen på häll/klippstränder kan delas in i två relativt 
+tydliga zoner, det vita bältet och den svarta zonen, baserat på organismsammansättningen (se 
+definitioner nedan; Fig. 2.). 
+Supralitoralen tar vid direkt ovanför geolitoralen, och påverkas av stormvågor, 
+extremhögvatten eller stänk. Avgränsningen nedåt är medelhögvattenlinjen medan 
+avgränsningen uppåt är där stormvågor, extremhögvatten eller stänk inte längre når (Fig. 1). 
+Supralitoralen på häll/klippstränder kan delas in tre relativt tydliga zoner, det orangea bältet, 
+kala zonen samt ett område som fortsättningsvis kallas för ”övre supralitoralen” baserat på 
+organismsammansättningen (se definitioner nedan; Fig. 2.). 
+Extralitoral: Området direkt ovanför supralitoralen. Området kan vara mer eller mindre 
+påverkat av saltaerosoler. Extralitoralen ingår i inventeringstransekten, i de fall den består av 
+sten- och grusvall, havsklippor/klippstrand, dynområde eller landhöjningsskog.  
+”Ovanför inventeringstransekten” är området som följer direkt efter extralitoralen, eller i de 
+fall denna inte finns, direkt efter supralitoralen. I området görs en habitatklassning, och 
+marktyp/markanvändning beskrivs men det behöver inte avgränsas med en bortre 
+avståndsgräns.  
+
+--- PAGE 7 ---
+ 
+7 
+Vita bältet återfinns, på häll/klippstränder främst på västkusten men även på östkusten, i 
+geolitoralens nedre del (Fig. 2.). Medelvattenlinjen ligger normalt i det vita bältets underkant. 
+Det vita bältet utgörs av havstulpaner. I norra Sverige finns inte havstulpaner, och 
+följdaktligen saknas därför det vita bältet i de flesta delarna av Kvarken och Bottenviken.  
+Svarta zonen återfinns i geolitoralens övre del på häll/klippstränder runtom kusterna precis 
+ovanför det vita bältet. Den svarta zonen utgörs av cyanobakterier av släktet såpor samt av 
+saltlav (Fig. 2.).  
+Orangea bältet återfinns i supralitoralens nedre del, på häll/klippstränder främst på 
+västkusten, precis ovanför geolitoralens svarta zon (Fig. 2.). Det orangea bältet består av 
+orangelavar (sl. Caloplaca) som tål stora mängder saltvattenstänk. 
+Kala zonen återfinns i surpalitoralen på häll/klippstränder, runtom kusterna, precis ovanför 
+det orangea bältet. Ett område där varken terrestra eller marina organismer lyckas etablera sig. 
+En hypotes är att en kombination av isbildning och extrema högvatten skapar denna zon. 
+”Övre supralitoralen”, återfinns i supralitoralens övre del på häll/klippstränder, runtom 
+kusterna, precis ovanför den kala zonen. Detta område påverkas tidvis av stormvågor, 
+extremhögvatten eller stänk men terrestra organismer kan etablera sig. Här finns det i 
+huvudsak välutvecklade lavsamhällen.  
+Medelvattenlinje, medelvattenstånd. På följande hemsida, 
+http://www.smhi.se/kunskapsbanken/oceanografi/arets-medelvattenstand-1.10047, avhandlas 
+hur man beräknar årets medelvattenstånd. Medelvattenståndet enligt de oceanografiska 
+definitionerna är inte det aktuella årets faktiska mätvärden utan det är ett beräknat värde på ett 
+antals års noteringar av medelvattenståndet. För få en säker skattning, med hjälp av en 
+regression, av årets medelvattenstånd behövs det åtminstone 30-års observationer. 
+Medelvattenlinjen är därmed egentligen en oceanografisk definition snarare än ekologisk. Det 
+finns dock organismer som på ett indikerar var denna linje går. 
+Medelhögvattenlinjen, medelhögvattenståndet, är ett beräknat värde baserat på ett antals års 
+noteringar av högvattenståndet. 
+Havsvattenstånd är differensen i cm över eller under det framräknade årets medelvattenstånd. 
+Observerat havsvattenstånd finner man på SMHI’s hemsida http://www.smhi.se/vadret/hav-
+och-kust/havsobservationer/havsvst_tab.htm. Prognoser baserade på HIROMB-modellen över 
+kommande vattenstånd återfinns på SMHI’s Ocean web sida 
+http://produkter.smhi.se/OceanWeb/. Klicka på HIROMB och därefter på Sea levels. Väl där 
+får ni upp en karta där ni kan välja närmsta station. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+--- PAGE 8 ---
+ 
+8 
+ 
+ 
+Figur 2. Skiss av en häll/klippstrand. Geolitoralen består längst ned av en zon som domineras 
+av havstulpaner, sk. vita bältet, följt av en zon dominerat av antingen cyanobakterier (sl. 
+såpor, sl. Calothrix) eller svartlav (Verrucaria maura) den sk. svarta zonen. Supralitoralen 
+består längst ned av en zon dominerad av orangelavar (sl. Caloplaca) det sk. orangea bältet, 
+följt av den kala zonen som i sin tur följs av ett område med ett välutvecklat lavsamhälle den 
+sk. ”övre supralitoralen”som är påverkad framför allt av stänk. Extralitoralen fortsätter till 
+dess klippan/hällen slutar och annat växtsamhälle tar vid, som inte visar tecken på att vara 
+påverkad av aerosoler.  
+ 
+1.4.  Måttenheter och noggrannhet 
+ 
+Mått på täckning anges antingen i hela procent (skattat t ex på zonens yta i transekten), eller 
+som ett mått på area i m2. Täckningen anges i m2 (med en decimal för areor under 1 m2). 
+Riktigt små förekomster (<0,1 m2) registreras som 0,1 m2. Summera arean för resp 
+art/fraktion, med en decimals noggrannhet för areor under 1 m2, därefter med 0,5 m2-
+noggrannhet upp till 3 m2. Är areorna ännu större räcker 1m2-noggrannhet. 
+ 
+Avstånd (eller position) ifrån inventeringstransektens startpunkt vid medelvattenlinjen 
+registreras för flera variabler. Avstånd anges i meter, med en decimals noggrannhet för små 
+avstånd (t ex mellan zonerna ifall lutningen är stor i transekten). I annat fall räcker hela meter 
+(t ex för detaljerade buskar och trädpositioner). 
+ 
+Djup mäts i hela decimeter –anges för hydrolitoralen tre meter ut från medelvattenlinjen 
+ 
+Klavningsdata anges i millimeter.
+Extralitoral 
+
+--- PAGE 9 ---
+ 
+9 
+ 
+ 
+Figur 3. Sandstrand som övergår i dynområde,  i profil. För detaljer om transektens fortsättning i extralitoralen 
+se 3.8.3. Detaljerad uppdelning av dynhabitat (2100) och figur 6. 
+1.5. Var återfinns olika strandtyper normalt? 
+På exponerade stränder har finare sedimentpartiklar sköljts ur, av vågornas svallning, och 
+lämnat kvar grövre material. De finare partiklarna, sand och grus, har i sin tur avlagrats 
+antingen på botten utanför stranden eller förts med strömmar från uddarna till vikarna där de 
+sedan har avlagrats. Därför hittar man oftast sand- och lerstränder i vikarna medan klipp-, 
+sten- och blockstränder återfinns ute på uddarna. Källa: Strahler 1975, Loberg 1980, SGU 
+2012. De utpekade strandmiljöer som klassas som Natura-naturtyper (tabell 2) återfinns därför 
+på antingen aktiva, eller fossila kuststränder där dessa fraktioner ansamlats. 
+ 
+Tabell 2. Natura-naturtyp som kan förekomma inom inventeringstransekten. Naturtyperna kan 
+finnas i en eller flera av de olika transektdelarna. *1610 resp 1620 ska inte registreras, men 
+istället de på åsöar och skär förekommande strandhabitat. 
+Habitatkod Namn Minsta 
+karteringsenhet 
+1210 Driftvallar  
+1220 Sten och grusvallar 0,1 ha 
+1230 Havsklippor  
+1239 
+1310 
+Klippstrand 
+Glasörtsstränder 
+ 
+0,1 ha 
+1330 Salta strandängar 0,1 ha 
+1610* Åsöar i Östersjön 0,25 ha 
+1620* Skär i Östersjön 0,1 ha 
+1630 Strandängar vid Östersjön 0,1 ha 
+1640 Sandstränder 0,1 ha 
+1952 Moränstränder 0,1 ha 
+2120 Vita dyner  
+ 
+0,1 ha tillsammans 
+2130 Grå dyner 
+2140 Risdyner 
+2170 Sandvidedyner 
+2180 Trädkläddadyner 0,25 ha 
+2190 Dynvåtmarker 0,1 ha 
+9030 Landhöjningsskog 0,25 ha 
+Extralitoral 
+
+--- PAGE 10 ---
+ 
+10 
+ 
+2. Utlägg av inventeringstransekt samt identifiering av strandzoner. 
+Basen i fältinventeringen är en 10 m bred transekt med startpunkten placerad i 
+medelvattenlinjen. Transekten täcker både geo- och supralitoralen, i fortsättningen även 
+kallad stranden eller strandzonen. Transekten fortsätter i vissa fall även in i området ovanför 
+strandzonen i de fall vissa utpekade habitat finns (eg dyområden, sten- och grusvallar, 
+landhöjningsskog resp havsklippor/klippstrand). Denna del av inventeringstransekten kallas 
+extralitoral (även om området egentligen inte tillhör själva stranden). Detaljerad inventering 
+sker i hela transekten, och för vissa variabler även i transektens förlängning ut i 
+hydrolitoralen. Viss information samlas även för området ovanför transekten slut, med ett 
+fotografi som visar en vy från transektens slut in i området ovanför, en habitatklassning samt 
+en bedömning av områdets markanvändning resp marktyp. 
+2.1. Utlägg av inventeringstransekt  
+Transektens startpunkt skall placeras i medelvattenlinjen. Transekten/måttbandet dras därefter 
+mer eller mindre vertikalt från vattnet, sett ur ett större perspektiv, genom att gå vertikalt mot 
+höjdkurvorna. Markera geo- respektive supralitoralens slut. Vid supralitoralens slut gör ni en 
+bedömning av området ovanför supralitoralen (dvs om det finns en extralitoral). Transekten 
+slutar vid extralitoralens slut. Ifall det inte finns en extralitoral kommer transektslutet att vara 
+detsamma som supralitoralens slut.   
+1. Finns följande Natura-naturtyper, Sten och grusvallar (1220), Havsklippor (1230) inkl 
+Klippstrand (1239), Dyner (2100) eller Landhöjningsskog (9030) ovanför 
+supralitoralen (i extralitoralen) fortsätter transekten genom dessa. 
+Inventeringstransekten slutar när nästa habitat tar vid, eller högsta höjd på grund, skär, 
+öar eller uddar. 
+2. Om det inte finns något av de ovan listade Natura-naturtyperna ovanför supralitoralen 
+slutar transekten vid supralitoralens översta avgränsning.  
+På häll/klippstränder skall dessutom det orangea bältet samt kala zonens slut identifieras. 
+Nedan följer en beskrivning hur de olika zonernas avgränsningar samt transektens startpunkt 
+respektive slutpunkt skall kunna identifieras.  
+ 
+2.2. Identifikation av strandzonerna 
+Strandzonerna definieras i huvudsak av vattenståndet. Men eftersom vattenståndet varierar 
+behövs det en eller flera indikator för att identifiera medelvattenlinjen. Vilken typ av indikator 
+som kan användas varierar ofta beroende på strandtyp.  
+I huvudsak kan ni använda er av en kombination av tre indikatortyper: 
+1. Vattenståndet: Dels rådande vattenstånd som erhålls från SMHI’s 
+havsvattenståndsobservationer som finns på hemsidan http://www.smhi.se/vadret/hav-
+och-kust/havsobservationer/havsvst_tab.htm samt prognoser baserade på HIROMB-
+modellen över kommande vattenstånd återfinns på SMHI’s Ocean web sida 
+http://produkter.smhi.se/OceanWeb/. Klicka på HIROMB och därefter på Sea levels. 
+Väl där får ni upp en karta där ni kan välja närmsta station. I bilaga 1 presenteras en 
+tabell över de observerade historiska vattenståndsvariationerna vid respektive 
+mätstation. 
+
+--- PAGE 11 ---
+ 
+11 
+2. Organismer: På en del stränder kan vi använda vissa gräsarter som indikatorer på var 
+startpunkten skall placeras eftersom de flesta gräs ej växer nedanför medelvattenlinjen 
+(bortsett från bladvass). Havstulpaner på västkusten är en annan organism som kan 
+användas som indikator på medelvattenlinjen. Eller längs norra kusten, gräns mellan 
+en ev synlig svart zon och avståndet till alger som t ex grönslick. 
+3. Strukturer: På sandstränder resp strandängar kan  erosionsstrukturer och vid 
+inventeringstillfället kvarliggande drift eller driftvallar användas som indikatorer på 
+gränser mellan t ex hydro- och geolitoral, eller mellan geo- och supralitoral. 
+ 
+2.2.1. Identifiera transektens startpunkt 
+Transektens startpunkt skall placeras i medelvattenlinjen. Kontrollera dagens vattenstånd för 
+att få en uppfattning om det ligger över eller under normalvattenståndet. Tänk även på att 
+tidpunkten på dagen kan spela roll i områden där tidvattenfluktuationerna över dygnet är 
+tydliga. 
+På sten/block/grusstränder på fastlandet såväl som öar i Bottenviken kan man anta att 
+medelvattenlinjen ligger precis utanför de yttersta madrören medan någon enstaka 
+gultåteltuva ev. kan finnas utanför medelvattenlinjen. Små sävar (e. nålsäv) växer i huvudsak 
+utanför medelvattenlinjen. 
+Klippstränder på Västkusten: Här kan vi använda oss av havstulpanerna som indikator på 
+medelvattenlinjen. Medelvattenlinjen är i den nedre delen av havstulpanbandet. Grön- och 
+brunalger växer istället i huvudsak nedanför medelvattenlinjen. 
+Övriga klippstränder: Havstulpaner och alger kan, i de fall de finns, även användas som 
+indikatorer på medelvattenlinjen på Östkusten. Finns inte dessa indikatorer får ni placera 
+medelvattenlinjen nederst på den svarta zonen. 
+På vissa strandängar på västkusten och längs Östersjökusten kan man använda sig av en 
+kombination av; 1. sluten vegetation ex. saltgräs (bildar slutet markskikt som kan växa ner till 
+strax ovanför medelvattenlinjen) och om de finns 2. havstulpaner (som kan finnas på 
+stenar/block till ̴ medelvattenlinjen). Annars se utlägget om madrör, gultåtel och sävar ovan. 
+Sandstränder: Det är svårt att hitta en riktigt lämplig/tydlig indikator för medelvattenlinjen på 
+sandstränder (Fig. 3). Transektens startpunkt bör läggas en bit ovan en eventuellt synlig 
+vågerosionskant i hydrolitoralen, ovan strukturer bildade av vågor på botten (t ex 
+böljeslagsmärken). När tidvattnet drar sig tillbaka hamnar drift kvar, och startpunkten bör då 
+ligga nedanför den drift som avlagts samma dag och med hänsyn taget till rådande 
+vattenstånd.  
+ 
+ 
+2.2.2. Identifiera geolitoralens slutpunkt 
+Geolitoralen (landstranden) tar per definition slut uppåt vid högvattenlinjen för 
+strandängsstränder resp sand/grus/morän-stränder eller vid klippstränder ovanför högvattnet 
+som skapas av bl a vågskvalpet. Därför kommer typen av ”proxy”/indikator att variera 
+beroende på strandtyp och vegetation. Se bilaga 1 för att se hur högt ovanför 
+normalvattenståndet som högvattnet brukar nå. 
+
+--- PAGE 12 ---
+ 
+12 
+Klippstränder: Geolitoralen slutar där den svarta zonen slutar. 
+Sandstränder: Här är det tämligen osäkert var geolitoralen slutar. Strukturerna kan förändras 
+från dag till dag beroende av vind och vågrörelser.   
+Övriga stränder: Här kan bildade driftvallar användas som indikation på gräns mellan geo- 
+och supralitoral. Ordentliga driftvallar avläggs ovanför högvattenlinjen av vågorna, och 
+följdakligen skall gränsen mellan geo- och supralitoral sättas nedanför stora driftvallar. Dessa 
+vallar kan ligga kvar flera år (men kan flyttas vid extremhögvatten) och är viktiga 
+etableringsplatser för olika växtarter.  
+ 
+ 
+ 
+2.2.3. Identifiera supralitoralens slutpunkt 
+Supralitoralen tar per definition slut uppåt precis där stormvågor, extremhögvatten eller stänk 
+inte längre når. Se bilaga 1 för att se hur högt ovanför normalvattenståndet som 
+extremhögvattnet (högsta högvattnet) brukar nå. Tänk på att stormvågor kan nå högre upp på 
+stranden än extremhögvattnet. 
+Sand/grus/sten/block-stränder samt strandängsstränder: I dessa strandtyper kan översta 
+driftvallen, e.g. extremhögvattenlinjen, användas som indikator på högvattenlinjen och 
+därmed supralitoralens slutpunkt. OBS! Hela driftvallen räknas in i stranden och därmed in i 
+supralitoralen. 
+Sandstränder som övergår i dyner: Supralitoralens avgränsning uppåt blir vid den mer eller 
+mindre skarpa erosionskant som ligger på utsidan av första dynen med flerårig vegetation 
+(Fig. 3). 
+Häll/klippstränder: Ovanför den svarta zonen börjar supralitoralen. Även här finns vissa mer 
+eller mindre tydligt utbildade zoner.  
+   Orangea bältet, det kan finnas ett bälte med orangelavar precis i överkanten av den svarta 
+zonen (påverkas av vågor under en stor del av dagen). Det här bältet är relativt markant på 
+västkusten men kommer gradvis att försvinna ju sötare vattnet blir på östkusten.  
+   Den sedan följande kala zonen är ofta väldigt tydlig på klippstränder. Inom om denna har 
+vågorna stor påverkan, men området är oftast helt torrlagt. Kala zonen slutar där lavarna tar 
+vid och bildar ett mer eller mindre välutvecklat lavsamhälle på klipporna. 
+   Ovanför den kala zonen kommer det en zon, som tillhör den övre delen av supralitoralen, 
+med lavar ex. vägglavar, orangelavar, brun franslav och brosklavar samt en del grå skorplavar 
+som tål saltstänk.  
+   Där supralitoralen slutar kommer de ”klassiska” gröngulakartlavarna och tuschlavarna in 
+som inte tål direkt saltstänk. I vissa fall kan klippor plana ut och stormvågor kan ge upphov 
+till driftvallar uppe på supralitoralen. Kombinationen av lavindikatorer och driftvallar kan ge 
+en ledning till hur supralitoralens övre gräns kan identifieras. Observera att supralitoralens 
+slutgräns i transekten alltid når ovanför den kala zonen. 
+
+--- PAGE 13 ---
+ 
+13 
+2.2.4 Identifiera ifall det finns ett område av extralitoral och var den slutar 
+Ifall det ovanför supralitoralens slutgräns finns områden av dyner, sten- och grusvallar, 
+landhöjningsskog eller havsklippor/klippstrand så registreras dessa inom den transektdel som 
+kallas extralitoral. Landhöjningsskog tar per definition slut vid tre meters höjd över havet, och 
+beroende på hur flackt området är kan det resultera i rätt långa transekter. Om extralitoralen är 
+ett dynområde kan det också innebära att transekten blir lång. Extralitoralens slutpunkt sätts 
+där naturtypen övergår i en ny naturtyp (som uppfyller sin minsta karteringsenhet). Märk: ifall 
+extralitoralens naturtyp bryts av ett mindre område (t ex en tomt), men sedan fortsätter, så 
+fortsätter även inventeringstransekten. 
+Anledningen till att vi fortsätter inventeringstransekten i extralitoralen är att de utpekade 
+naturtyperna är svåra att fånga i andra nationella inventeringar (eg NILS, Riksskogstaxeringen 
+och även MOTH-punktgitter).  
+Extralitoralens slutpunkt markeras, och finns med på det fotografi som tas i transektens 
+riktning upp mot området som ligger ovanför inventeringstransekten.    
+2.3. Kriterier om ”skär” nära land är en egen enhet eller ej. 
+Egentligen skall inga provytepunkter ha hamnat på ett grund (<0,1ha) eller skär (≥0,1ha till 
+>0,25 ha). De utslumpade provytepunkterna för fältinventering skall egentligen enbart ha 
+hamnat på fastlandet eller öar. Om ni ändå tycker att ni har hamnat på ett grund (<0,1ha) eller 
+skär (≥0,1ha till >0,25 ha) gäller följande:  
+ Är avståndet mellan fastland (det kan även vara ett annat skär/ö) och skär ≤2m, förs 
+skäret alltid ihop med ”fastlandet” eller ön och transekten placeras över skär och upp 
+till fastlandets/öns högvattenlinje. 
+ Om skäret ligger längre ut från land än 2m vid normalvattenstånd bör ni ringa! för en 
+diskussion. 
+ 
+3. Inventeringsprogrammet Strand 
+ 
+Nedan följer en beskrivning av de symboler som är inbyggda i inventeringsprogrammet 
+”Strand”:  
+Grå trekant i höger hörn  – Scrollista: välj alternativ  
+?   - Ja/nej fråga  
+Penna   –skrivfält/inmatningsfält 
+Lista   – variabeltext, följt av scrollista att välja alternativ 
+Lång, grå box/rad - markerar att gå vidare till underliggande meny/vy 
+ 
+  
+
+--- PAGE 14 ---
+ 
+14 
+3.1. Startvy: Provyteidentitet och inventeringsstatus 
+När programmet startas visas på första sidan vilken version av Strand som används. Vidare  
+visas fält för Lagnummer, Inventerare, Ruta och Provyta.  
+Då Ruta och Provyta angetts kommer en box att visas, där Provytans ID genererats, och fått 
+Status ”ny”. ID:t har 11 siffror som anger inventeringsår (4), Rutans nr (4) samt Provytans nr 
+(3).  
+I Py ID boxen skall inventeringstyp anges ur scrollistan. 
+ Inventeringstyp noteras i princip enligt NILS-manualen (4.3 s. 37) med tillägget 
+”inventeras ej”.  
+Ange inventeringstyp enligt följande: 
+1. Inventeras, beträds, Normal fältinventering. Hela transekten inventeras. 
+2. Avståndsinventera. Anges bara då transekten inventeras på avstånd.  
+3. Inventeras ej. Anges bara då transekten ej inventeras. Fotografi tas mot ytan, resp 
+orsak anges m varför transekten inte kan inventeras. 
+4. Markera klar. Anges då provytan är färdiginventerad. 
+ Då valet är gjort, tryck på ”Utför” för att börja inventeringen/gå vidare i programmet. 
+Samtidigt ändras transektens status till ”Påbörjad (normal)”, ”Påbörjad (distans)”, 
+”Påbörjad (inventeras ej)”, alt ”Markerad klar (normal)”.  
+ 
+Tabell 3: Orsak till att transekten ej inventeras. 
+Orsak till att transekten ej inventeras 
+05 Nej, tillf vattentäckt >30 cm Provytan/delytan kan inte beträdas. Övriga moment utgår. 
+06 Nej, otillgänglig våtmark Provytan/delytan (semiakvatisk) kan inte beträdas av 
+säkerhetsskäl (gungfly m.m.). Inventering görs från kanten av 
+närliggande delyta. Övriga moment utgår. 
+07 Nej, åkermark annuell gröda Växande eller nysådd gröda samt nyligen markbearbetad. 
+Provytan/delytan kan inte beträdas. Övriga moment utgår. 
+08 Nej, slåttervall Åkermark med insådd vallgröda, regelbundet plöjd, som skördas 
+med slåtter (ej betad). Provytan/delytan kan inte beträdas. Övriga 
+moment utgår. 
+09 Nej, otillgänglig åkerholme Provytan/delytan kan inte beträdas. Övriga moment utgår. 
+10 Nej, ö mindre än 0,1 ha Ön besöks inte. Övriga moment utgår. 
+11 Nej, otillgänglig brant mark Brant eller svårframkomlig mark. Över 25º lutning för områden 
+med sten, hällar och blockmark. Över 35º lutning för områden 
+bevuxna med väl rotad perenn vegetation. 
+12 Nej, otillgänglig rasrisk Mark med påtaglig risk för ras, erosion m.m. 
+13 Nej, tomt bebyggt industri Inhägnad eller på annat sätt privat mark i närheten av boningshus 
+eller annan anläggning, industri m.m. som ej kan beträdas. 
+14 Nej, beträdnadsförbud Mark med beträdnadsförbud, t. ex. militära anläggningar. 
+ 
+15 Nej, annan orsak (ange 
+skriftligt)  
+Lämna en skriftlig kommentar på ”blålapp”  
+ 
+  
+
+--- PAGE 15 ---
+ 
+15 
+ 
+3.2. Foto-vy 
+För att kunna beskriva transekten skall den först etableras. Startpunktens läge längs stranden 
+bestäms med hjälp av ortho-fotot, de olika zonerna markeras längs måttbandet (t ex med 
+trästickor) och GPS-koordinaterna i samlaren fixeras. Transekten dokumenteras med 
+fotografier från olika håll. Dessutom fotograferas området utanför transekten, både ut mot 
+havet och ut området ovanför transektens slut.  
+Märk: Driftvallar dokumenteras i en egen meny. Ifall det finns en driftvall fotografera 
+längs med denna. I samlarna finns möjlighet att fotografera två driftvallar per transekt.  
+ 
+ GPS easting/GPS northing: Använd samlarens GPS och fixera startpunktens 
+koordinater. Notera ner till meter nivå. OBSERVERA! I strandinventeringen 
+används SWEREF-koordinatsystem. Ifall samlarens GPS inte går att använda (t ex 
+tar för lång tid att stabilisera) använd er ”normala” GPS –och skriv in värdena i 
+Blålapp tillhörande provytan (hittas längst upp till höger i varje Strand-vy) 
+GPS koordinsater 2015:använd er normala GPS, spara ner koordingterns i gpx-
+filen, som sedan skickas in till kontoret 
+ 
+ Riktning: Kompassriktning från startpunkt till slutpunkt noteras. Notera hela grader. 
+Använd 360-graders kompass. 
+ 
+Fotografier: För att åskådliggöra transektens dragning skall transektens mitt markeras med ett 
+måttband. Alla fotografier görs i liggande format, för att få med så mkt av omgivningen som 
+möjligt samtidigt som transekten dokumenteras. Håll gärna bort grenar ifall de riskerar att 
+täcka bilden eller skymma vyn. Bilderna kommer att namnges/numreras i samlarna. Ifall 
+annan kamera används notera i ”Blålapp” för provytan vilka bilder som hör till resp vy. 
+Det är viktigt att fotografierna kommer i denna ordning för att kunna hantera och lagra fotona 
+på ett konsekvent sätt. Bilderna ska vara skarpa, så se till att det inte är vatten på linsen 
+ 
+1. UT -Vybild utåt: En vybild så att bakgrunden kommer med. Fotografera, om 
+möjligt, så att startpinnen kommer med samt 5m åt vardera hållet. Denna bild visar 
+bl.a. hur exponerad stranden, om det finns bryggor mm. Den kan även vara till 
+hjälp för att hitta igen startpunkten.  
+2. Vä -Vybild från vänster (sett nedifrån): Fotografera transekten från vänster (sett 
+nedifrån). Vybild. Transektens startpunkt skall finnas med i fotografiets högra 
+sida. Om det är lågvatten och långgrunt kan aktuell vattenlinje vara långt ut. Då är 
+det viktigare att transekten kommer med än att aktuell vattenlinje finns med på 
+bilden. 
+3. UPP-Vybild uppåt: Fotografera från startpinnen och upp längs transekten 
+(geolitoralen). 
+4. Hö- Vybild från höger (sett nedifrån): Fotografera transekten från höger (sett 
+nedifrån). Vybild. Transektens startpunkt skall finnas med i fotografiets vänstra 
+sida.  
+
+--- PAGE 16 ---
+ 
+16 
+5. SUP-Vid gränsen mellan geolitoral och supralitoraltas ett fotografi upp mot 
+supralitoralen(och ev extralitoral) 
+6. SLUT- Ovan inventeringstransekt, vybild ovanför: Fotograferas genom att ni står 
+i supralitoralen, alt i extralitoralen och fotograferar uppåt mot transektens 
+slutmarkering. Fotografera, om möjligt, så att slutmarkeringen kommer med samt 
+5m åt vardera hållet. Denna bild kan visa vad som finns ovan transekten samt vara 
+till hjälp för att hitta igen slutpunkten. Ifall sikt och perspektiv blir dåligt kan 
+fotopunkten justeras. 
+ 
+ 
+3.3. Zonerings-vy 
+Zonerings-vyn innehåller tio menyer: dels fyra menyer i vilka de olika transektzonerna 
+beskrivs (hydrolitoral, geolitoral, supralitoral samt extralitoral). Och dels sex menyer där 
+detaljerna istället beskrivs med antingen avstånd från transektens startpunkt, eller som 
+täckning (ofta som area i m2) inom transekten. Klicka på resp menybox, så visas de variabler 
+som skall registreras. Några listor med variabler som återkommer i flera menyer (t ex 
+”Substrat” och ”Arter” som registreras i alla transektzoner). Här kan man välja att antingen 
+registrera alla zoner vid samma tillfälle, eller att öppna ”Substrat” i samband med att man 
+registrerar andra variabler inom aktuell zon, men då också se vad man registrerat tidigare.   
+3.3.1 Hydrolitoral-meny:  
+ Strandtyp: Ange den strandtyp som dominerar i området kring 
+provytepunkten/startpunkten: 1. Klippa/Häll, 2. Block/grus, 3. Sandstrand, 4. 
+Strandäng/våtmark, 5. Konstruerad/hårdgjord strand. 
+ Kusttyp: Ange om provytan ligger på: 1, Fastland, 2. Öar (≥2ha), 3. Skär(≥0,1ha till < 
+2ha), 4. Grund (<0,1ha).  
+ VågExponering: Titta på vågexponeringskartan och bedöm om det modellerade 
+värdet är rimligt. enligt exponeringsklasserna: 1. Ultra skyddat, 2. Extremt skyddat, 3. 
+Mkt. skyddat, 4. Skyddat, 5. Moderat exp., 6. Exponerat, 7. Mkt. exponerat. 
+Anternativt “ingen ändring” 
+ Vattendjup: Ni står vid er markerade medelvattenlinje och mäter tre meter ut från 
+startpunkten. Använd mätspöet. Om rådande vattenstånd är 2 dm lägre än er 
+markerade medelvattenlinje lägger ni till dessa två dm. Undvik att mäta på enstaka 
+större stenar på botten. Om vattnet är mer än 20 dm djupt anges ”21”. Avrunda till 
+närmsta dm. Observera! Skattningen av största vattendjup skiljer sig något från NILS-
+manualen. Vattendjupet skattas i förhållande till er markerade medelvattenlinje (inte 
+till rådande vattenstånd som i NILS). 
+ Brygga/pir inom 30m i transektens förlängning (ut i vattnet), ange ja eller nej. 
+ Vassbälten 
+o längd vassbält: Den totala längden på vassbältet skattas från transektens 
+förlängning ute i hydrolitoralen (sträcker sig vassbältet utanför hydrolitoralen 
+räknas även denna del av vassbältet in i den totala längden!) och upp på 
+stranden. Skatta till närmsta meter. 
+o VassTäckning: Skatta även tätheten i %. Inom det bedömda området ovan. 
+Tätheten varierar dock längs transekten. 
+
+--- PAGE 17 ---
+ 
+17 
+3.3.1 Geo-, Supra- och Extralitoral-menyer: 
+De tre menyerna för de tre zonerna i inventeringstransekten ser likadana ut:  
+ 
+Slutlängd: Avståndet mäts längs horisontalplanet från startpunken till den aktuella 
+zonens slut. Mäts med vertex alternativt måttband. Blir avstånden stora >100m ger 
+GPS:en nog noggranhet. För längder kortare än 1 meter: Avrunda till närmsta hela dm 
+(0,1 m) (gäller främst små zoner).  
+Lutning: Lutningen för respektive zon mäts uppifrån och ned gränsen till 
+”underliggande” zon . Notera hela grader. Mäts med vertex. Lutning Geolitoral: Mäts 
+från geolitoralens övre avgränsning till transektens startpunkt. Lutning Supralitoral: 
+Mäts från supralitoralens övre avgränsning till geolitoralens övre avgränsning. (På 
+klippstränder inkluderar lutningsskattningen följande delzoner, orangea bältet, 
+kalazonen samt övre supralitoralen). Lutning Extralitoral: Mäts från extralitoralens 
+övre avgränsning till supralitoralens övre avgränsning. 
+Marktyp: Bedöm dominerande marktyp/markanvändning för var och en av zonerna, 
+geolittoral, supralitoral, ev extralitoral. Även för området ovanför strandtransekten 
+kommer att beskrivas med marktyp (vilket anges i Habitat-menyn). Använd listan i 
+samlaren och markera aktuell markanvändning. ”Marktyp” (tabell 4) är en 
+kombination av koder som används i menyn markanvänd (i NILS). Första siffran 
+motsvarar variabeln marktyp, andra siffran motsvarar den egentliga 
+markanvändningen. Skuggade fält i tabellen är kombinationer av marktyp och 
+markavändning som är osannolika att finna på havsstränder. Men förekommer 
+kombinationen får koden naturligtvis användas.  
+Täckningen av fältvegetation avser strikt täckning. Totaltäckning av fältskiktet (i 
+procent, %), i respektive zon vilket innefattar alla örter, ormbunksväxter, ris och 
+graminider inom hela transekten uppdelat på geolitoralen, supralitoralen och 
+extralitoralen. Alla levande blad och skottdelar räknas samt nyligen gulnade/döda 
+delar. OBS: Här ingår inte graminidförna.  
+Täckningen av trädvegetationen avser diffus krontäckning (i procent, %) inom 
+respektive zon. Alla trädindivider > 0,5m beaktas.  
+  
+
+--- PAGE 18 ---
+ 
+18 
+ 
+Tabell 4. Kombinerad Marktyp och Markanvändning. Det är osannolikt att finna vissa 
+kombinationer av marktyp och markanvändning på havsstränder. Dessa osannolika kombinationer 
+är skuggade. (Koderna återfinns inte i samlarna) 
+Kod KombineradMarktypochMarkanvändning Geo Supra Ovan 
+10 Åker-Träda/ingensynbarmarkanvändning    
+11 Åker-Nylmarkbearb/plöjd/harvad/sådd    
+12 Åker-Annuella grödor    
+13 Åker-Slåttervall    
+14 Åker-Betad vall(djurhållning)    
+15 Åker-Energiskog    
+16 Åker-Frukt/bärodling    
+20 Anlagd-Ingen synbar markanvändning    
+21 Anlagd-Kolonilottsodling    
+22 Anlagd-Rekreation(anläggning)    
+23 Anlagd-BostadstomtEnskiltellerfå(högst5)    
+24 Anlagd-TätortsbebyggelseFlerabostadshus(minst6)    
+25 Anlagd-JordbruksbebyggelseByggnader,gårdsplaner    
+26 Anlagd-Industriverksamhet    
+27 Anlagd-Transport    
+28 Anlagd-Pågåendeexploatering/väg/bygge    
+30 Skog-Pot.skogsbruk,ingaaverkningsspår    
+31 Skog-Skogsbruk    
+32 Skog-Skogsbruk,hänsynsyta    
+33 Skog-Hygge    
+34 Skog-Fröplantage    
+35 Skog-Kraftledningsgata    
+36 Skog-Skogsbete(+skogsbruk)    
+37 Skog-Rekreation(+skogsbruk)    
+38 Skog-Nyligenskogsplanteradåker    
+40 Övrig-Ingensynbarmarkanvändning    
+41 Övrig-Djurhållning,naturmark    
+42 Övrig-Djurhållningkultiverad/gödslmark    
+43 Övrig-Slåtter/gräsklippning    
+44 Övrig-Rekreation(naturmark)    
+45 Övrig-Bostadstomt(naturmark)    
+46 Övrig-Täkt    
+50 Vatten    
+ 
+ 
+. 
+ 
+ 
+  
+
+--- PAGE 19 ---
+ 
+19 
+3.4. Substrat 
+Syftet med variabeln är att beskriva vilka substrat stranden består av (tabell 5). I huvudsak 
+skall det oorganiska substratet beskrivas men på vissa strandängar/våtmarker med tjockt 
+organiskt material når jordsonden inte ner till mineraljorden. Inom ramen för Havs-
+strandinventering gör vi ingen skillnad på vilken typ av organiskt material utan sammanför 
+detta i klassen ”organiskt”.- I det sistnämnda fallet kan ex. findetritus eller grovditritus anges. 
+Ange substratets beståndsdelar i % andelar. Alla klasser skall tillsammans bli 100 % . I 
+”Substrat” kan antingen %-fördelningen inom resp zon skrivas med siffror, eller genom att 
+manuellt flytta resp substrattyps markör så att relationerna känns riktiga. –eller en 
+kombination av detta! Använd ”Finjustering”-funktionen för att justera fördelningarna så att 
+summan blir 100 %. 
+OBS: Egenkontroll! Om ni både skriver i och låser siffor och dessutom ”drar” de andra, 
+kontrollera att summan blir 100 %, lita inte på ”finjusteringen”!! 
+ 
+Hydrolitoralen (Hydro): Här avses en bedömning av bottentypen/ bottensubstratet från 
+vattenlinjen och tre meter ut i havet. Bedöm den procentuella fördelningen av de olika 
+substratklasserna listade i tabell 3. Alla klasser skall tillsammans bli 100%. Vid alla 
+bedömningar av bottensubstrat är det viktigt att tänka tillbaka på syftet. En så rättvisande 
+karaktärisering av bottensubstratet som möjligt ska göras. Vilka/vilket oorganiskt 
+bottensubstrat som dominerar är det viktigaste att reda ut! Om musslor, både 
+sötvattenslevande eller marina samt havstulpaner påträffas på bottensubstratet ska dessa 
+räknas bort. En blålapp med notering om detta ska då skrivas.   
+Geolitoralen (Geo): Här avses en bedömning av strandens substrat från medelvattenlinjen 
+(startpunkten) och upp geolitoralens övre avgränsning. Vid alla bedömningar av substrat är 
+det viktigt att tänka tillbaka på syftet. En så rättvisande karaktärisering av substratet som 
+möjligt ska göras. Vilka/vilket oorganiskt substrat som dominerar är det viktigaste att reda 
+ut! Bedöm den procentuella fördelningen av de olika substratklasserna listade i tabell 3.  
+Supralitoralen (Supra): Här avses en bedömning av supralitoralens substrat från 
+geolitoralens övre avgränsning till supralitoralens övre avgränsning. Vid alla bedömningar 
+av substrat är det viktigt att tänka tillbaka på syftet. En så rättvisande karaktärisering av 
+substratet som möjligt ska göras. Vilka/vilket oorganiskt substrat som dominerar är det 
+viktigaste att reda ut! Bedöm den procentuella fördelningen av de olika substratklasserna 
+listade i tabell 3.  
+ 
+  
+
+--- PAGE 20 ---
+ 
+20 
+Tabell 5. Substratklasser anges för resp zon. Överstrykningar i tabellen visar vad som utgått 
+från 2012 
+Ange % Substrat Beskrivning 
+0-100% Organiskt Anges då mkt vegetation, löv, grenar, torv etc gör det är svårt att se 
+oorganiska bottensubstratet 
+0-100% Vitmossa Arter i släktet Sphagnum 
+0-100% Annan vegetation Anges då mycket vegetation gör det svårt att se det oorganiska 
+bottensubstratet. Här ingår t.ex. alger, skottbaser, tuvor, rötter på 
+levande träd, mossor 
+0-100% Grovdetritus Löv, grenar, stockar o dyl. ved som inte är nedbrutet. 
+0-100% Findetritus  Mer eller mindre nedbrutet organiskt material, inkl torv, dvs 
+strandmader med tjockt organiskt material. För att findetritus ska 
+registreras måste det förekomma i ett minst 1 cm tjockt lager.  
+0-100% Lera  <0,02 mm φ  (tät gummiartad konsistens, rullprov håller ihop) 
+0-100% Sand  0,02-2 mm φ (håller inte ihop vid rullprov) 
+0-100% Grus  2-20 mm φ  
+0-100% Sten  20-200 mm φ  
+0-100% Block  > 200 mm φ  
+0-100% Häll  >4000 mm φ  
+0-100% Artificiell botten Övrig hårdgjord artificiell botten (betong, asfalt m.m.).  
+Kontrollfunktion: Alla klasser skall tillsammans bli 100%. 
+ 
+3.5. Arter: Inventering av artförekomster 
+Förekomst av de arter som är listade (Bilaga 2) skall noteras var de förekommer i 
+inventeringstransekten, i geolitoralen, supralitoralen resp. i extralitoralen. För några arter skall 
+även antal plantor, antal tuvor eller täckning noteras. Täckningen anges i m2, med 0,1m2 som 
+minsta möjliga notering. Enbart arter i transekten noteras. 
+ 
+ I de fall det finns driftvallar noteras arterna på i driftvallar som skärs av transektens mittlinje. 
+Arter som förekommer på en driftvall (som skärs av transektens mittlinje) i geolitoralen 
+dubbelnoteras, förekomst noteras i både driftvalls- och geolitoralkolumnerna.  
+Likadant om en art förekommer på en driftvall i supralitoralen så dubbelnoteras den, 
+förekomst noteras i både driftvalls- och supralitoralkolumnerna.  
+ Förekommer någon art på en driftvall som inte skärs av transektens mittlinje förs denna art 
+enbart in under rätt strandzon, d.v.s. geolitoralen eller supralitoralen.  
+  Lundelm (Roegneria canina) är ny på artlistan (2013), Saltgräs och grått saltgräs 
+(Puccinellia capillaris+distans) registreras i grupp. Likaså har vi sammanfört de tre gulaktiga 
+raggmossor som skall registreras på stränder till en grupp (Racomitrium canescens coll.) Även 
+cotula (Cotula coronopifolia) är ny på listan (2015). 
+ 
+Artlistan 2023 i Bilaga 2, är anpassad till de listor som används inom NILS gräsmarks- och 
+lövskogsinventeringar. 
+ 
+OBSERVERA 1! Arter som förekommer på driftvallar dubbelregistreras, dvs dels som 
+förekommande på driftvallen och dels som förekommande i geo- respektive supralitoralen. 
+  
+
+--- PAGE 21 ---
+ 
+21 
+ 
+ 
+3.6. Meny för Buskar  
+Syftet är att beskriva vegetationssammansättningen i transekten. Under varje zon-meny anges 
+fält- och trädskiktstäckning  för resp zon. Detaljerad beskrivning av busktäckningen bestäms i 
+menyn ”Buskarter” istället för hela inventeringstransekten genom att mäta längd (m), bredd 
+(m) och täthet (i %) bestämma avståndet från startpunkten för resp funnet buskage (av resp 
+art). 
+ 
+I Bilaga 2 tabell 6 återfinns de ”buskarter” som skall anges. Ange artnamn samt notera 
+täckningen av varje busktyp för sig. För varje buskage av resp busktyp anges avståndet från 
+medelvattenlinjen/startpunkten, buskagets längd och breddmått (i meter med en decimal) samt 
+ett täthetsmått i %. Avståndet anges i hela meter från transektens startpunkt 
+ 
+Tabell 6. Buskar, artnamn. 
+Kod Busktyp Kod Busktyp Kod Busktyp 
+00 Döda lövbuskar 27 Blåhallon 70 Skogskornell 
+01 En, levande 28 Björnbär 71 Videkornell 
+02 En, död 30 Vresros 72 Murgröna 
+10 Viden, delvis 31 Rosor övriga 80 Liguster 
+11 Glansvide 32 Tok, Ölandstok 81 Syren 
+12 Rip/ull/lappvide 33 Häggmisplar 85 Druvfläder 
+13 Pors 34 Oxbär 86 Fläder 
+14 Dvärgbjörk 35 Hagtorn 87 Olvon 
+15 Hassel 36 Slån 88 Snöbär 
+16 Berberis 40 Harris 90 Kaprifol 
+20 Vinbär 50 Benved 91 Skogstry 
+21 Krusbär 51 Getapel 92 Blåtry 
+22 Måbär 52 Brakved 99 Övriga buskar 
+25 Spirea 60 Tibast   
+26 Hallon 61 Havtorn   
+ 
+3.7.  Meny Trädarter 
+En detaljerad beskrivning av trädskiktet görs under ”Trädarter”, med klavning i brösthöjd 
+(130 cm) alternativt räkning av trädplantor högre än 50cm, men lägre än 130cm, samt 
+positionsbestämning med avstånd från startpunkten (i hela meter, där individ som står mellan 
+startpunkten och 1m registreras på avstånd 1 meter; träd mellan 1 m- 2m från startpunkten 
+registreras på avstånd 2 meter; etc.). I Bilaga 2 listas trädarterna som registreras  
+ 
+ 
+3.7.1 Klavning (träd ≥10 cm DBH och träd <10 cm DBH) 
+ Vid klavning skall klavens skaft peka in mot den stora transektens mittlinje. 
+ Ett träd noteras i transekten om groningspunkten är inne i transekten.  
+ Enbart levande träd räknas och klavas. DBH registreras i mm. 
+
+--- PAGE 22 ---
+ 
+22 
+ Notera på vilket avstånd från startpunkten trädet står. Avståndet registreras i hela 
+meter (t ex träd som påträffas mellan 9 och 10 meter från startpunkten registreras på 
+avstånd 10 meter, och om ett träd skulle stå inom en meter fr startpunkten registrera  
+avstånd 1 meter).  
+ 
+3.7.2. Klavning av ”stora träd”, ≥10 cm DBH. 
+Stora träd, dvs de som har en DBH större än 10 cm  klavas i en 5-meter bred transekt till 
+höger (sett nedifrån transektens startpunkt) om den stora transektens (10-m breda transekten) 
+mittlinje. Dvs transektens vänstra sida utgörs av den stora transektens mittlinje (dvs 
+måttbandet) och den högra sidan ligger 5-meter ut. 
+ 
+3.7.3. ”Mindre träd” som är ≥1.3m höga men <10 cm DBH klavas. 
+Mindre träd, dvs de som har en DBH mindre än 10 cm klavas i en 1-meter bred transekt till 
+höger (sett nedifrån) om den stora transektens (10-m breda transekten) mittlinje. Dvs 
+transektens vänstra sida utgörs av den stora transektens mittlinje (dvs måttbandet) och den 
+högra sidan ligger 1-meter ut. Avståndet från startpunkten registreras (i meter). Klavningsdata 
+registreras i mm. 
+ 
+3.7.4.”Små träd” högre än 0,5 men <1.3 m höga räknas. 
+Dessa träd räknas i en 1-meter bred transekt till höger om den stora transektens (10-m breda 
+transekten) mittlinje (samma transekt som i pkt 5.2.1). Dvs transektens vänstra sida utgörs av 
+den stora transektens mittlinje (dvs måttbandet) och den högra sidan ligger 1-meter ut. Antalet 
+”plantor” summeras per trädart och registrerat meter-avstånd fr startpunkten. Ingen diameter 
+anges, eftersom det är DBH som avses, och dessa plantor är för låga! 
+ 
+  
+
+--- PAGE 23 ---
+ 
+23 
+ 
+ 
+3.8. Meny Driftvallar Detaljerad beskrivning av driftvallar 
+OBSERVERA! Driftvallen noteras om någon del av driftvallen skärs av 
+mittlinjen/måttbandet. Skär inte mittlinjen driftvallen så noteras den inte som driftvall. 
+Avståndet från startpunkten till den första driftvallen (syfta på nedre kanten av driftvallen) 
+noteras. Avståndet registreras till meterintervallet från transektens startpunkt, på samma sätt 
+som för registrering av enskilda buskar och träd. .  
+A. Driftvallens bredd, längd och höjd skattas (Fig.4). Bredden och höjden skattas i första 
+hand där måttbandet skär driftvallen. I andra hand där transektens ”långsidor” skär 
+driftvallen. Bredd och höjd mäts med till närmsta 0,05m. Längd mäts till närmsta 0,1m 
+längs hela driftvallen även det som är utanför transekten.  
+B. Driftvallens innehåll skattas längs 10 m av driftvallens längd (närmast måttbandet) i 
+volym-% av;  
+1. tång, 0-100%  
+2. annan vegetation (strån, örter, ris, övriga alger, kvistar etc), 0-100%  
+3. grenar/kvist/ved, 0-100% 
+4. plast, 0-100%  
+5. övrigt skräp, 0-100%  
+C. Vegetation på driftvall: Ange täckningen (m2), av annueller respektive perenner på 
+driftvallarna i transekten (minsta enhet är 0,01 m2). 
+D. Fotografera driftvallen 
+E. Gör om proceduren för nästa driftvall etc.  
+ 
+Arter på driftvallarna registreras på artprotokollet (se 4. Inventering av artförekomster).  
+OBSERVERA 1! Arter som förekommer på driftvallar ska dubbelregistreras, dvs dels som 
+förekommande på driftvallen och dels som förekommande i geo- respektive supralitoralen. 
+
+--- PAGE 24 ---
+ 
+24 
+ 
+ 
+Figur 4. Driftvall. A, visar hur driftvallens höjd och bredd mäts B. Visar hur avstånd och 
+längd mäts. Driftvall i. noteras inte i protokollet eftersom den inte skärs av transektens 
+mittlinje. Driftvall ii. skärs av mittlinjen och noteras därmed i protokollet. 
+ 
+ 
+3.9. Meny Deponi: Deponering och ackumulerat material (m2) 
+Täckningen bedöms med ett mått som representerar hela inventeringstransekten. Här ingår 
+även driftvallarna även om de sär- registreras nedan. Täckningen anges i m2  avseende strikt 
+täckning av stranden. Summera arean för resp. fraktion. Riktigt små förekomster  av en 
+fraktion registreras som 0,01 m2 (d.v.s. 1 dm2), med två decimals noggrannhet för areor under 
+1 m2, därefter med 0,5 m2-noggrannhet upp till 3 m2. Är areorna ännu större räcker 1m2-
+noggrannhet 
+ 
+Sedan 2018 registreras fler fraktioner av framför allt plast, i enheter som bäst beskriver 
+fraktionen (antal, längs, eller yta). Typ av fraktion resp enhet framgår i 
+inventeringsprogrammet, och är listade i Bilaga 3. Varje fraktion att dokumenteras med ett 
+fotografi.   
+
+
+--- PAGE 25 ---
+ 
+25 
+3.10. Habitat 
+Alla naturtyper som finns inom inventeringstransekten registreras inom vilket avstånd till 
+startpunkten längs transekten de förekommer. Dessutom anges habitatkoden för området 
+närmast ovan inventeringstransektens slut. 
+3.10.1. Habitat i transekten 
+Alla naturtyper som finns inom transekten registreras inom vilket avstånd till startpunkten 
+längs transekten de förekommer. Observera och bedöm området i och omkring transekten. 
+1. Nyckla enligt ”Instruktion för habitatinventering i NILS och MOTH”. Två undantag: 
+i) Dynhabitat (utom ”Fördyner” 2110) nycklas enbart till dyner (2100). En detaljerad 
+uppdelning av dynhabitat sker nedan (3.10.4.)  
+ii) Om ni hamnar på naturtypen ”Åsöar i Östersjön” (1610) eller ”Skär i Östersjön” 
+(1620) skall ni, under Kusttyp (3.1. Provyteidentitet och översiktlig beskrivning) 
+notera att transekten är på en Ö, Skär eller grund. Men fortsätta nyckla ut till enskild 
+naturtyp.  
+2. Läs beskrivningen av habitatet. 
+3. Bedöm om minsta karteringsenhet är uppfyllt. Om ej, så ingeneraliseras stranden till 
+den närliggande strandtypen, på samma sätt som görs inom den ”vanliga” 
+habitatregistreringen i NILS. Om strandhabitatet klassas som 9999 se nedan. 
+4. Bedöm om habitatet uppfyller naturlighetskriterierna. Om inte, och habitatkod sättas 
+som 9999 så kommer anledningen att efterfrågas, ange vilket/-a i listan.  
+5. Ange Habitatkod: ur scrollistan. Habitatet anges alltid som om det är på ”fastlandet”. 
+D.v.s. klassa som en enskild naturtyp se pkt 1 ovan.  
+ 
+Nytt 2020: För varje Habitat anges statusvariabler (klasser) för miljön. Dessa variabler 
+kompletterar det data som samlas in inom transekten. Bedömningsyta motsvarar 0,1 ha av 
+registrerat habitat, där även yta utanför inventeringstransekten beaktas. För alla habitat klassas 
+busk- resp trädtäckning, likaså anges om det finns störning med fågelskrämmor eller pga av 
+skiktröjning, ett par variabler anges ytterligare på trädklädda habitat (volym grov död ved, och 
+vilka successionsstadier som finns), medan ett par variabler beskriver eventuell betesregim 
+(om det är tamdjur eller vilda djur/fåglar som står för betespåverkan) och betestryck. Med 
+betestryck avses hur stor andel av bedömningsytan som betas så pass intensivt att mängden 
+graminidförna är ”tunnare” än 3 cm.  
+ 
+Om något habitat i transekten inte uppfyller minsta karteringsenhet inkluderas ytan i det 
+omgivande strandhabitatet. Ex. transektens första metrar hamnar på en sandstrand men 
+sandstranden är totalt mindre än 0,1 ha då förs även denna sandstrandsdel in i t.ex. den 
+omgivande moränstranden. 
+ 
+I samlaren: 
+Registrera mellan vilka avstånd, (anges i meter med en decimal) längs transektens 
+horisontalplan som ett strandhabitat existerar. Välj habitatet i scrollistan, och tryck sedan på 
+”+” för att ange start och slutavstånd. Det första habitat som väljs kommer automatiskt att 
+starta vid 0.  Om fler habitat finns i transekten, gör om proceduren (välj habitat ur listan, och 
+tryck ”+” för att ange slutavstånd). En transekt kan eventuellt korsa flera strandhabitat ex. 
+först en (1952) moränstrand följt av en (1630) Strandäng vid Östersjön.  
+
+--- PAGE 26 ---
+ 
+26 
+ 
+ 
+OBSERVERA 1! 
+Området ovanför inventeringstransekten habitatklassas alltid och habitatkod anges i 
+protokollet. Detaljerad inventering i extralitoralen utförs endast i de fall som någon av 
+följande Natura-naturtyper, Sten och grusvallar (1220), Havsklippor (1230 inkl 1239), Dyner 
+(2100) eller Landhöjningsskog (9030) finns ovanför supralitoralen fortsätter transekten med 
+Extralitoral tills dess habitatet upphör. Undantaget är Havsklippor (1230) som inkluderas 
+även om de förekommer längre bort utan direkt kontakt med strandzonens slutpunkt. 
+OBSERVERA 2! 
+I de allra flesta fall uppfyller stranden kraven som någon Natura-naturtyp. Det är egentligen 
+enbart några få undantag när en strand inte skall klassas som någon Natura-naturtyp. Ex 1. 
+En konstgjord/hårdgjord strand (dvs en artificiell strand) är inte någon Natura-naturtyp. Ex. 
+2. Om stranden är totalt täckt av vass är det inte heller möjligt att applicera någon Natura-
+naturtyp på stranden.  
+OBSERVERA 3! 
+Även om det ”bara” finns låga hällar och klippor noteras dessa som 1239 Klippstrand. 
+Viktigt dock att komma ihåg att skatta höjd på dessa (i ”Högsta klippan i transekten”). 
+ 
+3.10.2. Habitat ovan transekten 
+Ange vilket habitat som finns direkt ovanför inventeringstransektens slut. Här kan alla habitat 
+förekomma (utom de som är bundna till fjällmiljöerna). Ta minsta karteringsenhet i 
+beaktande, naturlighetskriterier och ev avsteg från dessa beskrivna i habitatbeskrivningen – 
+följ Habitatmanualen! 
+Om transekten slutar på högsta punkten anges ”Det finns inget "Ovan", möter annan strand”. 
+3.10.3.  Icke habitat 9999 -ange kriterier som ej uppfylls 
+Ifall habitat 9999 anges ta ställning till de anledningar till som listas av varför koden använts, 
+Dessa listade anledningar är grundade på de naturlighetskriterier som ej uppfyllts för 
+respektive naturtyp. 
+ 
+Märk: samma lista visas även i de fall ”Habitat ovan transekt” sätts som 9999. Men 
+anledningarna kan vara helt andra (t ex att skogen visst naturligt föryngrad, men 
+ålderskriterier tillsammans med skiktning eller mängd död ved räcker inte). Ifall de listade 
+anledningarna inte stämmer ange orsaken på transektens ”Blålapp” (tillgänglig längst upp till 
+höger i Strand-vyerna).  
+ 
+  
+
+--- PAGE 27 ---
+ 
+27 
+3.10.4. Detaljerad uppdelning av dynhabitat (2100) 
+Dynerna förekommer ovan den egentliga strandzonen, i extralitoralen (Fig. 5), och är 
+framförallt formade av vinden. Dynområden består ofta av en mosaik av olika dynhabitat 
+(Tabell 7; Fig. 5). Unga dyner är ofta relativt vita/bleka till färgen (innehåller få 
+humuspartiklar), och är relativt sparsamt beväxta med vegetation som tål sanddrev främst 
+strandråg och sandrör, motsvarar dynhabitatet vita dyner (2120). Med tiden stabiliseras 
+dynerna med vegetation, och urlakning sker i de översta lagren vilket ger sanden en grå nyans. 
+Vegetationstäckta dyner klassificeras med hjälp av de växtarter som dominerar dynerna (se 
+habitatmanualen). Längs transekten anges täckningen, i hur många meter längs dynområdet 
+(eg längs måttbandet), som respektive dynhabitat finns.  För dynhabitat gäller diffus 
+bedömning av täckningen.  
+ 
+När det förekommer dyner i inventeringstransekten anges det i ”Habitat i transekten”. Då 
+visas inmatningsfältet för ”dynhabitat”.  Inmatningen sker på samma sätt som i ”Habitat ovan 
+stranden”: välj aktuellt dynhabitat, lägg till med ”+” och ange sträckan (i meter). Om fler dyn-
+typer finns i dynområdet upprepa proceduren. Vid varje inmatad sträcka summeras 
+automatiskt och läggs till i fältet för slutlängd för 2100 dynhabitat i ”Habitat i transekten”-
+listan. OBS: habitatet 2110 Fördyner skall inte registreras (överhuvudtaget), dels för att 
+naturtypen är temporär men framför allt för att den INTE förekommer i extralitoralen. 
+ 
+Även blottlagd sand anges (i meter längs transekten). Summera totala sträckan av blottlagd 
+sand längs måttbandet. Måttet skall avspegla blottad sand i dynområdet. 
+ 
+Tabell 7. Förekommande Natura-naturtyp inom Dynhabitatet (2100) . OBS 2110 Fördyner 
+finns ej med, eftersom habitatet inte förekommer i extralitoralen (ovan den egentliga stranden) 
+ 
+ 
+ 
+ 
+ 
+ 
+Habitatkod Dynhabitat Minsta 
+karteringsenhet 
+2120 Vita dyner  
+ 
+0.1 ha tillsammans 
+2130 Grå dyner 
+2140 Risdyner 
+2170 Sandvidedyner 
+2180 Trädklädda dyner 0,25 ha 
+2190 Dynvåtmarker 0,1 ha 
+
+--- PAGE 28 ---
+ 
+28 
+ 
+Figur 5. Transekt som visar hur dynhabitaten kan avlösa varandra inom transektens 
+extralitoral. Fördelningen mellan de olika dynhabitaten anges som den sträcka längs 
+måttbandet (transektens mittlinje) som träffar resp. typ. Blottad sand inom dynområdet mäts 
+på samma sätt. Transektens slutpunkt sätts där dynområdet slutar (i detta fall i en skog som 
+inte klassas till 2180 Trädklädda dyner).  
+ 
+ 
+Extralitoral 
+
+--- PAGE 29 ---
+ 
+29 
+ 
+ 
+3.11. Meny Övrigt 
+Syftet med variablerna i men Övrigt  är att beskriva vilken antropogen påverkan som finns på 
+stranden. Dessa kan komplettera den information som givits som Marktyp i de olika 
+transektzonerna  
+Rekreation (tabell 8): Ifall någon marktyp som innehåller rekreation förkommer inom 
+transekten anges vilken typ. Lämna menyn blank, dvs gör ingen registrering alls ifall 
+rekreation inte förekommer. 
+Röjning: bedöms för hela inventeringstransekten. Röjningstyp anges med hjälp av listan i 
+samlaren (tabell 9). Avverkning eller röjning på vegetationsremsan. Gäller all borttagning av träd och 
+buskar oavsett metod (inklusive vägkantsslåtter som påverkar vedväxter). Om både små och stora träd 
+avverkats registreras den dominerande kategorin (m.a.p. täckning). Gräns mellan stora och små träd 
+går vid stubbdiameter 10 cm. Kraftig utglesning innebär över 50 % av träden/ buskarna, svag 
+utglesning 5 till 50 %. Ifall området hållits öppet under lång tid (kontinuerlig röjning) är det inte säkert 
+att man finner stubbar. Jämför med omgivande opåverkade områden längs stranden för att få en 
+uppfattning om det borde ha funnits träd och buskar inom transekten.   
+Röjningstid: Ange när avverkning eller röjning utfördes enligt tabell 10. 
+Högsta klippan i transekten:Om habitatet havsklippor (1230) eller klippstrand (1239) finns 
+i transekten skattas höjden och lutningen för den högsta klippan. Även om det ”bara” finns 
+låga hällar och klippor noteras dessa som klippstrand. Viktigt dock att komma ihåg att skatta 
+höjd och lutning på dessa.  
+Observera! Havsklippor som uppfyller Natura-naturtyp kriterierna inkluderas även om de 
+förekommer utan direkt kontakt med strandzonens slutpunkt. 
+Stängsel. Finns det någon form av stängsel/staket eller stenmur inom transekten, ange ja eller 
+nej. 
+
+--- PAGE 30 ---
+ 
+30 
+Tabell 8. Typ av rekreation.  
+Kod Typ av rekreationsyta Beskrivning 
+1  Badplats Röjd naturmark, anlagd och/eller hårdgjord mark vid särskilt 
+avgränsad eller frekvent använd badplats. 
+2 Golfbana Röjd naturmark, anlagd och/eller hårdgjord mark inom 
+golfbaneområde. 
+3 Camping Kommersiell eller annan särskilt avsatt yta för camping, i t.ex. 
+reservat eller vid friluftsgårdar. 
+4 Slalombacke Röjd eller anlagd mark för utförsåkning, ofta med liftar. 
+5 Annan idrotts 
+/motionsanläggning 
+Annan idrotts- eller motionsanläggning, t.ex. löparbanor, fotbolls- 
+eller tennisplan. 
+6 Park Större grönyta för rekreation vid tätort eller herrgård som oftast 
+innehåller större eller mindre del anlagd mark (gräsmatta), 
+planterade träd m.m. 
+7 Annan rekreationsyta Annan yta permanent avsatt för rekreation. 
+ 
+7 
+Tabell 9. Röjningstyp. 
+Kod Röjningstyp 
+0 Ingen avverkning/ röjning, ≤ 5% 
+1 Kraftig utglesn av stora träd, ≥ 50% 
+2 Svag utglesn av stora träd, 5-50% 
+3 Kraftig utglesn av små träd, ≥ 50% 
+4 Svag utglesn av små träd, 5-50% 
+5 Kraftig utglesn av buskar, ≥ 50% 
+6 Svag utglesn av buskar 5-50% 
+ 
+Tabell 10. Röjningstid. 
+Kod Röjning tid  Kommentar 
+00 Innevarande år el säsong Tidpunkt för 
+avverkning eller 
+röjning 
+01 Föregående år el säsong 
+02 År el säsong 2 
+05 År el säsong 3-5 
+06 > 5år  
+ 
+ 
+
+--- PAGE 31 ---
+ 
+31 
+Referenser 
+Boak, E.H., Turner, I.L. 2005. Shoreline definition and Detection: A review. Journal of 
+Coastal Research, Number 214:688-703 
+Hjort, I. 2002. Ekologi – för miljöns skull. Liber, Stockholm. 
+Loberg, B. 1980. Geologi. Material, processer och Sveriges berggrund. Norstedts. 
+NILS 2012. Fältinstruktion för Nationell Inventering av Landskapet i Sverige. NILS 2012, 
+MOTH, LillNILS och Ä&B. Inst. för skoglig resurshushållning, SLU, Umeå. 
+Olsson, H. 1974. Studies on South Swedish sand vegetation. Acta Phytogeographica Suecica 
+60: 1-176. 
+Påhlsson, L. (Red). 1995. Vegetationstyper i Norden. TemaNord 1994:665. Nordiska 
+ministerrådet, Köpenhamn. 
+SGU 2012. Svallsediment – resultatet av havsströmmar och vågor 
+http://www.sgu.se/sgu/sv/geologi/jordtacket/efter-istiden/svallsediment.html. (Augusti 
+2012) 
+Strahler, A.N. 1975. Physical Geography. Wiley International. 
+Svensson, J. 2002. Succession and dynamics of Norway spruce communities on gulf of 
+Bothnia rising coastline. Doctoral Thesis, Silvestra 239, Department of Forest Ecology, 
+Swedish University of Agriculture Sciences, Umeå.
+
+--- PAGE 32 ---
+ 
+32 
+Bilaga 1. Vattenståndsvariation 
+ 
+Tabell A1. Tabellen visar vattenståndsvariationen som är registrerat vid de olika 
+mätstationerna (Sjöfartsverket 1992).  
+ Vattenstånd (cm) 
+Station HHVi MHVi MVi MLVi LLVi 
+Kalix(1974-1983) +181 +100 0 -80 -140 
+Furuögrund(1916-1981) +153 +79 0 -70 -120 
+Ratan(1892-1983) +137 +78 0 -70 -122 
+Draghällan/Spikarna(1898-1983) +132 +68 0 -56 -90 
+Björn(nedlagd)(1892-1975) +136 +73 0 -52 -81 
+Forsmark(1889-1983) +160 +75 0 -55 -90 
+Stockholm(1889-1983) +120 +61 0 -46 -68 
+Landsort(1887-1983) +99 +54 0 -44 -68 
+Marviken +101 +60 0 -45 -75 
+Visby +88 +48 0 -40 -70 
+Ölandsnorraudde(1887-1983) +135 +65 0 -42 -80 
+Kungsholmsfort(1887-1983) +133 +74 0 -65 -94 
+Simrishamn +160 +85 0 -85 -135 
+Ystad(1887-1983) +167 +90 0 -93 -144 
+Klagshamn +140 +86 0 -74 -102 
+Viken +160 +90 0 -70 -120 
+Varberg(nedlagd)(1887-1980) +145 +96 0 -64 -116 
+Ringhals +145 +95 0 -65 -120 
+Göteborg/Torshamnen +150 +100 0 -70 -120 
+Smögen(1911-1983) +148 +94 0 -69 -112 
+Kungsvik +150 +100 0 -70 -120 
+i. Högsta högvatten (HHV), Medelhögvatten (MHV), Medelvatten (MV), Medellågvatten (MLV), Lägsta 
+lågvatten (LLV) 
+ 
+Referenser (Bilaga): 
+Sjöfartsverket, 1992. Sjöfartsverket: Svensk Lots Del 1, Norrköping  
+ 
+  
+
+--- PAGE 33 ---
+ 
+33 
+Bilaga 2 Artlistor 
+ 
+Artmenyn Strand 
+2023  
+Svenskt namn Vetenskapligt namn 
+backtimjan Thymus serpyllum 
+baltisk strandmalört Artemisia maritima subsp. humifusa 
+bergrör Calamagrostis epigejos 
+bergsyra Rumex acetosella 
+besksöta Solanum dulcamara 
+blomsterlupin  Lupinus polyphyllus 
+blåbär Vaccinium myrtillus 
+blåsäv Schoenoplectus tabernaemontani 
+blåtåtel Molinia caerulea 
+bockrot Pimpinella saxifraga 
+bolmört Hyoscyamus niger 
+borsttåtel Corynephorus canescens 
+bottnisk malört Artemisia campestris subsp. bottnica 
+brosklavar Ramalina 
+broskmålla Atriplex glabriuscula 
+brun franslav Anaptychia runcinata 
+brunskära Bidens tripartita 
+brådmålla Atriplex longipes subsp. praecox 
+brännässla Urtica dioica 
+bunge Samolus valerandi 
+dansk skörbjuggsört Cochlearia danica 
+dvärgarun Centaurium pulchellum 
+dvärglin Radiola linoides 
+engelsk fetknopp Sedum anglicum 
+etternässla Urtica urens 
+fackelblomster Lythrum salicaria 
+finnskräppa Rumex pseudonatronatus 
+flikmålla Atriplex calotheca 
+flockfibbla Hieracium umbellatum 
+frossört Scutellaria galericulata 
+gatkamomill Matricaria discoidea 
+glasört Salicornia europaea 
+grönländsk gåsört Argentina anserina subsp. groenlandica 
+grönpyrola Pyrola chlorantha 
+gul fetknopp Sedum acre 
+gulaktiga sandraggmossor Racomitrium canescens s.lat. 
+gulgröna kartlavar Rhizocarpon 
+gulkämpar Plantago maritima 
+gulsporre Linaria vulgaris 
+gultåtel Deschampsia bottnica 
+
+--- PAGE 34 ---
+ 
+34 
+gulvial Lathyrus pratensis 
+gårdsgroblad Plantago major subsp. major 
+gårdsskräppa Rumex longifolius 
+gökblomster Lychnis flos-cuculi 
+hampflockel Eupatorium cannabinum 
+havsnarv Spergularia media 
+havssälting Triglochin maritima 
+havssäv Bolboschoenus maritimus 
+hundkäx Anthriscus sylvestris 
+hundtunga Cynoglossum officinale 
+huvudtåg Juncus capitatus 
+häckvicker Vicia sepium 
+hässlebrodd Milium effusum 
+hästsvans Hippuris vulgaris 
+hönsbär Cornus suecica 
+höskallra Rhinanthus angustifolius 
+höstfibbla Scorzoneroides autumnalis 
+kattfot Antennaria dioica 
+klapperstarr Carex glareosa 
+klapperögontröst Euphrasia wettsteinii var. baltica 
+klibbglim Silene viscosa 
+klibbkorsört Senecio viscosus 
+klöverärt Lotus maritimus 
+knutnarv Sagina nodosa 
+knutört Lysimachia minima 
+knölsyska Stachys palustris 
+korsört Senecio vulgaris 
+kotula Cotula coronopifolia 
+krusskräppa Rumex crispus 
+kruståtel Avenella flexuosa 
+krypnarv Sagina procumbens 
+krypven Agrostis stolonifera 
+krypvide Salix repens 
+kråkklöver Comarum palustre 
+kråkvicker Vicia cracca 
+kungsljus Verbascum 
+kustarun Centaurium littorale 
+kustbaldersbrå Tripleurospermum maritimum subsp. maritimum 
+kustgroblad Plantago major subsp. winteri 
+kvastmossor Dicranum 
+kvickrot Elytrigia repens 
+käringtand Lotus corniculatus 
+kärleksört Hylotelephium telephium 
+kärrknipprot Epipactis palustris 
+kärrsilja Peucedanum palustre 
+
+--- PAGE 35 ---
+ 
+35 
+kärrsälting Triglochin palustris 
+kärrtörel Euphorbia palustris 
+kärrvial Lathyrus palustris 
+lingon Vaccinium vitis-idaea 
+liten ärtstarr Carex oederi var. pulchella 
+ljung Calluna vulgaris 
+lundelm Elymus caninus 
+madrör Calamagrostis neglecta 
+malört Artemisia absinthium 
+marrisp Limonium vulgare 
+martorn Eryngium maritimum 
+marviol Cakile maritima 
+mjölon Arctostaphylos uva-ursi 
+navellavar Umbilicaria 
+nordbaldersbrå Tripleurospermum maritimum subsp. subpolare 
+nordgröe Poa pratensis subsp. alpigena 
+nordkråkbär Empetrum nigrum subsp. hermaphroditum 
+ormax Parapholis strigosa 
+ormtunga Ophioglossum vulgatum 
+ostronört Mertensia maritima 
+pilört Persicaria lapathifolia 
+plattsäv Blysmus compressus 
+renfana Tanacetum vulgare 
+revigt saltgräs Puccinellia maritima 
+rosenrot Rhodiola rosea 
+rosettlavar Physcia 
+rundsileshår Drosera rotundifolia 
+ryl Chimaphila umbellata 
+rödblära Silene dioica 
+rödplister Lamium purpureum 
+rödsvingel Festuca rubra 
+rödsäv Blysmus rufus 
+rödven Agrostis capillaris 
+röllika Achillea millefolium 
+rörflen Phalaris arundinacea 
+rörsvingel Schedonorus arundinaceus 
+saltarv Honckenya peploides 
+saltgräs+grått saltgräs Puccinellia capillaris agg. 
+saltlav Hydropunctaria maura 
+saltmålla Halimione pedunculata 
+saltnarv Spergularia marina 
+salttåg Juncus gerardii 
+saltört Suaeda maritima 
+sandrör Ammophila arenaria 
+sandsallad Lactuca tatarica 
+
+--- PAGE 36 ---
+ 
+36 
+sandskruvmossa Syntrichia ruraliformis 
+sandstarr Carex arenaria 
+sandtimotej Phleum arenarium 
+sandvide Salix repens var. argentea 
+skaftmålla Atriplex longipes subsp. longipes 
+skörbjuggsört Cochlearia officinalis 
+slåtterblomma Parnassia palustris 
+slåtterfibbla Hypochaeris maculata 
+smal kärringtand Lotus tenuis 
+smultronköver Trifolium fragiferum 
+smörblomma Ranunculus acris 
+snårvindor Calystegia 
+sodaört Kali turgidum 
+spikblad Hydrocotyle vulgaris 
+spjutmålla Atriplex prostrata 
+spjutskråp Petasites spurius 
+stenbär Rubus saxatilis 
+stensöta Polypodium vulgare 
+stillahavsostron Magallana gigas 
+storsileshår Drosera anglica 
+strandaster Tripolium pannonicum subsp. tripolium 
+strandbeta Beta vulgaris subsp. maritima 
+strandglim Silene uniflora 
+strandgråbo Artemisia vulgaris var. coarctata 
+strandkrypa Lysimachia maritima 
+strandkvanne Angelica archangelica subsp. littoralis 
+strandkvickrot Elytrigia juncea subsp. boreoatlantica 
+strandkål Crambe maritima 
+strandkämpar Plantago coronopus 
+strandloka Ligusticum scothicum 
+strandlysing Lysimachia vulgaris 
+strandmaskrosor Taraxacum sect. Palustria 
+strandmolke Sonchus palustris 
+strandmålla Atriplex littoralis 
+strandnarv Sagina maritima 
+strandråg Leymus arenarius 
+strandrödtoppa Odontites litoralis 
+strandtåg Juncus maritimus 
+strandvallmo Glaucium flavum 
+strandveronika Veronica longifolia 
+strandvial Lathyrus japonicus 
+strandviva Primula nutans 
+strandögontröst Euphrasia bottnica 
+strätta Angelica sylvestris 
+styv glasört Salicornia procumbens 
+
+--- PAGE 37 ---
+ 
+37 
+styvmorsviol Viola tricolor 
+sumpgentiana Gentianella uliginosa 
+sydkråkbär Empetrum nigrum subsp. nigrum 
+såpor Calothrix 
+toppdån Galeopsis bifida 
+toppfrossört Scutellaria hastifolia 
+trift Armeria maritima 
+trolldruva Actaea spicata 
+tuschlav Lasallia pustulata 
+vanlig gåsört Argentina anserina subsp. anserina 
+vanlig strandmalört Artemisia maritima subsp. maritima 
+vass Phragmites australis 
+vattenmynta Mentha aquatica 
+vejde Isatis tinctoria 
+vippärt Lathyrus niger 
+vittåtel Aira caryophyllea 
+vårkorsört Senecio leucanthemifolius subsp. vernalis 
+vårtåtel Aira praecox 
+vägglav Xanthoria parietina 
+väggmossa Pleurozium schreberi 
+vänderrötter Valeriana 
+västkustarv Cerastium diffusum 
+åkergroblad Plantago major subsp. intermedia 
+åkermolke Sonchus arvensis 
+älggräs Filipendula ulmaria 
+ängsskallra Rhinanthus minor 
+ängssyra Rumex acetosa 
+örnbräken Pteridium aquilinum 
+östersjötåg Juncus balticus 
+  
+Trädmenyn  
+Svenskt namn Vetenskapligt namn 
+Almar (alla) Ulmus 
+Aplar Malus 
+Ask Fraxinus excelsior 
+Asp Populus tremula 
+Avenbok Carpinus betulus 
+Bergtall Pinus mugo 
+Björkar (ej dvärg-) Betula 
+Bok Fagus sylvatica 
+Cembratall Pinus cembra 
+Contortatall Pinus contorta 
+Ekar Quercus robur 
+Gran Picea abies 
+Gråal Alnus incana 
+
+--- PAGE 38 ---
+ 
+38 
+Hägg Prunus padus 
+Hästkastanj Aesculus hippocastanum 
+Idegran Taxus baccata 
+Jolster Salix pentandra 
+Klibbal Alnus glutinosa 
+Lindar Tilia 
+Lärk Larix decidua 
+Lönn Acer platanoides 
+Oxlar Sorbus 
+Pilar Salix alba agg. 
+Plommon Prunus domestica 
+Päron Pyrus communis 
+Rönn Sorbus aucuparia 
+Sälg Salix caprea 
+Sötkörsbä Prunus avium 
+Tall Pinus sylvestris 
+Tysklönn Acer pseudoplatanus 
+Övriga popplar Populus 
+Övriga lövträd   
+Övriga barrträd   
+  
+Buskmenyn  
+Svenskt namn Vetenskapligt namn 
+Benved Euonymus europaeus 
+Berberis Berberis vulgaris 
+Björnbär (alla) Rubus subgen. Rubus 
+Blåhallon Rubus caesius 
+Blåtry Lonicera caerulea 
+Brakved Frangula alnus 
+Druvfläder Sambucus racemosa 
+Dvärgbjörk Betula nana 
+En Juniperus communis 
+Fläder Sambucus nigra 
+Getapel Rhamnus cathartica 
+Hagtorn (alla) Crataegus 
+Hallon Rubus idaeus 
+Harris Cytisus scoparius 
+Hassel Corylus avellana 
+Havtorn Hippophaë rhamnoides 
+Häggmisplar (alla) Amelanchier 
+Kaprifol Lonicera periclymenum 
+Krusbär Ribes uva-crispa 
+Liguster Ligustrum vulgare 
+Murgröna Hedera helix 
+Måbär Ribes alpinum 
+
+--- PAGE 39 ---
+ 
+39 
+Olvon Viburnum opulus 
+Oxbär (alla) Cotoneaster 
+Pors Myrica gale 
+Rip/ull/lappvide Salix glauca/lanata/lapponum   
+Rosor övriga Rosa 
+Skogskornell Cornus sanguinea 
+Skogstry Lonicera xylosteum 
+Slån Prunus spinosa 
+Snöbär Symphoricarpos albus 
+Spirea (alla) Spiraea 
+Syren Syringa vulgaris 
+Tibast Daphne mezereum 
+Videkornell Cornus sericea 
+Viden delvis Salix 
+Vinbär Ribes 
+Vresros Rosa rugosa 
+Ölandstok Dasiphora fruticosa 
+Övriga buskar   
+ 
+  
+
+--- PAGE 40 ---
+ 
+40 
+Bilaga 3. 
+ 
+ 
+Deponityp Enhet 
+Tång m2 
+Gren/kvist/ved m2 
+m2 m2 
+Sågat/bearbetat virke m 
+Bryggdelar m2 
+Fiskenät  m 
+Fisklina m 
+Plastflöten/bojar n 
+Annat fiskerelaterat n 
+Plastlådor n 
+Petflaskor n 
+Plastdunkar n 
+Plastpåsar n 
+Annan plast m2 
+Oljespill m2 
+Byggavfall m2 
+Grävmassor m2 
+Sten  m2 
+Metallskrot m2 
+Övrigt m2 
+ 
+Avser strikt täckning.  
+Noggrannhet:  
+mindre än 1 dm2 => ange som 0,01 m2 
+mellan 0,01- 0,1 m2 => 0,01 m2 noggrannhet 
+mellan 0,1-1 m2 => 0,1 m2 noggrannhet  
+mellan 1-3 m2 => 0,5 m2 noggrannhet 
+över 3 m2 => 1 m2 noggrannhet 

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/namn"
+        android:layout_height="wrap_content"
+        android:gravity= "center"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+         android:layout_width="0dp"
+         android:layout_weight="1"
+         android:background="@drawable/cell_shape"
+        android:text="TextView" />
+
+    <TextView
+        android:id="@+id/geo"
+        android:layout_height="wrap_content"
+        android:gravity= "center"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+         android:layout_width="0dp"
+         android:layout_weight="1"
+         android:background="@drawable/cell_shape"
+        android:text="X" />
+
+    <TextView
+        android:id="@+id/supra"
+        android:layout_height="wrap_content"
+        android:gravity= "center"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+         android:layout_width="0dp"
+         android:layout_weight="1"
+         android:background="@drawable/cell_shape"
+        android:text="" />
+    
+        <TextView
+        android:id="@+id/extra"
+        android:layout_height="wrap_content"
+        android:gravity= "center"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+         android:layout_width="0dp"
+         android:layout_weight="1"
+         android:background="@drawable/cell_shape"
+        android:text="" />
+
+            <TextView
+        android:id="@+id/drift"
+        android:layout_height="wrap_content"
+        android:gravity= "center"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+         android:layout_width="0dp"
+         android:layout_weight="1"
+         android:background="@drawable/cell_shape"
+        android:text="" />
+        
+        
+</TableRow>

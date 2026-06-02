@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="16dp"
+    android:orientation="vertical"
+    android:gravity="center|top"
+    android:padding="10dp"
+    >
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="10dp"
+        android:ems="15"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:text="Uppladdning av filer" />
+    <TextView
+        android:id="@+id/uploadProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="10dp"
+        android:ems="10"
+        android:text="5/15 filer" />
+    <ProgressBar android:id="@+id/uploadProgressbar"
+        android:layout_width="match_parent"
+        android:layout_height="15dp"
+        android:progress="55"
+        style="?android:attr/progressBarStyleHorizontal" />
+
+    <TextView
+        android:id="@+id/uploadInfoText"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginVertical="10dp"
+        android:ems="10"
+        android:text="test.json" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="200dp">
+
+        <LinearLayout
+            android:id="@+id/uploadResults"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:ems="10"
+                android:text="test.json" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:ems="10"
+                android:text="test.json" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:ems="10"
+                android:text="test.json" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:ems="10"
+                android:text="test.json" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/uploadUpload"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:gravity="right"
+        android:text="Ladda upp" />
+    <Button
+        android:id="@+id/uploadTillbaka"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:gravity="left"
+        android:text="Tillbaka" />
+
+
+
+</LinearLayout>

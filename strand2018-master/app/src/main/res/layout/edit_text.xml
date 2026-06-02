@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_margin="10dip" >
+
+        <TextView  android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dip"
+            android:text="Organiskt" />
+
+        <SeekBar android:id="@+id/sb1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"  />
+
+        <TextView  android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dip"
+            android:text="Lera" />
+
+        <SeekBar android:id="@+id/sb2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"  />
+
+        <TextView  android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dip"
+            android:text="Sand" />
+
+        <SeekBar android:id="@+id/sb3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"  />
+
+        <TextView  android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dip"
+            android:text="Grus" />
+
+        <SeekBar android:id="@+id/sb4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"  />
+
+        <TextView  android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dip"
+            android:text="Sten" />
+
+        <SeekBar android:id="@+id/sb5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"  />
+
+        <TextView  android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dip"
+            android:text="Block" />
+
+        <SeekBar android:id="@+id/sb6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"  />
+
+        <TextView  android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dip"
+            android:text="Häll" />
+
+        <SeekBar android:id="@+id/sb7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"  />
+
+        <TextView  android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dip"
+            android:text="Artificiell" />
+
+        <SeekBar android:id="@+id/sb8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"  />
+
+        <TextView  android:layout_width="wrap_content"
+            android:id="@+id/sum"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dip"
+            android:textStyle="bold"
+            android:text="Summa:" />
+
+    </LinearLayout>
+</ScrollView>
+
