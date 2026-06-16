@@ -26,7 +26,19 @@ export async function initializeApplication(): Promise<AppBootstrapResult> {
   await ensurePublicDirectoryStructure();
 
   const bundled = getBundledBasicData();
-  const saved = await loadSavedBasicData();
+  let saved = await loadSavedBasicData();
+
+  if (saved && compareVersions(bundled.meta.version, saved.meta.version) > 0) {
+    await saveBasicData(bundled);
+    await downloadBootstrapResources(bundled);
+    await saveBootstrapMetadata({
+      basicDataVersion: bundled.meta.version,
+      bootstrappedAt: new Date().toISOString(),
+      lastUpdateCheckAt: new Date().toISOString(),
+      source: 'bundled',
+    });
+    saved = bundled;
+  }
 
   if (!saved) {
     return bootstrapFirstLaunch(bundled);
@@ -148,4 +160,25 @@ async function updateBootstrapCheckTimestamp(version: string) {
     lastUpdateCheckAt: new Date().toISOString(),
     source: existing?.source ?? 'bundled',
   });
+}
+
+function compareVersions(a: string, b: string) {
+  const aParts = a.split('.').map(Number);
+  const bParts = b.split('.').map(Number);
+  const max = Math.max(aParts.length, bParts.length);
+
+  for (let index = 0; index < max; index += 1) {
+    const aValue = aParts[index] ?? 0;
+    const bValue = bParts[index] ?? 0;
+
+    if (aValue > bValue) {
+      return 1;
+    }
+
+    if (aValue < bValue) {
+      return -1;
+    }
+  }
+
+  return 0;
 }

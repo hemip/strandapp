@@ -23,6 +23,7 @@
     "react-native-qrcode-svg": "^6.3.21",
     "react-native-safe-area-context": "^5.5.2",
     "react-native-svg": "^15.15.4",
+    "react-native-webview": "^13.16.1",
     "uuid": "^14.0.0"
   },
   "devDependencies": {

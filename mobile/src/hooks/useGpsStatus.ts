@@ -11,10 +11,14 @@ const initialState: GpsSnapshot = {
 export function useGpsStatus() {
   const [gps, setGps] = useState<GpsSnapshot>(initialState);
 
-  const refreshGps = useCallback(async () => {
+  const refreshGps = useCallback(async (): Promise<GpsSnapshot> => {
     if (Platform.OS !== 'android') {
-      setGps({status: 'unavailable', message: 'GPS är endast konfigurerad för Android i denna version.'});
-      return;
+      const nextGps: GpsSnapshot = {
+        status: 'unavailable',
+        message: 'GPS är endast konfigurerad för Android i denna version.',
+      };
+      setGps(nextGps);
+      return nextGps;
     }
 
     setGps(prev => ({...prev, status: 'searching', message: 'Söker GPS-position...'}));
@@ -30,34 +34,41 @@ export function useGpsStatus() {
     );
 
     if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-      setGps({status: 'permission_denied', message: 'Platsbehörighet nekades.'});
-      return;
+      const nextGps: GpsSnapshot = {status: 'permission_denied', message: 'Platsbehörighet nekades.'};
+      setGps(nextGps);
+      return nextGps;
     }
 
-    Geolocation.getCurrentPosition(
-      position => {
-        setGps({
-          status: 'ok',
-          message: 'GPS redo.',
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy: position.coords.accuracy,
-          timestamp: position.timestamp,
-        });
-      },
-      error => {
-        setGps({
-          status: 'error',
-          message: error.message || 'Kunde inte läsa GPS-position.',
-        });
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 5000,
-        forceRequestLocation: true,
-      },
-    );
+    return new Promise(resolve => {
+      Geolocation.getCurrentPosition(
+        position => {
+          const nextGps: GpsSnapshot = {
+            status: 'ok',
+            message: 'GPS redo.',
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            timestamp: position.timestamp,
+          };
+          setGps(nextGps);
+          resolve(nextGps);
+        },
+        error => {
+          const nextGps: GpsSnapshot = {
+            status: 'error',
+            message: error.message || 'Kunde inte läsa GPS-position.',
+          };
+          setGps(nextGps);
+          resolve(nextGps);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 5000,
+          forceRequestLocation: true,
+        },
+      );
+    });
   }, []);
 
   useEffect(() => {

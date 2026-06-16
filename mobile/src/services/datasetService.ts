@@ -79,13 +79,15 @@ export function getUniqueDatasetOptions(rows: DatasetRow[], valueKey: string, di
 }
 
 export async function loadConfiguredArtResources(config: BasicDataConfig) {
-  const artOptions = config.lists.artkategorier ?? [];
   const resources = new Map<string, string>();
 
-  artOptions.forEach(option => {
-    if (option.value && option.resource) {
-      resources.set(option.value, option.resource);
-    }
+  Object.values(config.lists).forEach(options => {
+    options.forEach(option => {
+      const value = option.value ?? option.id;
+      if (value && option.resource) {
+        resources.set(value, option.resource);
+      }
+    });
   });
 
   const entries = await Promise.all(

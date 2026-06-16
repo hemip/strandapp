@@ -1,7 +1,7 @@
 ﻿{
   "meta": {
     "id": "havsstrand-basic-data",
-    "version": "0.1.0",
+    "version": "0.1.3",
     "source": "strand2018-master",
     "generated_at": "2026-04-27",
     "language": "sv-SE",
@@ -245,11 +245,13 @@
       { "value": "graminider", "label": "Graminider", "resource": "strandinventering_arter_graminider.csv", "entry_mode": "arter_table" },
       { "value": "ormbunkar", "label": "Ormbunkar", "resource": "strandinventering_arter_ormbunkar.csv", "entry_mode": "arter_table" },
       { "value": "mossor", "label": "Mossor", "resource": "strandinventering_arter_mossor.csv", "entry_mode": "arter_table" },
-      { "value": "lavar", "label": "Lavar", "resource": "strandinventering_arter_lavar.csv", "entry_mode": "arter_table" },
+      { "value": "lavar", "label": "Lavar", "resource": "strandinventering_arter_lavar.csv", "entry_mode": "arter_table" }
+    ],
+    "artzoner": [
       { "value": "geo", "label": "Geolitoral", "resource": "strandinventering_arter_alla.csv", "entry_mode": "species_observation" },
       { "value": "supra", "label": "Supralitoral", "resource": "strandinventering_arter_alla.csv", "entry_mode": "species_observation" },
       { "value": "extra", "label": "Extralitoral", "resource": "strandinventering_arter_alla.csv", "entry_mode": "species_observation" },
-      { "value": "strandvall", "label": "Strandvall", "resource": "strandinventering_arter_alla.csv", "entry_mode": "species_observation" }
+      { "value": "strandvall", "label": "Driftvall", "resource": "strandinventering_arter_alla.csv", "entry_mode": "species_observation" }
     ],
     "deponi_kategorier": [
       { "id": "1", "label": "Tång (m2)" },
@@ -397,8 +399,15 @@
               "id": "startpunkt",
               "label": "Startpunkt",
               "type": "gps_capture",
-              "required": false,
+              "required": true,
               "outputs": ["startPEast", "startPNorth", "gps_accuracy", "gps_timestamp"]
+            },
+            {
+              "id": "slutpunkt",
+              "label": "Slutpunkt",
+              "type": "gps_capture",
+              "required": true,
+              "outputs": ["slutPEast", "slutPNorth", "slut_gps_accuracy", "slut_gps_timestamp"]
             }
           ]
         },
@@ -449,7 +458,8 @@
             { "id": "marktypgeo", "label": "Marktyp", "type": "select", "list_id": "marktyper" },
             { "id": "vegtackningfaltgeo", "label": "Total fältskiktstäckning", "type": "integer", "unit": "%" },
             { "id": "tradtackninggeo", "label": "Total trädtäckning", "type": "integer", "unit": "%" },
-            { "id": "slutlengeo", "label": "Geolitoral slutlängd", "type": "decimal", "unit": "m" }
+            { "id": "slutlengeo", "label": "Geolitoral slutlängd", "type": "decimal", "unit": "m", "special": "transect_zone_boundary", "zone_order": 1, "zone_label": "Geolitoral", "zone_color": "#f2c94c" },
+            { "id": "arter_data", "label": "Artregistrering geolitoral", "type": "art_table", "category": "geo", "category_list_id": "artzoner", "columns": ["namn"] }
           ]
         }
       ]
@@ -466,7 +476,8 @@
             { "id": "marktypsupra", "label": "Marktyp", "type": "select", "list_id": "marktyper" },
             { "id": "vegtackningfaltsupra", "label": "Total fältskiktstäckning", "type": "integer", "unit": "%" },
             { "id": "tradtackningsupra", "label": "Total trädtäckning", "type": "integer", "unit": "%" },
-            { "id": "slutlensupra", "label": "Supralitoral slutlängd", "type": "decimal", "unit": "m" }
+            { "id": "slutlensupra", "label": "Supralitoral slutlängd", "type": "decimal", "unit": "m", "special": "transect_zone_boundary", "zone_order": 2, "zone_label": "Supralitoral", "zone_color": "#56ccf2" },
+            { "id": "arter_data", "label": "Artregistrering supralitoral", "type": "art_table", "category": "supra", "category_list_id": "artzoner", "columns": ["namn"] }
           ]
         }
       ]
@@ -483,7 +494,8 @@
             { "id": "marktypextra", "label": "Marktyp", "type": "select", "list_id": "marktyper" },
             { "id": "vegtackningfaltextra", "label": "Total fältskiktstäckning", "type": "integer", "unit": "%" },
             { "id": "tradtackningextra", "label": "Trädtäckning extralitoral", "type": "integer", "unit": "%" },
-            { "id": "slutlenovan", "label": "Extralitoral slutlängd", "type": "decimal", "unit": "m" }
+            { "id": "slutlenovan", "label": "Extralitoral slutlängd", "type": "decimal", "unit": "m", "special": "transect_zone_boundary", "zone_order": 3, "zone_label": "Extralitoral", "zone_color": "#bb6bd9" },
+            { "id": "arter_data", "label": "Artregistrering extralitoral", "type": "art_table", "category": "extra", "category_list_id": "artzoner", "columns": ["namn"] }
           ]
         }
       ]
@@ -541,18 +553,19 @@
       "sections": [
         {
           "id": "arter_kategorier",
-          "label": "Artkategorier",
+          "label": "Artobservationer per zon",
           "fields": [
             {
               "id": "arter_kategori_val",
-              "label": "Artkategori",
+              "label": "Zon",
               "type": "resource_picker",
-              "list_id": "artkategorier"
+              "list_id": "artzoner"
             },
             {
               "id": "arter_data",
               "label": "Arter",
               "type": "art_table",
+              "category_list_id": "artzoner",
               "modes": {
                 "arter_table": {
                   "columns": ["namn", "geo", "supra", "extra", "drift"]
