@@ -47,6 +47,8 @@ export function useGpsStatus() {
             message: 'GPS redo.',
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
+            altitude: position.coords.altitude,
+            altitudeAccuracy: position.coords.altitudeAccuracy,
             accuracy: position.coords.accuracy,
             timestamp: position.timestamp,
           };

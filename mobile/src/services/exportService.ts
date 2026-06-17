@@ -16,6 +16,11 @@ interface PhotoExportEntry {
   capturedAt?: string;
   typeValue?: string;
   typeLabel?: string;
+  latitude?: number;
+  longitude?: number;
+  altitude?: number | null;
+  altitudeAccuracy?: number | null;
+  accuracy?: number;
 }
 
 function stringValue(value: unknown) {
@@ -44,6 +49,11 @@ function collectPhotos(value: unknown, fieldPath = ''): PhotoExportEntry[] {
         capturedAt: stringValue(photo.capturedAt) || undefined,
         typeValue: stringValue(photo.typeValue) || undefined,
         typeLabel: stringValue(photo.typeLabel) || undefined,
+        latitude: typeof photo.latitude === 'number' ? photo.latitude : undefined,
+        longitude: typeof photo.longitude === 'number' ? photo.longitude : undefined,
+        altitude: typeof photo.altitude === 'number' ? photo.altitude : null,
+        altitudeAccuracy: typeof photo.altitudeAccuracy === 'number' ? photo.altitudeAccuracy : null,
+        accuracy: typeof photo.accuracy === 'number' ? photo.accuracy : undefined,
       },
     ];
   }
@@ -73,14 +83,18 @@ function createLegacyHeader(draft: Record<string, unknown>) {
   };
 }
 
-export async function exportDraftToJson({basicData, draft}: ExportOptions) {
+export function createDraftExportFileInfo(draft: Record<string, unknown>) {
   const exportId = createPlotFileBase(draft);
-  const exportedAt = new Date().toISOString();
   const fileName = `${sanitizePathSegment(exportId)}.json`;
   const path = `${publicPaths.exportDir}/${fileName}`;
+
+  return {exportId, fileName, path};
+}
+
+export function createDraftExportPayload({basicData, draft}: ExportOptions, exportedAt = new Date().toISOString()) {
   const photos = collectPhotos(draft);
 
-  const payload = {
+  return {
     schema: 'havsstrand-field-export',
     schema_version: 1,
     exported_at: exportedAt,
@@ -99,6 +113,12 @@ export async function exportDraftToJson({basicData, draft}: ExportOptions) {
     data: draft,
     photos,
   };
+}
+
+export async function exportDraftToJson({basicData, draft}: ExportOptions) {
+  const {fileName, path} = createDraftExportFileInfo(draft);
+  const payload = createDraftExportPayload({basicData, draft});
+  const photos = collectPhotos(draft);
 
   await writeJsonFile(path, payload);
 

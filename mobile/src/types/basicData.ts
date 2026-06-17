@@ -95,6 +95,8 @@ export interface UpdateCheckResult {
 export interface GpsSnapshot {
   latitude?: number;
   longitude?: number;
+  altitude?: number | null;
+  altitudeAccuracy?: number | null;
   accuracy?: number;
   timestamp?: number;
   status: 'ok' | 'permission_denied' | 'unavailable' | 'error' | 'idle' | 'searching';
