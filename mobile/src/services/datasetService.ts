@@ -17,6 +17,10 @@ export interface ArtResourceRow {
 
 const DATASET_RESOURCE_DIRS = ['utlagg', 'vardelistor', 'artlistor'];
 
+const DATASET_FILE_ALIASES: Record<string, string[]> = {
+  provyteunderlag: ['data.csv', 'provyteunderlag.csv'],
+};
+
 export async function loadConfiguredDatasets(config: BasicDataConfig): Promise<DatasetMap> {
   const datasetIds = collectDatasetIds(config);
   const datasets: DatasetMap = {};
@@ -101,7 +105,7 @@ export async function loadConfiguredArtResources(config: BasicDataConfig) {
 }
 
 async function loadDataset(datasetId: string, config: BasicDataConfig) {
-  const resource = await findDatasetFile(datasetId, config);
+  const resource = await findFirstExistingFile(getDatasetFileCandidates(datasetId, config));
   if (!resource) {
     return [];
   }
@@ -110,14 +114,42 @@ async function loadDataset(datasetId: string, config: BasicDataConfig) {
   return parseCsv(content);
 }
 
-async function findDatasetFile(datasetId: string, config: BasicDataConfig) {
+function getDatasetFileCandidates(datasetId: string, config: BasicDataConfig) {
   const configuredResource = config.bootstrap_resources?.find(resource => resource.id === datasetId);
-  const candidates = [
+  const aliases = DATASET_FILE_ALIASES[datasetId] ?? [`${datasetId}.csv`];
+  return [
+    ...aliases.map(fileName => `${publicPaths.basicDataDir}/${fileName}`),
+    ...aliases.map(fileName => `${publicPaths.root}/${fileName}`),
+    ...DATASET_RESOURCE_DIRS.flatMap(dir =>
+      aliases.flatMap(fileName => [
+        `${publicPaths.basicDataDir}/${dir}/${fileName}`,
+        `${publicPaths.basicDataDir}/basic_data/${dir}/${fileName}`,
+      ]),
+    ),
     configuredResource ? `${publicPaths.root}/${configuredResource.target_path}` : null,
-    `${publicPaths.basicDataDir}/${datasetId}.csv`,
-    ...DATASET_RESOURCE_DIRS.map(dir => `${publicPaths.basicDataDir}/${dir}/${datasetId}.csv`),
+    configuredResource ? `${publicPaths.basicDataDir}/${configuredResource.target_path}` : null,
   ].filter((candidate): candidate is string => Boolean(candidate));
+}
 
+async function loadArtResource(resourceName: string): Promise<ArtResourceRow[]> {
+  const candidates = [
+    `${publicPaths.basicDataDir}/${resourceName}`,
+    `${publicPaths.root}/${resourceName}`,
+    `${publicPaths.basicDataDir}/basic_data/${resourceName}`,
+    ...DATASET_RESOURCE_DIRS.map(dir => `${publicPaths.basicDataDir}/${dir}/${resourceName}`),
+    ...DATASET_RESOURCE_DIRS.map(dir => `${publicPaths.basicDataDir}/basic_data/${dir}/${resourceName}`),
+  ];
+
+  const resource = await findFirstExistingFile(candidates);
+  if (resource) {
+    const content = await RNFS.readFile(resource, 'utf8');
+    return parseHeaderlessArtCsv(content);
+  }
+
+  return [];
+}
+
+async function findFirstExistingFile(candidates: string[]) {
   for (const candidate of candidates) {
     if (await RNFS.exists(candidate)) {
       return candidate;
@@ -125,22 +157,6 @@ async function findDatasetFile(datasetId: string, config: BasicDataConfig) {
   }
 
   return null;
-}
-
-async function loadArtResource(resourceName: string): Promise<ArtResourceRow[]> {
-  const candidates = [
-    `${publicPaths.basicDataDir}/${resourceName}`,
-    ...DATASET_RESOURCE_DIRS.map(dir => `${publicPaths.basicDataDir}/${dir}/${resourceName}`),
-  ];
-
-  for (const candidate of candidates) {
-    if (await RNFS.exists(candidate)) {
-      const content = await RNFS.readFile(candidate, 'utf8');
-      return parseHeaderlessArtCsv(content);
-    }
-  }
-
-  return [];
 }
 
 function collectDatasetIds(config: BasicDataConfig) {

@@ -18,7 +18,6 @@ import {
   View,
 } from 'react-native';
 import {Camera, CameraType, type CameraApi} from 'react-native-camera-kit';
-import MapView, {Marker, UrlTile} from 'react-native-maps';
 import QRCode from 'react-native-qrcode-svg';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {WebView, type WebViewMessageEvent} from 'react-native-webview';
@@ -571,6 +570,104 @@ function createTransectLeafletHtml(options: {
       return container;
     };
     switchControl.addTo(map);
+  </script>
+</body>
+</html>`;
+}
+
+function createPlotSelectionLeafletHtml(options: {
+  points: Array<{
+    latitude: number;
+    longitude: number;
+    title: string;
+    selected: boolean;
+    row: Record<string, string>;
+  }>;
+  userCoordinate: {latitude: number; longitude: number} | null;
+}) {
+  const data = JSON.stringify(options);
+
+  return `<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    html, body, #map { height: 100%; margin: 0; padding: 0; }
+    body { background: #eef3ed; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    #map { touch-action: none; }
+    .leaflet-control-attribution { font-size: 10px; }
+    .plot-marker {
+      align-items: center;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.35);
+      display: flex;
+      height: 18px;
+      justify-content: center;
+      width: 18px;
+    }
+    .plot-marker.default { background: #277a48; }
+    .plot-marker.selected { background: #245fc7; height: 22px; width: 22px; }
+    .plot-marker.user { background: #b33a2f; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const data = ${data};
+    const points = Array.isArray(data.points) ? data.points : [];
+    const user = data.userCoordinate;
+    const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+      maxZoom: 17,
+      maxNativeZoom: 17,
+      attribution: 'Kartdata © OpenStreetMap, SRTM | Kartstil © OpenTopoMap'
+    });
+    const map = L.map('map', {
+      layers: [topo],
+      zoomControl: true,
+      attributionControl: true,
+      tap: true
+    });
+
+    function icon(className, size) {
+      return L.divIcon({
+        className: '',
+        html: '<div class="plot-marker ' + className + '"></div>',
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size / 2]
+      });
+    }
+
+    const bounds = L.latLngBounds([]);
+    points.forEach(point => {
+      const coordinate = [point.latitude, point.longitude];
+      bounds.extend(coordinate);
+      const marker = L.marker(coordinate, {
+        icon: icon(point.selected ? 'selected' : 'default', point.selected ? 22 : 18),
+        title: point.title || ''
+      }).addTo(map);
+      marker.bindPopup(point.title || 'Provyta');
+      marker.on('click', () => {
+        if (window.ReactNativeWebView) {
+          window.ReactNativeWebView.postMessage(JSON.stringify({type: 'plot', row: point.row}));
+        }
+      });
+    });
+
+    if (user && Number.isFinite(user.latitude) && Number.isFinite(user.longitude)) {
+      const coordinate = [user.latitude, user.longitude];
+      bounds.extend(coordinate);
+      L.marker(coordinate, {icon: icon('user', 18), title: 'Din GPS-position'}).addTo(map).bindPopup('Din GPS-position');
+    }
+
+    if (bounds.isValid()) {
+      map.fitBounds(bounds.pad(0.1), {maxZoom: 15});
+    } else {
+      map.setView([59.5, 18], 8);
+    }
   </script>
 </body>
 </html>`;
@@ -1189,6 +1286,17 @@ function StrandApp() {
       }
     } catch {
       // Ignorera okända meddelanden från kartans WebView.
+    }
+  }
+
+  function handlePlotSelectionMapMessage(event: WebViewMessageEvent) {
+    try {
+      const message = JSON.parse(event.nativeEvent.data) as {type?: string; row?: Record<string, string>};
+      if (message.type === 'plot' && message.row) {
+        promptCreateInventoryFromMap(message.row);
+      }
+    } catch {
+      // Ignorera okända meddelanden från provytekartan.
     }
   }
 
@@ -3703,28 +3811,6 @@ function StrandApp() {
     );
   }
 
-  function getPlotSelectionRegion(rows: Record<string, string>[]) {
-    if (typeof gps.latitude === 'number' && typeof gps.longitude === 'number') {
-      return {
-        latitude: gps.latitude,
-        longitude: gps.longitude,
-        latitudeDelta: 0.18,
-        longitudeDelta: 0.18,
-      };
-    }
-
-    const fallbackRow = nearestPlotMatch?.row ?? rows.find(row => parseNumber(row.latitud) != null && parseNumber(row.longitud) != null);
-    const fallbackLat = parseNumber(fallbackRow?.latitud);
-    const fallbackLon = parseNumber(fallbackRow?.longitud);
-
-    return {
-      latitude: fallbackLat ?? 59.5,
-      longitude: fallbackLon ?? 18,
-      latitudeDelta: 0.18,
-      longitudeDelta: 0.18,
-    };
-  }
-
   function renderPlotSelectionMap() {
     const rows = datasets.provyteunderlag ?? [];
     const visibleRows = rows.filter(row => {
@@ -3747,37 +3833,34 @@ function StrandApp() {
       );
     }
 
+    const leafletHtml = createPlotSelectionLeafletHtml({
+      points: visibleRows.map(row => {
+        const latitude = parseNumber(row.latitud) ?? 0;
+        const longitude = parseNumber(row.longitud) ?? 0;
+        const selected = row.ruta === ruta && row.provyta === provyta;
+
+        return {
+          latitude,
+          longitude,
+          selected,
+          row,
+          title: `Ruta ${row.ruta}, provyta ${row.provyta}`,
+        };
+      }),
+      userCoordinate,
+    });
+
     return (
       <View style={styles.plotSelectionMapWrap}>
-        <MapView
-          initialRegion={getPlotSelectionRegion(visibleRows)}
-          mapType={Platform.OS === 'android' ? 'none' : 'standard'}
-          rotateEnabled
-          scrollEnabled
-          showsCompass
-          showsScale
+        <WebView
+          key={`plot-map-${visibleRows.length}-${ruta}-${provyta}-${gps.latitude ?? ''}-${gps.longitude ?? ''}`}
+          javaScriptEnabled
+          nestedScrollEnabled
+          onMessage={handlePlotSelectionMapMessage}
+          originWhitelist={['*']}
+          source={{html: leafletHtml}}
           style={styles.transectMap}
-          zoomControlEnabled
-          zoomEnabled>
-          {Platform.OS === 'android' ? (
-            <UrlTile maximumZ={19} tileSize={256} urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          ) : null}
-          {visibleRows.map((row, index) => {
-            const latitude = parseNumber(row.latitud) ?? 0;
-            const longitude = parseNumber(row.longitud) ?? 0;
-            const selected = row.ruta === ruta && row.provyta === provyta;
-            return (
-              <Marker
-                key={`${row.pyid || `${row.ruta}-${row.provyta}`}-${index}`}
-                coordinate={{latitude, longitude}}
-                onPress={() => promptCreateInventoryFromMap(row)}
-                pinColor={selected ? 'blue' : 'green'}
-                title={`Ruta ${row.ruta}, provyta ${row.provyta}`}
-              />
-            );
-          })}
-          {userCoordinate ? <Marker coordinate={userCoordinate} pinColor="red" title="Din GPS-position" /> : null}
-        </MapView>
+        />
       </View>
     );
   }
@@ -4526,7 +4609,7 @@ function StrandApp() {
           <View style={styles.cameraHeader}>
             <Text style={styles.modalTitle}>{photoCaptureTarget?.label ?? 'Ta bild'}</Text>
             <Text style={styles.fieldHelp}>
-              Bilden sparas i telefonens publika Strand-mapp och kopplas till aktuell provyta.
+              Bilden sparas i appens Strand-mapp och kopplas till aktuell provyta.
             </Text>
           </View>
 

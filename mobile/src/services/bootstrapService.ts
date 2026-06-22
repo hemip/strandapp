@@ -10,6 +10,8 @@
 import {
   ensurePublicDirectoryStructure,
   loadBootstrapMetadata,
+  normalizeBasicDataDirectory,
+  resetBasicDataDirectory,
   saveBootstrapMetadata,
 } from './publicFileService';
 import {BasicDataConfig, UpdateCheckResult} from '../types/basicData';
@@ -32,6 +34,7 @@ export async function initializeApplication(): Promise<AppBootstrapResult> {
   if (saved && compareVersions(bundled.meta.version, saved.meta.version) > 0) {
     await saveBasicData(bundled);
     await downloadBootstrapResources(bundled);
+    await normalizeBasicDataDirectory();
     await saveBootstrapMetadata({
       basicDataVersion: bundled.meta.version,
       bootstrappedAt: new Date().toISOString(),
@@ -43,6 +46,12 @@ export async function initializeApplication(): Promise<AppBootstrapResult> {
 
   if (!saved) {
     return bootstrapFirstLaunch(bundled);
+  }
+
+  try {
+    await normalizeBasicDataDirectory();
+  } catch {
+    // Om en äldre installation saknar någon resurs fortsätter appen med det som finns.
   }
 
   const notices = ['Lokal konfiguration laddad.'];
@@ -77,7 +86,9 @@ export async function runManualBasicDataUpdate(currentConfig?: BasicDataConfig) 
   let sftpError: unknown = null;
 
   try {
+    await resetBasicDataDirectory();
     await downloadBasicDataBundleFromSftp();
+    await normalizeBasicDataDirectory();
     const sftpConfig = (await loadSavedBasicData()) ?? base;
 
     await saveBootstrapMetadata({
@@ -96,6 +107,8 @@ export async function runManualBasicDataUpdate(currentConfig?: BasicDataConfig) 
 
   if (!remote) {
     if (sftpError) {
+      await saveBasicData(base);
+      await downloadBootstrapResources(base);
       const message = sftpError instanceof Error ? sftpError.message : 'SFTP-hämtningen misslyckades.';
       throw new Error(message);
     }
@@ -133,6 +146,7 @@ async function bootstrapFirstLaunch(bundled: BasicDataConfig): Promise<AppBootst
       if (remote) {
         await saveBasicData(remote);
         await downloadBootstrapResources(remote);
+        await normalizeBasicDataDirectory();
         await saveBootstrapMetadata({
           basicDataVersion: remote.meta.version,
           bootstrappedAt: new Date().toISOString(),
@@ -159,6 +173,7 @@ async function bootstrapFirstLaunch(bundled: BasicDataConfig): Promise<AppBootst
 
   await saveBasicData(bundled);
   await downloadBootstrapResources(bundled);
+  await normalizeBasicDataDirectory();
   await saveBootstrapMetadata({
     basicDataVersion: bundled.meta.version,
     bootstrappedAt: new Date().toISOString(),

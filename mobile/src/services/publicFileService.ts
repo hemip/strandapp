@@ -7,8 +7,8 @@ const ROOT_FOLDER_NAME = 'Strand';
 const METADATA_KEY = '@strand/bootstrap-metadata';
 
 function getRootDirectory() {
-  if (Platform.OS === 'android' && RNFS.DownloadDirectoryPath) {
-    return `${RNFS.DownloadDirectoryPath}/${ROOT_FOLDER_NAME}`;
+  if (Platform.OS === 'android' && RNFS.ExternalDirectoryPath) {
+    return `${RNFS.ExternalDirectoryPath}/${ROOT_FOLDER_NAME}`;
   }
 
   return `${RNFS.DocumentDirectoryPath}/${ROOT_FOLDER_NAME}`;
@@ -48,8 +48,79 @@ export async function ensurePublicDirectoryStructure() {
   await ensureDir(publicPaths.documentsDir);
 }
 
+export async function resetBasicDataDirectory() {
+  await ensureDir(publicPaths.root);
+  if (await RNFS.exists(publicPaths.basicDataDir)) {
+    await RNFS.unlink(publicPaths.basicDataDir);
+  }
+  await ensureDir(publicPaths.basicDataDir);
+}
+
 export function getBasicDataPath() {
   return `${publicPaths.basicDataDir}/basic_data.json`;
+}
+
+function getBasicDataCandidatePaths() {
+  return [
+    getBasicDataPath(),
+    `${publicPaths.basicDataDir}/basic_data.bas.json`,
+    `${publicPaths.basicDataDir}/default-basic-data.json`,
+    `${publicPaths.basicDataDir}/basic_data/basic_data.json`,
+    `${publicPaths.basicDataDir}/basic_data/basic_data.bas.json`,
+    `${publicPaths.basicDataDir}/basic_data/default-basic-data.json`,
+  ];
+}
+
+function getCanonicalBasicDataFileCandidates() {
+  return {
+    basicData: getBasicDataCandidatePaths(),
+    data: [
+      `${publicPaths.basicDataDir}/data.csv`,
+      `${publicPaths.basicDataDir}/utlagg/data.csv`,
+      `${publicPaths.basicDataDir}/basic_data/data.csv`,
+      `${publicPaths.basicDataDir}/basic_data/utlagg/data.csv`,
+    ],
+    artList: [
+      `${publicPaths.basicDataDir}/strandinventering_arter_alla.csv`,
+      `${publicPaths.basicDataDir}/artlistor/strandinventering_arter_alla.csv`,
+      `${publicPaths.basicDataDir}/basic_data/strandinventering_arter_alla.csv`,
+      `${publicPaths.basicDataDir}/basic_data/artlistor/strandinventering_arter_alla.csv`,
+    ],
+  };
+}
+
+async function readFirstExistingTextFile(paths: string[]) {
+  for (const path of paths) {
+    if (await RNFS.exists(path)) {
+      return RNFS.readFile(path, 'utf8');
+    }
+  }
+
+  return null;
+}
+
+export async function normalizeBasicDataDirectory() {
+  const candidates = getCanonicalBasicDataFileCandidates();
+  const basicDataContent = await readFirstExistingTextFile(candidates.basicData);
+  const dataContent = await readFirstExistingTextFile(candidates.data);
+  const artListContent = await readFirstExistingTextFile(candidates.artList);
+
+  if (!basicDataContent) {
+    throw new Error('Ingen basic_data-fil hittades i hämtad bundle.');
+  }
+
+  if (!dataContent) {
+    throw new Error('Ingen data.csv hittades i hämtad bundle.');
+  }
+
+  if (!artListContent) {
+    throw new Error('Ingen strandinventering_arter_alla.csv hittades i hämtad bundle.');
+  }
+
+  await resetBasicDataDirectory();
+  await RNFS.writeFile(getBasicDataPath(), basicDataContent.replace(/^\uFEFF/, ''), 'utf8');
+  await RNFS.writeFile(`${publicPaths.basicDataDir}/data.csv`, dataContent, 'utf8');
+  await RNFS.writeFile(`${publicPaths.basicDataDir}/strandinventering_arter_alla.csv`, artListContent, 'utf8');
 }
 
 export function getWorkingDraftPath() {
@@ -72,7 +143,7 @@ export async function readJsonFile<T>(path: string): Promise<T | null> {
   }
 
   const content = await RNFS.readFile(path, 'utf8');
-  return JSON.parse(content) as T;
+  return JSON.parse(content.replace(/^\uFEFF/, '')) as T;
 }
 
 export async function writeTextFile(path: string, value: string) {
@@ -148,5 +219,24 @@ export async function saveBasicDataToDisk(config: BasicDataConfig) {
 }
 
 export async function loadBasicDataFromDisk() {
-  return readJsonFile<BasicDataConfig>(getBasicDataPath());
+  const candidates = await Promise.all(
+    getBasicDataCandidatePaths().map(async path => {
+      if (!(await RNFS.exists(path))) {
+        return null;
+      }
+
+      try {
+        const stat = await RNFS.stat(path);
+        const modifiedAt = stat.mtime ? new Date(stat.mtime).getTime() : 0;
+        return {path, modifiedAt: Number.isFinite(modifiedAt) ? modifiedAt : 0};
+      } catch {
+        return {path, modifiedAt: 0};
+      }
+    }),
+  );
+  const newest = candidates
+    .filter((candidate): candidate is {path: string; modifiedAt: number} => Boolean(candidate))
+    .sort((a, b) => b.modifiedAt - a.modifiedAt)[0];
+
+  return newest ? readJsonFile<BasicDataConfig>(newest.path) : null;
 }

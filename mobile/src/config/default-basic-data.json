@@ -21,53 +21,13 @@
     {
       "id": "provyteunderlag",
       "type": "csv",
-      "target_path": "basic_data/utlagg/data.csv",
+      "target_path": "basic_data/data.csv",
       "description": "Årets utlägg och provyteunderlag"
-    },
-    {
-      "id": "artlista_trad",
-      "type": "csv",
-      "target_path": "basic_data/artlistor/strandinventering_arter_trad.csv"
-    },
-    {
-      "id": "artlista_buskar",
-      "type": "csv",
-      "target_path": "basic_data/artlistor/strandinventering_arter_buskar.csv"
-    },
-    {
-      "id": "artlista_graminider",
-      "type": "csv",
-      "target_path": "basic_data/artlistor/strandinventering_arter_graminider.csv"
-    },
-    {
-      "id": "artlista_lavar",
-      "type": "csv",
-      "target_path": "basic_data/artlistor/strandinventering_arter_lavar.csv"
-    },
-    {
-      "id": "artlista_mossor",
-      "type": "csv",
-      "target_path": "basic_data/artlistor/strandinventering_arter_mossor.csv"
-    },
-    {
-      "id": "artlista_orter",
-      "type": "csv",
-      "target_path": "basic_data/artlistor/strandinventering_arter_orter.csv"
-    },
-    {
-      "id": "artlista_ris",
-      "type": "csv",
-      "target_path": "basic_data/artlistor/strandinventering_arter_ris.csv"
-    },
-    {
-      "id": "artlista_ormbunkar",
-      "type": "csv",
-      "target_path": "basic_data/artlistor/strandinventering_arter_ormbunkar.csv"
     },
     {
       "id": "artlista_alla",
       "type": "csv",
-      "target_path": "basic_data/artlistor/strandinventering_arter_alla.csv"
+      "target_path": "basic_data/strandinventering_arter_alla.csv"
     }
   ],
   "lists": {
@@ -238,14 +198,14 @@
       { "value": "Välbetat (<70% ytan)", "label": "Välbetat (<70% ytan)" }
     ],
     "artkategorier": [
-      { "value": "trad", "label": "Trädarter", "resource": "strandinventering_arter_trad.csv", "entry_mode": "presence_observation" },
-      { "value": "buskar", "label": "Buskarter", "resource": "strandinventering_arter_buskar.csv", "entry_mode": "presence_observation" },
-      { "value": "orter", "label": "Örter", "resource": "strandinventering_arter_orter.csv", "entry_mode": "arter_table" },
-      { "value": "ris", "label": "Ris", "resource": "strandinventering_arter_ris.csv", "entry_mode": "arter_table" },
-      { "value": "graminider", "label": "Graminider", "resource": "strandinventering_arter_graminider.csv", "entry_mode": "arter_table" },
-      { "value": "ormbunkar", "label": "Ormbunkar", "resource": "strandinventering_arter_ormbunkar.csv", "entry_mode": "arter_table" },
-      { "value": "mossor", "label": "Mossor", "resource": "strandinventering_arter_mossor.csv", "entry_mode": "arter_table" },
-      { "value": "lavar", "label": "Lavar", "resource": "strandinventering_arter_lavar.csv", "entry_mode": "arter_table" }
+      { "value": "trad", "label": "Trädarter", "resource": "strandinventering_arter_alla.csv", "entry_mode": "presence_observation" },
+      { "value": "buskar", "label": "Buskarter", "resource": "strandinventering_arter_alla.csv", "entry_mode": "presence_observation" },
+      { "value": "orter", "label": "Örter", "resource": "strandinventering_arter_alla.csv", "entry_mode": "arter_table" },
+      { "value": "ris", "label": "Ris", "resource": "strandinventering_arter_alla.csv", "entry_mode": "arter_table" },
+      { "value": "graminider", "label": "Graminider", "resource": "strandinventering_arter_alla.csv", "entry_mode": "arter_table" },
+      { "value": "ormbunkar", "label": "Ormbunkar", "resource": "strandinventering_arter_alla.csv", "entry_mode": "arter_table" },
+      { "value": "mossor", "label": "Mossor", "resource": "strandinventering_arter_alla.csv", "entry_mode": "arter_table" },
+      { "value": "lavar", "label": "Lavar", "resource": "strandinventering_arter_alla.csv", "entry_mode": "arter_table" }
     ],
     "artzoner": [
       { "value": "geo", "label": "Geolitoral", "resource": "strandinventering_arter_alla.csv", "entry_mode": "species_observation" },
