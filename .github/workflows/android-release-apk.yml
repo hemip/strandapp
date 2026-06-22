@@ -1,0 +1,114 @@
+name: Android release APK
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build signed APK
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    env:
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      SFTP_HOST: ${{ secrets.SFTP_HOST }}
+      SFTP_PORT: ${{ secrets.SFTP_PORT }}
+      SFTP_USER: ${{ secrets.SFTP_USER }}
+      SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+      SFTP_APK_DIR: ${{ secrets.SFTP_APK_DIR }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Decode Android keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "ANDROID_KEYSTORE_BASE64 saknas i GitHub Secrets."
+            exit 1
+          fi
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/release.keystore
+          echo "ANDROID_KEYSTORE_FILE=release.keystore" >> "$GITHUB_ENV"
+
+      - name: Set app version
+        id: app_version
+        run: |
+          echo "VERSION_CODE=${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            VERSION_NAME="${GITHUB_REF_NAME#v}"
+          else
+            VERSION_NAME="0.0.${GITHUB_RUN_NUMBER}"
+          fi
+          echo "VERSION_NAME=${VERSION_NAME}" >> "$GITHUB_ENV"
+          echo "version_name=${VERSION_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint -- --quiet
+
+      - name: Make Gradle executable
+        run: chmod +x android/gradlew
+
+      - name: Build release APK
+        run: ./android/gradlew -p android :app:assembleRelease --console=plain
+
+      - name: Prepare APK artifact
+        run: |
+          mkdir -p dist
+          cp android/app/build/outputs/apk/release/app-release.apk "dist/strand-${VERSION_NAME}.apk"
+          cp android/app/build/outputs/apk/release/app-release.apk "dist/strand-latest.apk"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: strand-apk-${{ steps.app_version.outputs.version_name }}
+          path: |
+            mobile/dist/strand-${{ steps.app_version.outputs.version_name }}.apk
+            mobile/dist/strand-latest.apk
+
+      - name: Upload APK to SFTP on version tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          if [ -z "$SFTP_HOST" ] || [ -z "$SFTP_USER" ] || [ -z "$SFTP_PASSWORD" ]; then
+            echo "SFTP-secrets saknas. APK:n finns som GitHub artifact men laddas inte upp till servern."
+            exit 0
+          fi
+          python -m pip install --user paramiko
+          python ../scripts/upload_apk_to_sftp.py \
+            --host "$SFTP_HOST" \
+            --port "${SFTP_PORT:-22}" \
+            --username "$SFTP_USER" \
+            --password "$SFTP_PASSWORD" \
+            --remote-dir "${SFTP_APK_DIR:-apk}" \
+            --version "$VERSION_NAME" \
+            --apk "dist/strand-${VERSION_NAME}.apk" \
+            --latest-apk "dist/strand-latest.apk"

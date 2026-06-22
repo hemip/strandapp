@@ -59,6 +59,28 @@ react {
  */
 def enableProguardInReleaseBuilds = false
 
+def envOrProperty = { name ->
+    return System.getenv(name) ?: (project.hasProperty(name) ? project.property(name) : null)
+}
+
+def intEnvOrProperty = { name, fallback ->
+    def value = envOrProperty(name)
+    if (value == null || value.toString().trim().isEmpty()) {
+        return fallback
+    }
+    try {
+        return value.toString().toInteger()
+    } catch (ignored) {
+        return fallback
+    }
+}
+
+def releaseStoreFilePath = envOrProperty("ANDROID_KEYSTORE_FILE")
+def releaseStorePassword = envOrProperty("ANDROID_KEYSTORE_PASSWORD")
+def releaseKeyAlias = envOrProperty("ANDROID_KEY_ALIAS")
+def releaseKeyPassword = envOrProperty("ANDROID_KEY_PASSWORD")
+def hasReleaseSigning = releaseStoreFilePath && releaseStorePassword && releaseKeyAlias && releaseKeyPassword
+
 /**
  * The preferred build flavor of JavaScriptCore (JSC)
  *
@@ -82,8 +104,8 @@ android {
         applicationId "com.strand"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode intEnvOrProperty("VERSION_CODE", 1)
+        versionName envOrProperty("VERSION_NAME") ?: "1.0"
     }
     signingConfigs {
         debug {
@@ -92,17 +114,31 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            if (hasReleaseSigning) {
+                storeFile file(releaseStoreFilePath)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig hasReleaseSigning ? signingConfigs.release : signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+}
+
+tasks.configureEach { task ->
+    if (task.name in ["assembleRelease", "bundleRelease"] && !hasReleaseSigning) {
+        task.doFirst {
+            throw new GradleException("Release-signering saknas. Sätt ANDROID_KEYSTORE_FILE, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS och ANDROID_KEY_PASSWORD.")
         }
     }
 }
