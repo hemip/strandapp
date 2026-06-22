@@ -101,6 +101,14 @@ export async function markInventorySubmitted(draft: Record<string, unknown>) {
 export async function deleteInventoryFromDevice(item: InventoryListItem) {
   await deleteFileIfExists(getDraftPath(item.id));
   await deleteFileIfExists(`${publicPaths.exportDir}/${sanitizePathSegment(item.id)}.json`);
+  if (await RNFS.exists(publicPaths.exportDir)) {
+    const exportFiles = await RNFS.readDir(publicPaths.exportDir);
+    await Promise.all(
+      exportFiles
+        .filter(file => file.isFile() && file.name.startsWith(`${sanitizePathSegment(item.id)}_`) && file.name.endsWith('.json'))
+        .map(file => deleteFileIfExists(file.path)),
+    );
+  }
 
   const photoDir = `${publicPaths.photosDir}/${sanitizePathSegment(item.id)}`;
   if (await RNFS.exists(photoDir)) {

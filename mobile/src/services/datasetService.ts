@@ -114,6 +114,7 @@ async function findDatasetFile(datasetId: string, config: BasicDataConfig) {
   const configuredResource = config.bootstrap_resources?.find(resource => resource.id === datasetId);
   const candidates = [
     configuredResource ? `${publicPaths.root}/${configuredResource.target_path}` : null,
+    `${publicPaths.basicDataDir}/${datasetId}.csv`,
     ...DATASET_RESOURCE_DIRS.map(dir => `${publicPaths.basicDataDir}/${dir}/${datasetId}.csv`),
   ].filter((candidate): candidate is string => Boolean(candidate));
 
@@ -127,7 +128,10 @@ async function findDatasetFile(datasetId: string, config: BasicDataConfig) {
 }
 
 async function loadArtResource(resourceName: string): Promise<ArtResourceRow[]> {
-  const candidates = DATASET_RESOURCE_DIRS.map(dir => `${publicPaths.basicDataDir}/${dir}/${resourceName}`);
+  const candidates = [
+    `${publicPaths.basicDataDir}/${resourceName}`,
+    ...DATASET_RESOURCE_DIRS.map(dir => `${publicPaths.basicDataDir}/${dir}/${resourceName}`),
+  ];
 
   for (const candidate of candidates) {
     if (await RNFS.exists(candidate)) {

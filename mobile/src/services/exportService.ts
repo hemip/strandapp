@@ -1,5 +1,5 @@
 import {BasicDataConfig} from '../types/basicData';
-import {createPlotFileBase} from './namingService';
+import {createExportFileBase} from './namingService';
 import {publicPaths, sanitizePathSegment, writeJsonFile} from './publicFileService';
 
 interface ExportOptions {
@@ -7,7 +7,7 @@ interface ExportOptions {
   draft: Record<string, unknown>;
 }
 
-interface PhotoExportEntry {
+export interface PhotoExportEntry {
   fieldPath: string;
   fileName: string;
   path: string;
@@ -84,7 +84,7 @@ function createLegacyHeader(draft: Record<string, unknown>) {
 }
 
 export function createDraftExportFileInfo(draft: Record<string, unknown>) {
-  const exportId = createPlotFileBase(draft);
+  const exportId = createExportFileBase(draft);
   const fileName = `${sanitizePathSegment(exportId)}.json`;
   const path = `${publicPaths.exportDir}/${fileName}`;
 
@@ -127,5 +127,6 @@ export async function exportDraftToJson({basicData, draft}: ExportOptions) {
     path,
     payload,
     photoCount: photos.length,
+    photos,
   };
 }

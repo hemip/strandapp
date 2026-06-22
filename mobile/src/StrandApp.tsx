@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Keyboard,
   Modal,
   PermissionsAndroid,
   Platform,
@@ -41,6 +42,7 @@ import {
   saveWorkingDraft,
 } from './services/publicFileService';
 import {createDraftExportFileInfo, createDraftExportPayload, exportDraftToJson} from './services/exportService';
+import {uploadExportAndPhotosToSftp} from './services/sftpBundleService';
 import {
   InventoryListItem,
   deleteInventoryFromDevice,
@@ -49,20 +51,20 @@ import {
   markInventorySubmitted,
   saveInventoryDraftSnapshot,
 } from './services/inventoryStore';
-import {createPlotFileBase} from './services/namingService';
+import {createPlotFileBase, getInventerareFileId} from './services/namingService';
 import {BasicDataConfig, BasicDataField, BasicDataListOption, GpsSnapshot} from './types/basicData';
 
 const SESSION_CODE_TYPE = 'strand-session';
 const USER_SETUP_FIELD_IDS = new Set(['lagnummer', 'inventerare']);
 const REQUIRES_SELECTED_PLOT_FIELD_IDS = new Set(['inventeringstyp']);
 const HEADER_MENU_TAB_IDS = new Set([
-  'substrat',
   'arter',
   'ej_inventerad',
   'extra_bilder',
 ]);
 const NORMAL_INVENTORY_TAB_ID = 'start_bilder';
 const DISTANCE_INVENTORY_TAB_ID = 'hydro';
+const SIDE_TAB_LAST_IDS = new Set(['substrat']);
 
 interface PhotoEntry {
   id: string;
@@ -876,6 +878,7 @@ function StrandApp() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [statusText, setStatusText] = useState('Förbereder appen...');
   const [updateVersion, setUpdateVersion] = useState<string | null>(null);
+  const [keyboardInset, setKeyboardInset] = useState(0);
   const photoCameraRef = useRef<CameraApi | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const promptShown = useRef(false);
@@ -1219,6 +1222,20 @@ function StrandApp() {
   }, []);
 
   useEffect(() => {
+    const showSubscription = Keyboard.addListener('keyboardDidShow', event => {
+      setKeyboardInset(event.endCoordinates.height);
+    });
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardInset(0);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
+  useEffect(() => {
     return () => {
       if (toastTimer.current) {
         clearTimeout(toastTimer.current);
@@ -1355,6 +1372,65 @@ function StrandApp() {
     }
   }, [basicData, hasUserSetup, isLoading]);
 
+  function isRequiredFieldMissing(field: BasicDataField, value: unknown) {
+    if (!field.required) {
+      return false;
+    }
+
+    if (field.type === 'gps_capture') {
+      return !isStoredGpsPoint(value);
+    }
+
+    if (field.type === 'inventory_uuid') {
+      return !isValidUuid(value);
+    }
+
+    if (Array.isArray(value)) {
+      return value.length === 0;
+    }
+
+    if (value && typeof value === 'object') {
+      return Object.keys(value).length === 0;
+    }
+
+    return value === undefined || value === null || String(value).trim() === '';
+  }
+
+  function getMissingRequiredFields() {
+    if (!basicData) {
+      return [];
+    }
+
+    const missing: Array<{fieldId: string; label: string; tabId?: string; tabLabel?: string}> = [];
+    const seen = new Set<string>();
+
+    const visitField = (fieldOrId: string | BasicDataField, tabId?: string, tabLabel?: string) => {
+      const field = resolveField(fieldOrId);
+      if (!field?.required || seen.has(field.id)) {
+        return;
+      }
+
+      seen.add(field.id);
+      if (isRequiredFieldMissing(field, draft[field.id])) {
+        missing.push({
+          fieldId: field.id,
+          label: field.label,
+          tabId,
+          tabLabel,
+        });
+      }
+    };
+
+    basicData.tabs.forEach(tab => {
+      tab.sections.forEach(section => {
+        section.fields.forEach(fieldOrId => visitField(fieldOrId, tab.id, tab.label));
+      });
+    });
+    basicData.global_fields?.forEach(field => visitField(field));
+
+    return missing;
+  }
+
   async function handleManualExport() {
     if (!basicData) {
       Alert.alert('Export saknar grunddata', 'Appen behöver ha läst in basic_data innan export kan skapas.');
@@ -1366,17 +1442,52 @@ function StrandApp() {
       return;
     }
 
+    const missingRequiredFields = getMissingRequiredFields();
+    if (missingRequiredFields.length > 0) {
+      const firstMissingTabId = missingRequiredFields.find(item => item.tabId)?.tabId;
+      const missingText = missingRequiredFields
+        .slice(0, 12)
+        .map(item => `• ${item.tabLabel ? `${item.tabLabel}: ` : ''}${item.label}`)
+        .join('\n');
+      const overflowText =
+        missingRequiredFields.length > 12 ? `\n...och ${missingRequiredFields.length - 12} till.` : '';
+
+      Alert.alert(
+        'Obligatoriska fält saknas',
+        `Fyll i dessa innan export skapas:\n\n${missingText}${overflowText}`,
+        [
+          {text: 'Avbryt', style: 'cancel'},
+          firstMissingTabId
+            ? {
+                text: 'Gå till första',
+                onPress: () => setActiveTabId(firstMissingTabId),
+              }
+            : {text: 'OK'},
+        ],
+      );
+      return;
+    }
+
     try {
       setIsExporting(true);
       await saveWorkingDraft(draft);
       const result = await exportDraftToJson({basicData, draft});
+      const uploadResult = await uploadExportAndPhotosToSftp({
+        exportPath: result.path,
+        exportFileName: result.fileName,
+        photos: result.photos,
+      });
       const item = await markInventorySubmitted(draft);
       if (item) {
         setInventories(prev => [item, ...prev.filter(existing => existing.id !== item.id)]);
       }
       Alert.alert(
-        'JSON-export skapad',
-        `Fil: ${result.fileName}\nFoton i exporten: ${result.photoCount}\n\nSökväg:\n${result.path}`,
+        'JSON-export skapad och uppladdad',
+        `Fil: ${result.fileName}\nFoton i exporten: ${result.photoCount}\n\nUppladdat: ${
+          uploadResult.export.uploaded + uploadResult.photos.uploaded
+        } filer\nRedan aktuella: ${uploadResult.export.skipped + uploadResult.photos.skipped} filer\nSaknade: ${
+          uploadResult.export.missing + uploadResult.photos.missing
+        } filer\n\nSökväg:\n${result.path}`,
       );
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Kunde inte skapa JSON-exporten.';
@@ -1863,6 +1974,11 @@ function StrandApp() {
     return createPlotFileBase(draft);
   }
 
+  function getPhotoNameParts(photoName: string) {
+    const inventorId = getInventerareFileId(draft);
+    return inventorId ? [getPhotoPlotId(), photoName, inventorId] : [getPhotoPlotId(), photoName];
+  }
+
   async function openPhotoCapture(target: PhotoCaptureTarget) {
     try {
       const status = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA, {
@@ -1907,7 +2023,7 @@ function StrandApp() {
       const saved = await saveCapturedPhotoToPublicStorage(captured.uri, {
         plotId,
         category: photoCaptureTarget.category,
-        nameParts: [plotId, photoName],
+        nameParts: getPhotoNameParts(photoName),
       });
       const entry: PhotoEntry = {
         id: uuidv4(),
@@ -2055,7 +2171,7 @@ function StrandApp() {
     const category = getPhotoCategory(field);
 
     return (
-      <View key={field.id} style={styles.fieldCard}>
+      <View key={field.id} style={[styles.fieldCard, styles.matrixFieldCard]}>
         <Text style={styles.fieldLabel}>{field.label}</Text>
         {photo ? renderPhotoPreview(photo, () => removePhoto(field.id, photo), field.label) : null}
         <Pressable
@@ -2566,12 +2682,26 @@ function StrandApp() {
       ? (draft[fieldId] as Record<string, Record<string, string>>)
       : {};
     const currentRow = current[rowId] ?? {};
+    const currentColumnTotal = Object.entries(current).reduce((total, [currentRowId, rowValues]) => {
+      if (currentRowId === rowId) {
+        return total;
+      }
+
+      const rowValue = Number(rowValues?.[columnId] ?? 0);
+      return Number.isFinite(rowValue) ? total + rowValue : total;
+    }, 0);
+    const nextValue = Number(numericValue || 0);
+    const adjustedValue = Math.max(0, Math.min(nextValue, 100 - currentColumnTotal));
+
+    if (adjustedValue !== nextValue) {
+      showValidationToast(`Värdet justerades till ${adjustedValue} så att summan blir 100 procent.`);
+    }
 
     updateDraftValue(fieldId, {
       ...current,
       [rowId]: {
         ...currentRow,
-        [columnId]: numericValue,
+        [columnId]: numericValue === '' ? '' : String(adjustedValue),
       },
     });
   }
@@ -2718,13 +2848,15 @@ function StrandApp() {
     const nameColumn = getArtNameColumn(columns);
     const rows = getArtTableRows(draft[field.id]);
     const displayName = art.swedishName || art.scientificName;
+    const isSpeciesObservation = entryMode === 'species_observation';
+    const isPresenceObservation = entryMode === 'presence_observation';
 
-    const coordinateGps = entryMode === 'species_observation' ? await refreshGps() : gps;
+    const coordinateGps = isSpeciesObservation ? await refreshGps() : null;
     if (
-      entryMode === 'species_observation' &&
-      (typeof coordinateGps.latitude !== 'number' || typeof coordinateGps.longitude !== 'number')
+      isSpeciesObservation &&
+      (!coordinateGps || typeof coordinateGps.latitude !== 'number' || typeof coordinateGps.longitude !== 'number')
     ) {
-      showValidationToast(coordinateGps.message || 'Kunde inte läsa GPS-position för artobservationen.');
+      showValidationToast(coordinateGps?.message || 'Kunde inte läsa GPS-position för artobservationen.');
       return;
     }
 
@@ -2737,21 +2869,24 @@ function StrandApp() {
         scientificName: art.scientificName,
         swedishName: art.swedishName,
         zone: category ?? '',
-        registrationMode: art.registrationMode,
+        registrationMode: isPresenceObservation ? 'presence' : art.registrationMode,
         registrationCode: art.registrationCode,
         zoneLabel: getArtCategoryOption(field)?.label ?? '',
-        latitude: typeof coordinateGps.latitude === 'number' ? String(coordinateGps.latitude) : '',
-        longitude: typeof coordinateGps.longitude === 'number' ? String(coordinateGps.longitude) : '',
-        altitude: typeof coordinateGps.altitude === 'number' ? String(coordinateGps.altitude) : '',
-        altitudeAccuracy: typeof coordinateGps.altitudeAccuracy === 'number' ? String(coordinateGps.altitudeAccuracy) : '',
-        accuracy: typeof coordinateGps.accuracy === 'number' ? String(coordinateGps.accuracy) : '',
+        latitude: coordinateGps && typeof coordinateGps.latitude === 'number' ? String(coordinateGps.latitude) : '',
+        longitude: coordinateGps && typeof coordinateGps.longitude === 'number' ? String(coordinateGps.longitude) : '',
+        altitude: coordinateGps && typeof coordinateGps.altitude === 'number' ? String(coordinateGps.altitude) : '',
+        altitudeAccuracy:
+          coordinateGps && typeof coordinateGps.altitudeAccuracy === 'number' ? String(coordinateGps.altitudeAccuracy) : '',
+        accuracy: coordinateGps && typeof coordinateGps.accuracy === 'number' ? String(coordinateGps.accuracy) : '',
         coordinateCapturedAt: new Date().toISOString(),
-        ...(entryMode === 'species_observation'
+        ...(isSpeciesObservation
           ? art.registrationMode === 'count'
             ? {antal: ''}
             : art.registrationMode === 'area'
               ? {m2: ''}
               : {finns: '1'}
+          : isPresenceObservation
+            ? {finns: '1'}
           : {}),
         [nameColumn]: displayName,
       },
@@ -2908,7 +3043,7 @@ function StrandApp() {
             }}
             placeholder="Kommentar"
             placeholderTextColor="#8e8579"
-            style={[styles.input, styles.multilineInput]}
+            style={[styles.input, styles.artCommentInput]}
             value={getStringValue(row.kommentar)}
           />
         </View>
@@ -2937,7 +3072,7 @@ function StrandApp() {
                       parentRowId: nested.parentRow.id,
                       nestedFieldId: field.id,
                       observationId: row.id,
-                      typeValue: getStringValue(row.artId) || row.id,
+                      typeValue: `${getStringValue(row.artId) || 'art'}_${row.id}`,
                       typeLabel: label,
                     }
                   : {
@@ -2946,7 +3081,7 @@ function StrandApp() {
                       category: 'arter',
                       label: `Ta bild: ${label}`,
                       observationId: row.id,
-                      typeValue: getStringValue(row.artId) || row.id,
+                      typeValue: `${getStringValue(row.artId) || 'art'}_${row.id}`,
                       typeLabel: label,
                     },
               ).catch(() => undefined)
@@ -2964,6 +3099,8 @@ function StrandApp() {
     const category = categoryOption?.value ?? (typeof field.category === 'string' ? field.category : null);
     const entryMode = categoryOption?.entry_mode;
     const isSpeciesObservation = entryMode === 'species_observation';
+    const isPresenceObservation = entryMode === 'presence_observation';
+    const isObservation = isSpeciesObservation || isPresenceObservation;
     const columns = getArtTableColumns(field, categoryOption);
     const nameColumn = getArtNameColumn(columns);
     const rows = getArtTableRows(draft[field.id]);
@@ -2988,8 +3125,8 @@ function StrandApp() {
         ) : (
           <>
             <Text style={styles.fieldHelp}>
-              {categoryOption?.label ?? field.label}: sök fram en art och lägg till den. GPS-koordinat sparas på
-              observationen.
+              {categoryOption?.label ?? field.label}: sök fram en art och lägg till den.
+              {isSpeciesObservation ? ' GPS-koordinat sparas på observationen.' : ''}
             </Text>
             <TextInput
               autoCapitalize="none"
@@ -3012,9 +3149,11 @@ function StrandApp() {
                     <Text style={styles.artSearchName}>{art.swedishName || art.scientificName}</Text>
                     <Text style={styles.artSearchMeta}>
                       {art.scientificName} | {art.family}
-                      {isSpeciesObservation
-                        ? ` | ${art.registrationMode === 'count' ? 'Antal' : art.registrationMode === 'area' ? 'm2' : 'Finns'}`
-                        : ''}
+                      {isPresenceObservation
+                        ? ' | Finns'
+                        : isSpeciesObservation
+                          ? ` | ${art.registrationMode === 'count' ? 'Antal' : art.registrationMode === 'area' ? 'm2' : 'Finns'}`
+                          : ''}
                     </Text>
                   </Pressable>
                 ))
@@ -3042,31 +3181,36 @@ function StrandApp() {
                     <Text style={styles.smallDangerButtonText}>Ta bort</Text>
                   </Pressable>
                 </View>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                  <View style={styles.artColumnRow}>
-                    {isSpeciesObservation
-                      ? renderSpeciesObservationInput(field.id, row)
-                      : columns
-                          .filter(column => column !== nameColumn)
-                          .map(column => (
-                            <View key={`${row.id}-${column}`} style={styles.artColumnInputGroup}>
-                              <Text style={styles.repeaterFieldLabel}>{formatConfigLabel(column)}</Text>
-                              <TextInput
-                                onChangeText={text => updateArtRow(field.id, row.id, column, text)}
-                                placeholder="Värde"
-                                placeholderTextColor="#8e8579"
-                                style={styles.artValueInput}
-                                value={getStringValue(row[column])}
-                              />
-                            </View>
-                          ))}
-                  </View>
-                </ScrollView>
-                {isSpeciesObservation ? renderArtObservationExtras(field, row) : null}
-                <Text style={styles.artCoordinateText}>
-                  Koordinat: {row.latitude && row.longitude ? `${getStringValue(row.latitude)}, ${getStringValue(row.longitude)}` : 'saknas'}
-                  {row.altitude ? ` | höjd ${Number(row.altitude).toFixed(2)} m` : ''}
-                </Text>
+                {isObservation ? (
+                  <View style={styles.artColumnRowCompact}>{renderSpeciesObservationInput(field.id, row)}</View>
+                ) : (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    <View style={styles.artColumnRow}>
+                      {columns
+                        .filter(column => column !== nameColumn)
+                        .map(column => (
+                          <View key={`${row.id}-${column}`} style={styles.artColumnInputGroup}>
+                            <Text style={styles.repeaterFieldLabel}>{formatConfigLabel(column)}</Text>
+                            <TextInput
+                              onChangeText={text => updateArtRow(field.id, row.id, column, text)}
+                              placeholder="Värde"
+                              placeholderTextColor="#8e8579"
+                              style={styles.artValueInput}
+                              value={getStringValue(row[column])}
+                            />
+                          </View>
+                        ))}
+                    </View>
+                  </ScrollView>
+                )}
+                {isObservation ? renderArtObservationExtras(field, row) : null}
+                {isSpeciesObservation ? (
+                  <Text style={styles.artCoordinateText}>
+                    Koordinat:{' '}
+                    {row.latitude && row.longitude ? `${getStringValue(row.latitude)}, ${getStringValue(row.longitude)}` : 'saknas'}
+                    {row.altitude ? ` | höjd ${Number(row.altitude).toFixed(2)} m` : ''}
+                  </Text>
+                ) : null}
               </View>
             ))}
           </View>
@@ -3834,11 +3978,13 @@ function StrandApp() {
     ? basicData.tabs.filter(tab => HEADER_MENU_TAB_IDS.has(tab.id) && tab.id !== 'ej_inventerad')
     : [];
   const visibleTabs = hasSelectedPlot
-    ? basicData.tabs.filter(
-        tab =>
-          !hiddenMainTabIds.has(tab.id) &&
-          (!HEADER_MENU_TAB_IDS.has(tab.id) || (tab.id === 'ej_inventerad' && draft.inventeringstyp === 'ej_inventerad')),
-      )
+    ? basicData.tabs
+        .filter(
+          tab =>
+            !hiddenMainTabIds.has(tab.id) &&
+            (!HEADER_MENU_TAB_IDS.has(tab.id) || (tab.id === 'ej_inventerad' && draft.inventeringstyp === 'ej_inventerad')),
+        )
+        .sort((left, right) => Number(SIDE_TAB_LAST_IDS.has(left.id)) - Number(SIDE_TAB_LAST_IDS.has(right.id)))
     : basicData.tabs.filter(tab => tab.id === 'oversikt');
   const visibleActiveTab = hasSelectedPlot
     ? hiddenMainTabIds.has(activeTab.id)
@@ -3846,13 +3992,12 @@ function StrandApp() {
       : activeTab
     : overviewTab;
   const shouldShowSideTabs = hasSelectedPlot && visibleActiveTab.id !== overviewTab.id;
+  const activeTabTitle = visibleActiveTab.id === 'substrat' ? 'Substratmatris' : visibleActiveTab.label;
   const tabContent = (
     <View style={styles.tabContainer}>
-      <Text style={styles.tabTitle}>{visibleActiveTab.label}</Text>
-      {visibleActiveTab.sections.map(section => (
-        <View key={section.id} style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>{section.label}</Text>
-          {section.fields.map(fieldOrId => {
+      <Text style={styles.tabTitle}>{activeTabTitle}</Text>
+      {visibleActiveTab.sections.map(section => {
+        const sectionFields = section.fields.map(fieldOrId => {
             const field = resolveField(fieldOrId);
             if (
               !field ||
@@ -3862,15 +4007,25 @@ function StrandApp() {
               return null;
             }
             return renderField(field);
-          })}
-          {section.id === 'provyta_val' ? (
+          });
+
+        if (visibleActiveTab.id === 'substrat' && section.id === 'substratmatris') {
+          return <View key={section.id}>{sectionFields}</View>;
+        }
+
+        return (
+          <View key={section.id} style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>{section.label}</Text>
+            {sectionFields}
+            {section.id === 'provyta_val' ? (
             <>
               {renderPlotMapButton()}
               {renderInventoryActionCard()}
             </>
-          ) : null}
-        </View>
-      ))}
+            ) : null}
+          </View>
+        );
+      })}
     </View>
   );
 
@@ -3901,7 +4056,11 @@ function StrandApp() {
       ) : null}
 
       <ScrollView
-        contentContainerStyle={[styles.content, shouldShowSideTabs && styles.inventoryContentContainer]}
+        contentContainerStyle={[
+          styles.content,
+          keyboardInset > 0 && {paddingBottom: keyboardInset + 96},
+          shouldShowSideTabs && styles.inventoryContentContainer,
+        ]}
         keyboardShouldPersistTaps="handled">
         {shouldShowSideTabs ? (
           <View style={styles.inventoryLayout}>
@@ -3999,7 +4158,7 @@ function StrandApp() {
               <>
                 <Text style={styles.modalTitle}>{editingField.field.label}</Text>
                 {editingField.field.type === 'select' || editingField.field.type === 'boolean_select' ? (
-                  <View style={styles.dialogOptionList}>
+                  <ScrollView nestedScrollEnabled style={styles.dialogOptionScroll} contentContainerStyle={styles.dialogOptionList}>
                     {(editingField.field.list_id ? basicData.lists[editingField.field.list_id] ?? [] : []).map(option => {
                       const optionValue = option.value ?? option.id ?? option.label;
                       const selected = editingField.value === optionValue;
@@ -4015,7 +4174,7 @@ function StrandApp() {
                         </Pressable>
                       );
                     })}
-                  </View>
+                  </ScrollView>
                 ) : (
                   <>
                     {isZoneBoundaryField(editingField.field)
@@ -4602,7 +4761,7 @@ const styles = StyleSheet.create({
   inventoryLayout: {
     alignItems: 'flex-start',
     flexDirection: 'row',
-    gap: 6,
+    gap: 4,
   },
   sideTabRail: {
     backgroundColor: '#d8d4cb',
@@ -4618,9 +4777,9 @@ const styles = StyleSheet.create({
     borderBottomColor: '#c2b8aa',
     borderBottomWidth: 1,
     justifyContent: 'center',
-    minHeight: 50,
-    paddingHorizontal: 3,
-    paddingVertical: 6,
+    minHeight: 36,
+    paddingHorizontal: 2,
+    paddingVertical: 3,
   },
   sideTabSelected: {
     backgroundColor: '#d7e5e0',
@@ -4667,6 +4826,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 12,
     padding: 14,
+  },
+  matrixFieldCard: {
+    paddingHorizontal: 8,
+    paddingVertical: 10,
   },
   promptFieldRow: {
     alignItems: 'center',
@@ -4769,6 +4932,11 @@ const styles = StyleSheet.create({
   },
   multilineInput: {
     minHeight: 96,
+    textAlignVertical: 'top',
+  },
+  artCommentInput: {
+    minHeight: 58,
+    paddingVertical: 8,
     textAlignVertical: 'top',
   },
   inputDisabled: {
@@ -5079,7 +5247,7 @@ const styles = StyleSheet.create({
   },
   matrixTable: {
     borderColor: '#e0d3c2',
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: 1,
     overflow: 'hidden',
   },
@@ -5094,27 +5262,27 @@ const styles = StyleSheet.create({
     borderRightColor: '#eadfce',
     borderRightWidth: 1,
     justifyContent: 'center',
-    minHeight: 54,
-    padding: 6,
-    width: 78,
+    minHeight: 42,
+    padding: 2,
+    width: 48,
   },
   matrixLabelCell: {
     alignItems: 'flex-start',
     backgroundColor: '#fbf7ef',
-    width: 118,
+    width: 78,
   },
   matrixHeaderCell: {
     backgroundColor: '#213127',
   },
   matrixHeaderText: {
     color: '#ffffff',
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '800',
     textAlign: 'center',
   },
   matrixRowLabel: {
     color: '#213127',
-    fontSize: 13,
+    fontSize: 10,
     fontWeight: '700',
   },
   matrixInput: {
@@ -5123,12 +5291,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     color: '#17261d',
-    fontSize: 15,
-    minHeight: 40,
-    paddingHorizontal: 8,
-    paddingVertical: 8,
+    fontSize: 13,
+    minHeight: 34,
+    paddingHorizontal: 4,
+    paddingVertical: 5,
     textAlign: 'center',
-    width: 58,
+    width: 38,
   },
   matrixTotalRow: {
     borderTopColor: '#d8ccbc',
@@ -5140,7 +5308,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   matrixTotalCell: {
-    minHeight: 48,
+    minHeight: 38,
   },
   matrixTotalOk: {
     backgroundColor: '#eef6ee',
@@ -5149,7 +5317,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff7dd',
   },
   matrixTotalText: {
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: '800',
   },
   matrixTotalTextOk: {
@@ -5164,7 +5332,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     marginTop: 10,
-    maxHeight: 280,
+    maxHeight: 220,
     overflow: 'hidden',
   },
   artSearchItem: {
@@ -5185,27 +5353,32 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   artTableList: {
-    gap: 10,
+    gap: 8,
     marginTop: 12,
   },
   artTableRowCard: {
     backgroundColor: '#fbf7ef',
     borderColor: '#e3d6c5',
-    borderRadius: 14,
+    borderRadius: 10,
     borderWidth: 1,
-    gap: 10,
-    padding: 12,
+    gap: 8,
+    padding: 10,
   },
   artObservationExtras: {
-    gap: 10,
+    gap: 8,
   },
   artColumnRow: {
     flexDirection: 'row',
     gap: 10,
   },
+  artColumnRowCompact: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+  },
   artColumnInputGroup: {
-    gap: 6,
-    width: 104,
+    gap: 4,
+    width: 92,
   },
   artValueInput: {
     backgroundColor: '#f8f3eb',
@@ -5214,9 +5387,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     color: '#17261d',
     fontSize: 14,
-    minHeight: 42,
+    minHeight: 38,
     paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingVertical: 6,
   },
   presenceToggle: {
     alignItems: 'center',
@@ -5285,12 +5458,18 @@ const styles = StyleSheet.create({
   modalCard: {
     backgroundColor: '#fffaf2',
     borderRadius: 20,
+    maxHeight: '92%',
     padding: 20,
     width: '100%',
+  },
+  dialogOptionScroll: {
+    flexGrow: 0,
+    maxHeight: '78%',
   },
   dialogOptionList: {
     gap: 10,
     marginBottom: 8,
+    paddingBottom: 4,
   },
   dialogOption: {
     alignItems: 'center',

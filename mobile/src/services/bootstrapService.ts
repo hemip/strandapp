@@ -13,6 +13,7 @@ import {
   saveBootstrapMetadata,
 } from './publicFileService';
 import {BasicDataConfig, UpdateCheckResult} from '../types/basicData';
+import {downloadBasicDataBundleFromSftp} from './sftpBundleService';
 
 export interface AppBootstrapResult {
   basicData: BasicDataConfig;
@@ -73,9 +74,32 @@ export async function initializeApplication(): Promise<AppBootstrapResult> {
 
 export async function runManualBasicDataUpdate(currentConfig?: BasicDataConfig) {
   const base = currentConfig ?? (await loadSavedBasicData()) ?? getBundledBasicData();
+  let sftpError: unknown = null;
+
+  try {
+    await downloadBasicDataBundleFromSftp();
+    const sftpConfig = (await loadSavedBasicData()) ?? base;
+
+    await saveBootstrapMetadata({
+      basicDataVersion: sftpConfig.meta.version,
+      bootstrappedAt: new Date().toISOString(),
+      lastUpdateCheckAt: new Date().toISOString(),
+      source: 'remote',
+    });
+
+    return sftpConfig;
+  } catch (error) {
+    sftpError = error;
+  }
+
   const remote = await fetchRemoteBasicData(base);
 
   if (!remote) {
+    if (sftpError) {
+      const message = sftpError instanceof Error ? sftpError.message : 'SFTP-hämtningen misslyckades.';
+      throw new Error(message);
+    }
+
     await saveBasicData(base);
     await downloadBootstrapResources(base);
     await saveBootstrapMetadata({

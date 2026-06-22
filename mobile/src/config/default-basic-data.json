@@ -1,7 +1,7 @@
 ﻿{
   "meta": {
     "id": "havsstrand-basic-data",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "source": "strand2018-master",
     "generated_at": "2026-04-27",
     "language": "sv-SE",
@@ -238,8 +238,8 @@
       { "value": "Välbetat (<70% ytan)", "label": "Välbetat (<70% ytan)" }
     ],
     "artkategorier": [
-      { "value": "trad", "label": "Trädarter", "resource": "strandinventering_arter_trad.csv", "entry_mode": "tree_table" },
-      { "value": "buskar", "label": "Buskarter", "resource": "strandinventering_arter_buskar.csv", "entry_mode": "buske_table" },
+      { "value": "trad", "label": "Trädarter", "resource": "strandinventering_arter_trad.csv", "entry_mode": "presence_observation" },
+      { "value": "buskar", "label": "Buskarter", "resource": "strandinventering_arter_buskar.csv", "entry_mode": "presence_observation" },
       { "value": "orter", "label": "Örter", "resource": "strandinventering_arter_orter.csv", "entry_mode": "arter_table" },
       { "value": "ris", "label": "Ris", "resource": "strandinventering_arter_ris.csv", "entry_mode": "arter_table" },
       { "value": "graminider", "label": "Graminider", "resource": "strandinventering_arter_graminider.csv", "entry_mode": "arter_table" },
@@ -650,10 +650,10 @@
                   "columns": ["namn", "geo", "supra", "extra", "drift"]
                 },
                 "tree_table": {
-                  "columns": ["avstand", "art", "diameter", "antal"]
+                  "columns": ["namn"]
                 },
                 "buske_table": {
-                  "columns": ["avstand", "art", "bredd", "langd", "tathet"]
+                  "columns": ["namn"]
                 },
                 "species_observation": {
                   "columns": ["namn"]
@@ -678,7 +678,7 @@
               "label": "Trädarter",
               "type": "art_table",
               "category": "trad",
-              "columns": ["avstand", "art", "diameter", "antal"]
+              "columns": ["namn"]
             }
           ]
         }
@@ -698,7 +698,7 @@
               "label": "Buskarter",
               "type": "art_table",
               "category": "buskar",
-              "columns": ["avstand", "art", "bredd", "langd", "tathet"]
+              "columns": ["namn"]
             }
           ]
         }
