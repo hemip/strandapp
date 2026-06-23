@@ -27,7 +27,22 @@
     {
       "id": "artlista_alla",
       "type": "csv",
-      "target_path": "basic_data/strandinventering_arter_alla.csv"
+      "target_path": "basic_data/havsstrand_artlista.csv"
+    },
+    {
+      "id": "atlasartlista_havsstrand",
+      "type": "csv",
+      "target_path": "basic_data/atlasartlista_havsstrand.csv"
+    },
+    {
+      "id": "dynkoder",
+      "type": "json",
+      "target_path": "basic_data/dynkoder.json"
+    },
+    {
+      "id": "habitatkoder",
+      "type": "json",
+      "target_path": "basic_data/habitatkoder.json"
     }
   ],
   "lists": {
@@ -198,21 +213,21 @@
       { "value": "Välbetat (<70% ytan)", "label": "Välbetat (<70% ytan)" }
     ],
     "artkategorier": [
-      { "value": "trad", "label": "Trädarter", "resource": "strandinventering_arter_alla.csv", "entry_mode": "presence_observation" },
-      { "value": "buskar", "label": "Buskarter", "resource": "strandinventering_arter_alla.csv", "entry_mode": "presence_observation" },
-      { "value": "orter", "label": "Örter", "resource": "strandinventering_arter_alla.csv", "entry_mode": "arter_table" },
-      { "value": "ris", "label": "Ris", "resource": "strandinventering_arter_alla.csv", "entry_mode": "arter_table" },
-      { "value": "graminider", "label": "Graminider", "resource": "strandinventering_arter_alla.csv", "entry_mode": "arter_table" },
-      { "value": "ormbunkar", "label": "Ormbunkar", "resource": "strandinventering_arter_alla.csv", "entry_mode": "arter_table" },
-      { "value": "mossor", "label": "Mossor", "resource": "strandinventering_arter_alla.csv", "entry_mode": "arter_table" },
-      { "value": "lavar", "label": "Lavar", "resource": "strandinventering_arter_alla.csv", "entry_mode": "arter_table" }
+      { "value": "trad", "label": "Trädarter", "resource": "havsstrand_artlista.csv", "entry_mode": "presence_observation" },
+      { "value": "buskar", "label": "Buskarter", "resource": "havsstrand_artlista.csv", "entry_mode": "presence_observation" },
+      { "value": "orter", "label": "Örter", "resource": "havsstrand_artlista.csv", "entry_mode": "arter_table" },
+      { "value": "ris", "label": "Ris", "resource": "havsstrand_artlista.csv", "entry_mode": "arter_table" },
+      { "value": "graminider", "label": "Graminider", "resource": "havsstrand_artlista.csv", "entry_mode": "arter_table" },
+      { "value": "ormbunkar", "label": "Ormbunkar", "resource": "havsstrand_artlista.csv", "entry_mode": "arter_table" },
+      { "value": "mossor", "label": "Mossor", "resource": "havsstrand_artlista.csv", "entry_mode": "arter_table" },
+      { "value": "lavar", "label": "Lavar", "resource": "havsstrand_artlista.csv", "entry_mode": "arter_table" }
     ],
     "artzoner": [
-      { "value": "geo", "label": "Geolitoral", "resource": "strandinventering_arter_alla.csv", "entry_mode": "species_observation" },
-      { "value": "supra", "label": "Supralitoral", "resource": "strandinventering_arter_alla.csv", "entry_mode": "species_observation" },
-      { "value": "extra", "label": "Extralitoral", "resource": "strandinventering_arter_alla.csv", "entry_mode": "species_observation" },
-      { "value": "strandvall", "label": "Driftvall", "resource": "strandinventering_arter_alla.csv", "entry_mode": "species_observation" },
-      { "value": "fordyn", "label": "Fördyn", "resource": "strandinventering_arter_alla.csv", "entry_mode": "species_observation" }
+      { "value": "geo", "label": "Geolitoral", "resource": "havsstrand_artlista.csv", "entry_mode": "species_observation" },
+      { "value": "supra", "label": "Supralitoral", "resource": "havsstrand_artlista.csv", "entry_mode": "species_observation" },
+      { "value": "extra", "label": "Extralitoral", "resource": "havsstrand_artlista.csv", "entry_mode": "species_observation" },
+      { "value": "strandvall", "label": "Driftvall", "resource": "havsstrand_artlista.csv", "entry_mode": "species_observation" },
+      { "value": "fordyn", "label": "Fördyn", "resource": "havsstrand_artlista.csv", "entry_mode": "species_observation" }
     ],
     "deponi_kategorier": [
       { "id": "1", "label": "Tång (m2)" },
@@ -489,8 +504,7 @@
               "special": "habitat_transect_rows",
               "item_schema": {
                 "fields": [
-                  { "id": "kod", "label": "Kod", "type": "text" },
-                  { "id": "namn", "label": "Namn", "type": "text" },
+                  { "id": "habitatval", "label": "Habitat", "type": "dataset_search", "dataset": "habitatkoder", "value_key": "habitat", "display_key": "habitatnamn", "target_value_field": "kod", "target_label_field": "namn" },
                   { "id": "utbredning", "label": "M.K.", "type": "text" },
                   { "id": "start", "label": "Start", "type": "decimal", "unit": "m" },
                   { "id": "slut", "label": "Slut", "type": "decimal", "unit": "m" },
@@ -502,7 +516,8 @@
                   { "id": "grov_dod_ved", "label": "Grov död ved", "type": "select", "list_id": "habitat_grov_dod_ved" },
                   { "id": "skog_succession", "label": "Skogssuccession", "type": "select", "list_id": "habitat_skog_succession" },
                   { "id": "betesregim", "label": "Betesregim", "type": "select", "list_id": "habitat_betesregim" },
-                  { "id": "betestryck", "label": "Betestryck", "type": "select", "list_id": "habitat_betestryck" }
+                  { "id": "betestryck", "label": "Betestryck", "type": "select", "list_id": "habitat_betestryck" },
+                  { "id": "foto", "label": "Foto", "type": "photo_array", "storage_category": "habitat", "max_count": 1, "photo_name_prefix": "habitat" }
                 ]
               }
             },
@@ -516,13 +531,15 @@
               "id": "dynhabitat_rows",
               "label": "Dynhabitat",
               "type": "repeater",
+              "special": "fordyn_habitat_rows",
               "item_schema": {
                 "fields": [
-                  { "id": "kod", "label": "Kod", "type": "select", "list_id": "dynhabitat" },
-                  { "id": "namn", "label": "Namn", "type": "text" },
+                  { "id": "dynhabitatval", "label": "Dynhabitat", "type": "dataset_search", "dataset": "dynkoder", "value_key": "habitat", "display_key": "habitatnamn", "target_value_field": "kod", "target_label_field": "namn" },
                   { "id": "utbredning", "label": "M.K.", "type": "text" },
-                  { "id": "langd", "label": "Längd", "type": "decimal", "unit": "m" },
-                  { "id": "kriterie", "label": "Kriterie", "type": "text" }
+                  { "id": "start", "label": "Start", "type": "decimal", "unit": "m" },
+                  { "id": "slut", "label": "Slut", "type": "decimal", "unit": "m" },
+                  { "id": "kriterie", "label": "Kriterie", "type": "text" },
+                  { "id": "foto", "label": "Foto", "type": "photo_array", "storage_category": "fordynshabitat", "max_count": 1, "photo_name_prefix": "fordynshabitat" }
                 ]
               }
             }
@@ -690,24 +707,8 @@
     },
     {
       "id": "drift",
-      "label": "Drift",
+      "label": "Drift & fördyner",
       "sections": [
-        {
-          "id": "driftfoton",
-          "label": "Driftfoton",
-          "fields": [
-            {
-              "id": "driftfoton_standard",
-              "label": "Driftfoton",
-              "type": "photo_set",
-              "list": [
-                { "value": "drift1", "label": "Driftfoto 1" },
-                { "value": "drift2", "label": "Driftfoto 2" }
-              ],
-              "storage_category": "drift"
-            }
-          ]
-        },
         {
           "id": "vallar",
           "label": "Driftvallar",
@@ -730,6 +731,7 @@
                   { "id": "ovrigt_skrap", "label": "Övrigt skräp", "type": "text" },
                   { "id": "annueller", "label": "Annueller", "type": "text" },
                   { "id": "perenner", "label": "Perenner", "type": "text" },
+                  { "id": "foto", "label": "Foto", "type": "photo_array", "storage_category": "driftvall", "max_count": 1, "photo_name_prefix": "driftvall" },
                   { "id": "arter", "label": "Arter", "type": "art_table", "category": "strandvall", "category_list_id": "artzoner", "columns": ["namn"] }
                 ]
               }
@@ -758,6 +760,7 @@
                   { "id": "ovrigt_skrap", "label": "Övrigt skräp", "type": "text" },
                   { "id": "annueller", "label": "Annueller", "type": "text" },
                   { "id": "perenner", "label": "Perenner", "type": "text" },
+                  { "id": "foto", "label": "Foto", "type": "photo_array", "storage_category": "fordyn", "max_count": 1, "photo_name_prefix": "fordyn" },
                   { "id": "arter", "label": "Arter", "type": "art_table", "category": "fordyn", "category_list_id": "artzoner", "columns": ["namn"] }
                 ]
               }

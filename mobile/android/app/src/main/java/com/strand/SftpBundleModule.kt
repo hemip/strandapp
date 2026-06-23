@@ -10,6 +10,7 @@ import com.jcraft.jsch.Channel
 import com.jcraft.jsch.ChannelSftp
 import com.jcraft.jsch.JSch
 import com.jcraft.jsch.Session
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Properties
@@ -79,6 +80,52 @@ class SftpBundleModule(reactContext: ReactApplicationContext) : ReactContextBase
         promise.resolve(result)
       } catch (error: Exception) {
         promise.reject("SFTP_UPLOAD_FAILED", error.message, error)
+      } finally {
+        connection?.close()
+      }
+    }.start()
+  }
+
+  @ReactMethod
+  fun listTextFiles(options: ReadableMap, promise: Promise) {
+    Thread {
+      var connection: SftpConnection? = null
+      try {
+        val host = options.getString("host") ?: throw IllegalArgumentException("host saknas")
+        val username = options.getString("username") ?: throw IllegalArgumentException("username saknas")
+        val password = options.getString("password") ?: throw IllegalArgumentException("password saknas")
+        val remoteDir = options.getString("remoteDir") ?: throw IllegalArgumentException("remoteDir saknas")
+        val port = if (options.hasKey("port")) options.getInt("port") else 22
+
+        connection = openSftp(host, port, username, password)
+        val sftp = connection.sftp
+        val result = Arguments.createArray()
+
+        @Suppress("UNCHECKED_CAST")
+        val entries = sftp.ls(remoteDir.trimEnd('/')) as Vector<ChannelSftp.LsEntry>
+
+        entries
+          .filter { entry ->
+            val fileName = entry.filename
+            fileName != "." && fileName != ".." && !entry.attrs.isDir
+          }
+          .forEach { entry ->
+            val fileName = entry.filename
+            val remotePath = "${remoteDir.trimEnd('/')}/$fileName"
+            val output = ByteArrayOutputStream()
+            sftp.get(remotePath, output)
+
+            val item = Arguments.createMap()
+            item.putString("fileName", fileName)
+            item.putDouble("modifiedAt", entry.attrs.mTime.toDouble() * 1000.0)
+            item.putDouble("size", entry.attrs.size.toDouble())
+            item.putString("text", output.toString(Charsets.UTF_8.name()))
+            result.pushMap(item)
+          }
+
+        promise.resolve(result)
+      } catch (error: Exception) {
+        promise.reject("SFTP_LIST_TEXT_FILES_FAILED", error.message, error)
       } finally {
         connection?.close()
       }

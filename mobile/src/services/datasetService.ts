@@ -7,6 +7,8 @@ export type DatasetMap = Record<string, DatasetRow[]>;
 
 export interface ArtResourceRow {
   id: string;
+  table: string;
+  taxonId: string;
   family: string;
   scientificName: string;
   swedishName: string;
@@ -19,6 +21,9 @@ const DATASET_RESOURCE_DIRS = ['utlagg', 'vardelistor', 'artlistor'];
 
 const DATASET_FILE_ALIASES: Record<string, string[]> = {
   provyteunderlag: ['data.csv', 'provyteunderlag.csv'],
+  atlasartlista_havsstrand: ['atlasartlista_havsstrand.csv'],
+  dynkoder: ['dynkoder.json'],
+  habitatkoder: ['habitatkoder.json'],
 };
 
 export async function loadConfiguredDatasets(config: BasicDataConfig): Promise<DatasetMap> {
@@ -111,7 +116,7 @@ async function loadDataset(datasetId: string, config: BasicDataConfig) {
   }
 
   const content = await RNFS.readFile(resource, 'utf8');
-  return parseCsv(content);
+  return resource.toLowerCase().endsWith('.json') ? parseJsonDataset(content) : parseCsv(content);
 }
 
 function getDatasetFileCandidates(datasetId: string, config: BasicDataConfig) {
@@ -143,7 +148,7 @@ async function loadArtResource(resourceName: string): Promise<ArtResourceRow[]> 
   const resource = await findFirstExistingFile(candidates);
   if (resource) {
     const content = await RNFS.readFile(resource, 'utf8');
-    return parseHeaderlessArtCsv(content);
+    return parseArtCsv(content);
   }
 
   return [];
@@ -162,6 +167,10 @@ async function findFirstExistingFile(candidates: string[]) {
 function collectDatasetIds(config: BasicDataConfig) {
   const datasetIds = new Set<string>();
 
+  config.bootstrap_resources
+    ?.filter(resource => resource.type === 'csv' || resource.type === 'json')
+    .forEach(resource => datasetIds.add(resource.id));
+
   const visitField = (fieldOrId: string | BasicDataField) => {
     if (typeof fieldOrId === 'string') {
       const field = config.global_fields?.find(globalField => globalField.id === fieldOrId);
@@ -174,12 +183,41 @@ function collectDatasetIds(config: BasicDataConfig) {
     if (fieldOrId.dataset) {
       datasetIds.add(fieldOrId.dataset);
     }
+
+    const itemSchema = fieldOrId.item_schema;
+    if (itemSchema && typeof itemSchema === 'object' && 'fields' in itemSchema && Array.isArray(itemSchema.fields)) {
+      itemSchema.fields.forEach(nestedField => {
+        if (nestedField && typeof nestedField === 'object') {
+          visitField(nestedField as BasicDataField);
+        }
+      });
+    }
   };
 
   config.global_fields?.forEach(visitField);
   config.tabs.forEach(tab => tab.sections.forEach(section => section.fields.forEach(visitField)));
 
   return Array.from(datasetIds);
+}
+
+function parseJsonDataset(content: string): DatasetRow[] {
+  const parsed = JSON.parse(content.replace(/^\uFEFF/, '')) as unknown;
+  const rows = Array.isArray(parsed)
+    ? parsed
+    : parsed && typeof parsed === 'object' && Array.isArray((parsed as {items?: unknown}).items)
+      ? (parsed as {items: unknown[]}).items
+      : [];
+
+  return rows
+    .filter((row): row is Record<string, unknown> => Boolean(row && typeof row === 'object' && !Array.isArray(row)))
+    .map(row =>
+      Object.entries(row).reduce<DatasetRow>((nextRow, [key, value]) => {
+        if (value != null && typeof value !== 'object') {
+          nextRow[key] = String(value);
+        }
+        return nextRow;
+      }, {}),
+    );
 }
 
 function parseCsv(content: string): DatasetRow[] {
@@ -245,24 +283,60 @@ function parseCsvRecords(content: string) {
   return records;
 }
 
-function parseHeaderlessArtCsv(content: string): ArtResourceRow[] {
-  return parseCsvRecords(content)
+function getRegistrationMode(registrationCode: string): ArtResourceRow['registrationMode'] {
+  const normalizedCode = registrationCode.toLowerCase();
+  if (normalizedCode.includes('r')) {
+    return 'count';
+  }
+  if (normalizedCode.includes('t')) {
+    return 'area';
+  }
+  return 'presence';
+}
+
+function parseArtCsv(content: string): ArtResourceRow[] {
+  const records = parseCsvRecords(content.replace(/^\uFEFF/, ''));
+  const headers = records[0]?.map(header => header.trim()) ?? [];
+
+  if (headers.includes('scientific_name') || headers.includes('taxon_id')) {
+    const rows = parseCsv(content);
+    return rows.map((row, index) => {
+      const taxonId = row.taxon_id?.trim() ?? '';
+      const scientificName = row.scientific_name?.trim() ?? '';
+      const swedishName = row.vernacular_name?.trim() ?? scientificName;
+      const registrationCode = row.registrering?.trim() ?? '';
+
+      return {
+        id: taxonId || `${scientificName || swedishName || index}-${index}`,
+        table: row.tabell?.trim() ?? '',
+        taxonId,
+        family: row.family?.trim() ?? '',
+        scientificName,
+        swedishName,
+        registrationMode: getRegistrationMode(registrationCode),
+        registrationCode,
+        metadata: [row.phylum?.trim()].filter(Boolean).join(', ') || undefined,
+      };
+    });
+  }
+
+  return records
     .filter(record => record.some(value => value.trim() !== ''))
     .map((record, index) => {
       const family = record[0]?.trim() ?? '';
       const scientificName = record[1]?.trim() ?? '';
       const swedishName = record[2]?.trim() ?? scientificName;
       const registrationCode = record[record.length - 1]?.trim() ?? '';
-      const normalizedCode = registrationCode.toLowerCase();
-      const registrationMode = normalizedCode === 'r' ? 'count' : normalizedCode === 't' ? 'area' : 'presence';
       const metadata = record.slice(3, -1).map(value => value.trim()).filter(Boolean).join(', ');
 
       return {
         id: `${scientificName || swedishName || index}-${index}`,
+        table: '',
+        taxonId: '',
         family,
         scientificName,
         swedishName,
-        registrationMode,
+        registrationMode: getRegistrationMode(registrationCode),
         registrationCode,
         metadata,
       };

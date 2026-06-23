@@ -19,6 +19,13 @@ interface SftpUploadFile {
   remoteName: string;
 }
 
+export interface ServerMessageFile {
+  fileName: string;
+  modifiedAt: number;
+  size: number;
+  text: string;
+}
+
 interface SftpBundleNativeModule {
   downloadNewerFiles(options: {
     host: string;
@@ -36,6 +43,13 @@ interface SftpBundleNativeModule {
     remoteDir: string;
     files: SftpUploadFile[];
   }): Promise<SftpUploadResult>;
+  listTextFiles(options: {
+    host: string;
+    port: number;
+    username: string;
+    password: string;
+    remoteDir: string;
+  }): Promise<ServerMessageFile[]>;
 }
 
 const sftpBundle = NativeModules.SftpBundle as SftpBundleNativeModule | undefined;
@@ -50,6 +64,7 @@ const SFTP_CONFIG = {
 const SFTP_REMOTE_DIRS = {
   bundle: 'bundle',
   export: 'strandexport',
+  messages: 'messages',
   photos: 'strandpics',
 };
 
@@ -70,6 +85,13 @@ export async function downloadBasicDataBundleFromSftp() {
     ...SFTP_CONFIG,
     remoteDir: SFTP_REMOTE_DIRS.bundle,
     localDir: publicPaths.basicDataDir,
+  });
+}
+
+export async function listServerMessagesFromSftp() {
+  return getSftpModule().listTextFiles({
+    ...SFTP_CONFIG,
+    remoteDir: SFTP_REMOTE_DIRS.messages,
   });
 }
 

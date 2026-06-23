@@ -1,5 +1,6 @@
 ﻿import 'react-native-get-random-values';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   ActivityIndicator,
@@ -28,6 +29,7 @@ import {initializeApplication, runManualBasicDataUpdate} from './services/bootst
 import {
   ArtResourceRow,
   DatasetMap,
+  DatasetRow,
   filterDatasetRows,
   findDatasetRow,
   getUniqueDatasetOptions,
@@ -41,7 +43,7 @@ import {
   saveWorkingDraft,
 } from './services/publicFileService';
 import {createDraftExportFileInfo, createDraftExportPayload, exportDraftToJson} from './services/exportService';
-import {uploadExportAndPhotosToSftp} from './services/sftpBundleService';
+import {listServerMessagesFromSftp, uploadExportAndPhotosToSftp} from './services/sftpBundleService';
 import {
   InventoryListItem,
   deleteInventoryFromDevice,
@@ -64,6 +66,8 @@ const HEADER_MENU_TAB_IDS = new Set([
 const NORMAL_INVENTORY_TAB_ID = 'start_bilder';
 const DISTANCE_INVENTORY_TAB_ID = 'hydro';
 const SIDE_TAB_LAST_IDS = new Set(['substrat']);
+const MESSAGE_READ_KEYS_STORAGE_KEY = '@strand/read-server-message-keys';
+const MESSAGE_POLL_INTERVAL_MS = 15 * 60 * 1000;
 
 interface PhotoEntry {
   id: string;
@@ -94,6 +98,16 @@ interface PhotoCaptureTarget {
   nestedFieldId?: string;
   observationId?: string;
   parentRowId?: string;
+  replaceExisting?: boolean;
+}
+
+interface ServerMessage {
+  key: string;
+  fileName: string;
+  modifiedAt: number;
+  size: number;
+  text: string;
+  read: boolean;
 }
 
 type RepeaterRow = Record<string, unknown> & {id: string};
@@ -834,6 +848,22 @@ function getStringArrayProperty(field: BasicDataField, key: string) {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
 }
 
+function getStringProperty(field: BasicDataField, key: string) {
+  const value = field[key];
+  return typeof value === 'string' ? value : '';
+}
+
+function formatDatasetSearchLabel(row: DatasetRow, valueKey: string, displayKey: string) {
+  const value = row[valueKey] ?? '';
+  const label = row[displayKey] ?? '';
+
+  if (value && label) {
+    return `${value} - ${label}`;
+  }
+
+  return value || label;
+}
+
 function formatConfigLabel(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1).replace(/_/g, ' ');
 }
@@ -932,6 +962,10 @@ function isHabitatTransectRowsField(field: BasicDataField | null | undefined) {
   return field?.special === 'habitat_transect_rows';
 }
 
+function isFordynHabitatRowsField(field: BasicDataField | null | undefined) {
+  return field?.special === 'fordyn_habitat_rows';
+}
+
 function getZoneBoundaryOrder(field: BasicDataField) {
   const order = parseNumber(field.zone_order);
   return order ?? Number.MAX_SAFE_INTEGER;
@@ -956,6 +990,7 @@ function StrandApp() {
   const [showPlotMapModal, setShowPlotMapModal] = useState(false);
   const [showInventoryListModal, setShowInventoryListModal] = useState(false);
   const [showExportPreviewModal, setShowExportPreviewModal] = useState(false);
+  const [showMessagesModal, setShowMessagesModal] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
   const [showNavigationMenu, setShowNavigationMenu] = useState(false);
   const [showScannerModal, setShowScannerModal] = useState(false);
@@ -967,6 +1002,8 @@ function StrandApp() {
   const [isCapturingPhoto, setIsCapturingPhoto] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [openDatasetFieldId, setOpenDatasetFieldId] = useState<string | null>(null);
+  const [openRepeaterDatasetKey, setOpenRepeaterDatasetKey] = useState<string | null>(null);
+  const [repeaterDatasetSearch, setRepeaterDatasetSearch] = useState<Record<string, string>>({});
   const [artSearchByField, setArtSearchByField] = useState<Record<string, string>>({});
   const [manualUuidInput, setManualUuidInput] = useState('');
   const [lagnummerInput, setLagnummerInput] = useState('');
@@ -976,9 +1013,12 @@ function StrandApp() {
   const [statusText, setStatusText] = useState('Förbereder appen...');
   const [updateVersion, setUpdateVersion] = useState<string | null>(null);
   const [keyboardInset, setKeyboardInset] = useState(0);
+  const [serverMessages, setServerMessages] = useState<ServerMessage[]>([]);
+  const [readServerMessageKeys, setReadServerMessageKeys] = useState<Set<string>>(() => new Set());
   const photoCameraRef = useRef<CameraApi | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const promptShown = useRef(false);
+  const announcedMessageKeys = useRef(new Set<string>());
 
   const globalFieldMap = useMemo(() => {
     const map = new Map<string, BasicDataField>();
@@ -1167,11 +1207,69 @@ function StrandApp() {
     return parseNumber(rows[index - 1]?.slut) ?? 0;
   }
 
-  function normalizeHabitatRows(rows: RepeaterRow[]) {
+  function normalizeHabitatRows(rows: RepeaterRow[]): RepeaterRow[] {
     return rows.map((row, index) => ({
       ...row,
       start: formatMetersValue(getHabitatRowStart(rows, index)),
     }));
+  }
+
+  function getFordynHabitatBounds() {
+    const habitatRows = normalizeHabitatRows(getRepeaterRows(draft.habitat_rows));
+    const habitatRow = habitatRows.find(row => getStringValue(row.kod).trim() === '2100');
+    if (!habitatRow) {
+      return null;
+    }
+
+    const startMeters = parseNumber(habitatRow.start);
+    const endMeters = parseNumber(habitatRow.slut);
+    if (startMeters == null || endMeters == null || endMeters <= startMeters) {
+      return null;
+    }
+
+    return {startMeters, endMeters, habitatRow};
+  }
+
+  function getFordynHabitatRowStart(rows: RepeaterRow[], index: number, bounds = getFordynHabitatBounds()) {
+    if (!bounds) {
+      return null;
+    }
+
+    if (index <= 0) {
+      return bounds.startMeters;
+    }
+
+    return parseNumber(rows[index - 1]?.slut) ?? bounds.startMeters;
+  }
+
+  function normalizeFordynHabitatRows(rows: RepeaterRow[]): RepeaterRow[] {
+    const bounds = getFordynHabitatBounds();
+    if (!bounds) {
+      return [];
+    }
+
+    return rows.map((row, index) => {
+      const startMeters = getFordynHabitatRowStart(rows, index, bounds) ?? bounds.startMeters;
+      const isLastRow = index === rows.length - 1;
+      const rowEnd = isLastRow ? bounds.endMeters : parseNumber(row.slut);
+      return {
+        ...row,
+        start: formatMetersValue(startMeters),
+        slut: formatMetersValue(rowEnd == null ? bounds.endMeters : Math.min(Math.max(rowEnd, startMeters), bounds.endMeters)),
+      };
+    });
+  }
+
+  function normalizeRowsForField(field: BasicDataField | null | undefined, rows: RepeaterRow[]) {
+    if (isHabitatTransectRowsField(field)) {
+      return normalizeHabitatRows(rows);
+    }
+
+    if (isFordynHabitatRowsField(field)) {
+      return normalizeFordynHabitatRows(rows);
+    }
+
+    return rows;
   }
 
   function getZoneBoundaryStartMeters(field: BasicDataField, values: Record<string, unknown> = draft) {
@@ -1319,6 +1417,66 @@ function StrandApp() {
     }
   }, [basicData]);
 
+  const saveReadServerMessageKeys = useCallback(async (keys: Set<string>) => {
+    setReadServerMessageKeys(new Set(keys));
+    await AsyncStorage.setItem(MESSAGE_READ_KEYS_STORAGE_KEY, JSON.stringify(Array.from(keys)));
+  }, []);
+
+  const markServerMessageRead = useCallback(
+    async (message: ServerMessage) => {
+      const nextKeys = new Set(readServerMessageKeys);
+      nextKeys.add(message.key);
+      await saveReadServerMessageKeys(nextKeys);
+      setServerMessages(prev => prev.map(item => (item.key === message.key ? {...item, read: true} : item)));
+    },
+    [readServerMessageKeys, saveReadServerMessageKeys],
+  );
+
+  const refreshServerMessages = useCallback(
+    async (showAlerts = false) => {
+      try {
+        const files = await listServerMessagesFromSftp();
+        const messages = files
+          .map(file => {
+            const modifiedAt = Number(file.modifiedAt);
+            const size = Number(file.size);
+            const key = `${file.fileName}:${Number.isFinite(modifiedAt) ? Math.round(modifiedAt) : 0}:${
+              Number.isFinite(size) ? size : 0
+            }`;
+            return {
+              key,
+              fileName: file.fileName,
+              modifiedAt: Number.isFinite(modifiedAt) ? modifiedAt : 0,
+              size: Number.isFinite(size) ? size : 0,
+              text: file.text ?? '',
+              read: readServerMessageKeys.has(key),
+            };
+          })
+          .sort((left, right) => right.modifiedAt - left.modifiedAt);
+
+        setServerMessages(messages);
+
+        if (showAlerts) {
+          const unread = messages.find(message => !message.read && !announcedMessageKeys.current.has(message.key));
+          if (unread) {
+            announcedMessageKeys.current.add(unread.key);
+            Alert.alert(unread.fileName, unread.text || 'Tomt meddelande.', [
+              {
+                text: 'OK',
+                onPress: () => {
+                  markServerMessageRead(unread).catch(() => undefined);
+                },
+              },
+            ]);
+          }
+        }
+      } catch {
+        // Meddelandekontrollen ska aldrig störa inventeringen om servern inte nås.
+      }
+    },
+    [markServerMessageRead, readServerMessageKeys],
+  );
+
   useEffect(() => {
     const run = async () => {
       await boot();
@@ -1328,6 +1486,26 @@ function StrandApp() {
       // boot hanterar fel via UI och alert
     });
   }, []);
+
+  useEffect(() => {
+    AsyncStorage.getItem(MESSAGE_READ_KEYS_STORAGE_KEY)
+      .then(raw => {
+        const parsed = raw ? (JSON.parse(raw) as unknown) : [];
+        if (Array.isArray(parsed)) {
+          setReadServerMessageKeys(new Set(parsed.filter((value): value is string => typeof value === 'string')));
+        }
+      })
+      .catch(() => undefined);
+  }, []);
+
+  useEffect(() => {
+    refreshServerMessages(true).catch(() => undefined);
+    const interval = setInterval(() => {
+      refreshServerMessages(true).catch(() => undefined);
+    }, MESSAGE_POLL_INTERVAL_MS);
+
+    return () => clearInterval(interval);
+  }, [refreshServerMessages]);
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', event => {
@@ -1383,6 +1561,25 @@ function StrandApp() {
       setDraft(prev => ({...prev, deponi_rows: normalizedRows}));
     }
   }, [basicData, draft.deponi_rows]);
+
+  useEffect(() => {
+    if (!basicData || !Array.isArray(draft.dynhabitat_rows)) {
+      return;
+    }
+
+    const field = findConfiguredTopLevelField('dynhabitat_rows');
+    if (!isFordynHabitatRowsField(field)) {
+      return;
+    }
+
+    const rows = getRepeaterRows(draft.dynhabitat_rows);
+    const normalizedRows = normalizeFordynHabitatRows(rows);
+    if (JSON.stringify(rows) !== JSON.stringify(normalizedRows)) {
+      setDraft(prev => ({...prev, dynhabitat_rows: normalizedRows}));
+    }
+    // normalizeFordynHabitatRows läser aktuell draft och ska köras när raderna eller habitatintervallet ändras.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [basicData, draft.dynhabitat_rows, draft.habitat_rows]);
 
   useEffect(() => {
     if (!updateVersion || promptShown.current) {
@@ -1787,14 +1984,67 @@ function StrandApp() {
     showValidationToast(`${field.label}: ${formatted} m från startpunkten.`);
   }
 
-  function selectPlotRow(row: Record<string, string>) {
-    setDraft(prev => ({
-      ...prev,
+  function createCleanDraftForPlot(row: Record<string, string>) {
+    const role = typeof draft.inventering_roll === 'string' ? draft.inventering_roll : '';
+    const nextDraft: Record<string, unknown> = {
+      lagnummer,
+      inventerare,
       ruta: row.ruta ?? '',
       provyta: row.provyta ?? '',
       pyid: row.pyid ?? '',
-    }));
+    };
+
+    if (typeof draft.antal_inventerare === 'string') {
+      nextDraft.antal_inventerare = draft.antal_inventerare;
+    }
+
+    if (role) {
+      nextDraft.inventering_roll = role;
+    }
+
+    if (role === 'master') {
+      nextDraft.inventering_uuid = uuidv4();
+    }
+
+    return nextDraft;
+  }
+
+  function selectPlotRow(row: Record<string, string>) {
+    const nextDraft = createCleanDraftForPlot(row);
+    setDraft(nextDraft);
+    setManualUuidInput(typeof nextDraft.inventering_uuid === 'string' ? nextDraft.inventering_uuid : '');
+    saveWorkingDraft(nextDraft).catch(() => {
+      // Autosparningen försöker igen på nästa draft-ändring.
+    });
     setOpenDatasetFieldId(null);
+  }
+
+  function startNewInventory() {
+    const nextDraft: Record<string, unknown> = {
+      lagnummer,
+      inventerare,
+    };
+
+    if (typeof draft.antal_inventerare === 'string') {
+      nextDraft.antal_inventerare = draft.antal_inventerare;
+    }
+
+    if (typeof draft.inventering_roll === 'string') {
+      nextDraft.inventering_roll = draft.inventering_roll;
+    }
+
+    if (draft.inventering_roll === 'master') {
+      nextDraft.inventering_uuid = uuidv4();
+    }
+
+    setDraft(nextDraft);
+    setManualUuidInput(typeof nextDraft.inventering_uuid === 'string' ? nextDraft.inventering_uuid : '');
+    setActiveTabId('oversikt');
+    setShowInventoryListModal(false);
+    setOpenDatasetFieldId(null);
+    saveWorkingDraft(nextDraft).catch(() => {
+      // Autosparningen försöker igen på nästa draft-ändring.
+    });
   }
 
   function promptCreateInventoryFromMap(row: Record<string, string>) {
@@ -2124,9 +2374,22 @@ function StrandApp() {
           ? draft[photoCaptureTarget.fieldId]
           : photoCaptureTarget.mode === 'set' && photoCaptureTarget.typeValue
             ? getPhotoRecord(draft[photoCaptureTarget.fieldId])[photoCaptureTarget.typeValue]
+            : photoCaptureTarget.mode === 'rowPhotoArray' &&
+                photoCaptureTarget.replaceExisting &&
+                photoCaptureTarget.rowId &&
+                photoCaptureTarget.nestedFieldId
+              ? getRepeaterRows(draft[photoCaptureTarget.fieldId])
+                  .find(row => row.id === photoCaptureTarget.rowId)
+                  ?.[photoCaptureTarget.nestedFieldId]
             : null;
       if (isPhotoEntry(existingReplacementPhoto)) {
         await deleteFileIfExists(existingReplacementPhoto.path);
+      } else if (Array.isArray(existingReplacementPhoto)) {
+        await Promise.all(
+          existingReplacementPhoto
+            .filter(isPhotoEntry)
+            .map(photo => deleteFileIfExists(photo.path).catch(() => undefined)),
+        );
       }
       const saved = await saveCapturedPhotoToPublicStorage(captured.uri, {
         plotId,
@@ -2201,7 +2464,9 @@ function StrandApp() {
 
             return {
               ...row,
-              [photoCaptureTarget.nestedFieldId]: [...getPhotoArray(row[photoCaptureTarget.nestedFieldId]), entry],
+              [photoCaptureTarget.nestedFieldId]: photoCaptureTarget.replaceExisting
+                ? [entry]
+                : [...getPhotoArray(row[photoCaptureTarget.nestedFieldId]), entry],
             };
           }),
         );
@@ -2436,9 +2701,9 @@ function StrandApp() {
         ? ensureFixedRepeaterRows(configuredField)
         : getRepeaterRows(draft[fieldId]);
 
-    if (isHabitatTransectRowsField(configuredField) && (key === 'slut' || key === 'start')) {
+    if ((isHabitatTransectRowsField(configuredField) || isFordynHabitatRowsField(configuredField)) && (key === 'slut' || key === 'start')) {
       const nextRows = rows.map(row => (row.id === rowId ? {...row, [key]: value} : row));
-      updateDraftValue(fieldId, normalizeHabitatRows(nextRows));
+      updateDraftValue(fieldId, normalizeRowsForField(configuredField, nextRows));
       return;
     }
 
@@ -2446,6 +2711,17 @@ function StrandApp() {
       fieldId,
       rows.map(row => (row.id === rowId ? {...row, [key]: value} : row)),
     );
+  }
+
+  function updateRepeaterRowValues(fieldId: string, rowId: string, values: Record<string, unknown>) {
+    const configuredField = findConfiguredTopLevelField(fieldId);
+    const rows =
+      configuredField?.type === 'fixed_repeater' && configuredField.id !== 'deponi_rows'
+        ? ensureFixedRepeaterRows(configuredField)
+        : getRepeaterRows(draft[fieldId]);
+
+    const nextRows = rows.map(row => (row.id === rowId ? {...row, ...values} : row));
+    updateDraftValue(fieldId, normalizeRowsForField(configuredField, nextRows));
   }
 
   function addRepeaterRow(field: BasicDataField) {
@@ -2462,6 +2738,23 @@ function StrandApp() {
       return;
     }
 
+    if (isFordynHabitatRowsField(field)) {
+      const bounds = getFordynHabitatBounds();
+      if (!bounds) {
+        showValidationToast('Sätt en habitatrad med kod 2100 innan du lägger till fördynshabitat.');
+        return;
+      }
+
+      const normalizedRows = normalizeFordynHabitatRows(rows);
+      const nextRow = {
+        id: uuidv4(),
+        start: formatMetersValue(getFordynHabitatRowStart([...normalizedRows, {id: 'preview'}], normalizedRows.length, bounds)),
+        slut: formatMetersValue(bounds.endMeters),
+      };
+      updateDraftValue(field.id, normalizeFordynHabitatRows([...normalizedRows, nextRow]));
+      return;
+    }
+
     updateDraftValue(field.id, [...rows, {id: uuidv4()}]);
   }
 
@@ -2474,7 +2767,7 @@ function StrandApp() {
         onPress: () => {
           const configuredField = findConfiguredTopLevelField(fieldId);
           const rows = getRepeaterRows(draft[fieldId]).filter(row => row.id !== rowId);
-          updateDraftValue(fieldId, isHabitatTransectRowsField(configuredField) ? normalizeHabitatRows(rows) : rows);
+          updateDraftValue(fieldId, normalizeRowsForField(configuredField, rows));
         },
       },
     ]);
@@ -2538,7 +2831,16 @@ function StrandApp() {
 
     const rows = getRepeaterRows(draft[parentField.id]);
     const rowIndex = rows.findIndex(item => item.id === row.id);
-    const rowStart = getHabitatRowStart(rows, rowIndex);
+    const fordynBounds = isFordynHabitatRowsField(parentField) ? getFordynHabitatBounds() : null;
+    if (isFordynHabitatRowsField(parentField) && !fordynBounds) {
+      showValidationToast('Sätt en habitatrad med kod 2100 innan GPS kan användas för fördynshabitat.');
+      return;
+    }
+
+    const rowStart = isFordynHabitatRowsField(parentField)
+      ? getFordynHabitatRowStart(rows, rowIndex, fordynBounds ?? undefined) ?? 0
+      : getHabitatRowStart(rows, rowIndex);
+    const maxEndMeters = fordynBounds?.endMeters ?? geometry.lengthMeters;
     const userPoint = latLonToRelativeMeters(geometry.startLat, geometry.startLon, nextGps.latitude, nextGps.longitude);
     const meters = getDistanceAlongSegmentMeters(userPoint, geometry.start, geometry.end);
 
@@ -2547,13 +2849,13 @@ function StrandApp() {
       return;
     }
 
-    if (meters > geometry.lengthMeters) {
-      showValidationToast(`GPS-positionen ligger efter transektens slut (${formatMetersValue(geometry.lengthMeters)} m).`);
+    if (meters > maxEndMeters) {
+      showValidationToast(`GPS-positionen ligger efter tillåtet slut (${formatMetersValue(maxEndMeters)} m).`);
       return;
     }
 
     updateRepeaterRow(parentField.id, row.id, 'slut', formatMetersValue(meters));
-    showValidationToast(`Habitat slut: ${formatMetersValue(meters)} m från startpunkten.`);
+    showValidationToast(`Slut: ${formatMetersValue(meters)} m från startpunkten.`);
   }
 
   function renderRepeaterRowField(
@@ -2563,8 +2865,13 @@ function StrandApp() {
     rowIndex = 0,
     rows: RepeaterRow[] = [],
   ) {
-    const isHabitatRange = isHabitatTransectRowsField(parentField) && (field.id === 'start' || field.id === 'slut');
-    const rowValue = field.id === 'start' && isHabitatRange ? formatMetersValue(getHabitatRowStart(rows, rowIndex)) : row[field.id];
+    const isRangeRow = (isHabitatTransectRowsField(parentField) || isFordynHabitatRowsField(parentField)) && (field.id === 'start' || field.id === 'slut');
+    const rowValue =
+      field.id === 'start' && isRangeRow
+        ? isFordynHabitatRowsField(parentField)
+          ? formatMetersValue(getFordynHabitatRowStart(rows, rowIndex))
+          : formatMetersValue(getHabitatRowStart(rows, rowIndex))
+        : row[field.id];
 
     if (field.type === 'art_table') {
       return renderNestedArtTableField(parentField, row, field);
@@ -2573,10 +2880,16 @@ function StrandApp() {
     if (field.type === 'photo_array') {
       const photos = getPhotoArray(rowValue);
       const category = getPhotoCategory(field);
+      const maxCount = parseNumber(field.max_count);
+      const replaceExisting = maxCount === 1;
+      const photoNamePrefix = getStringProperty(field, 'photo_name_prefix') || field.id;
+      const photoName = `${photoNamePrefix}_${rowIndex + 1}`;
       const categoryOptions =
         parentField.id === 'deponi_rows' ? basicData?.lists.deponi_kategorier ?? [] : [];
       const rowCategoryLabel =
-        categoryOptions.length > 0 ? getListOptionLabel(categoryOptions, row.kategori) : String(row.kategori ?? field.label);
+        categoryOptions.length > 0
+          ? getListOptionLabel(categoryOptions, row.kategori)
+          : `${field.label} ${rowIndex + 1}`;
       return (
         <View key={field.id} style={styles.repeaterNestedBlock}>
           <Text style={styles.repeaterFieldLabel}>{field.label}</Text>
@@ -2593,13 +2906,89 @@ function StrandApp() {
                 label: field.label,
                 rowId: row.id,
                 nestedFieldId: field.id,
-                typeValue: String(row.kategori ?? row.id),
+                typeValue: replaceExisting ? photoName : String(row.kategori ?? row.id),
                 typeLabel: rowCategoryLabel,
+                replaceExisting,
               }).catch(() => undefined)
             }
             style={styles.secondaryButton}>
-            <Text style={styles.secondaryButtonText}>Lägg till bild</Text>
+            <Text style={styles.secondaryButtonText}>{replaceExisting && photos.length > 0 ? 'Byt bild' : 'Lägg till bild'}</Text>
           </Pressable>
+        </View>
+      );
+    }
+
+    if (field.type === 'dataset_search') {
+      const datasetId = getStringProperty(field, 'dataset');
+      const valueKey = getStringProperty(field, 'value_key') || 'value';
+      const displayKey = getStringProperty(field, 'display_key') || 'label';
+      const targetValueField = getStringProperty(field, 'target_value_field') || field.id;
+      const targetLabelField = getStringProperty(field, 'target_label_field');
+      const searchKey = `${parentField.id}:${row.id}:${field.id}`;
+      const selectedCode = getStringValue(row[targetValueField]);
+      const selectedName = targetLabelField ? getStringValue(row[targetLabelField]) : '';
+      const selectedLabel = selectedCode && selectedName ? `${selectedCode} - ${selectedName}` : selectedCode || selectedName;
+      const searchText = repeaterDatasetSearch[searchKey] ?? selectedLabel;
+      const normalizedSearch = searchText.trim().toLowerCase();
+      const datasetRows = datasetId ? datasets[datasetId] ?? [] : [];
+      const filteredRows = datasetRows
+        .filter(datasetRow => {
+          if (!normalizedSearch || searchText === selectedLabel) {
+            return true;
+          }
+
+          const optionLabel = formatDatasetSearchLabel(datasetRow, valueKey, displayKey).toLowerCase();
+          return optionLabel.includes(normalizedSearch);
+        })
+        .slice(0, 40);
+      const isOpen = openRepeaterDatasetKey === searchKey;
+
+      return (
+        <View key={field.id} style={styles.repeaterNestedBlock}>
+          <Text style={styles.repeaterFieldLabel}>{field.label}</Text>
+          <TextInput
+            onChangeText={text => {
+              setRepeaterDatasetSearch(prev => ({...prev, [searchKey]: text}));
+              setOpenRepeaterDatasetKey(searchKey);
+            }}
+            onFocus={() => setOpenRepeaterDatasetKey(searchKey)}
+            placeholder="Sök kod eller namn"
+            placeholderTextColor="#8e8579"
+            style={styles.input}
+            value={searchText}
+          />
+          {isOpen ? (
+            <ScrollView nestedScrollEnabled style={styles.repeaterListbox}>
+              {filteredRows.length === 0 ? (
+                <Text style={styles.repeaterListboxEmptyText}>Inga träffar.</Text>
+              ) : (
+                filteredRows.map((datasetRow, optionIndex) => {
+                  const optionCode = datasetRow[valueKey] ?? '';
+                  const optionName = datasetRow[displayKey] ?? '';
+                  const optionLabel = formatDatasetSearchLabel(datasetRow, valueKey, displayKey);
+                  const selected = optionCode === selectedCode && (!targetLabelField || optionName === selectedName);
+                  return (
+                    <Pressable
+                      key={`${searchKey}-${optionCode}-${optionIndex}`}
+                      onPress={() => {
+                        const values: Record<string, unknown> = {[targetValueField]: optionCode};
+                        if (targetLabelField) {
+                          values[targetLabelField] = optionName;
+                        }
+                        updateRepeaterRowValues(parentField.id, row.id, values);
+                        setRepeaterDatasetSearch(prev => ({...prev, [searchKey]: optionLabel}));
+                        setOpenRepeaterDatasetKey(null);
+                      }}
+                      style={[styles.repeaterListboxItem, selected && styles.repeaterListboxItemSelected]}>
+                      <Text style={[styles.repeaterListboxText, selected && styles.repeaterListboxTextSelected]}>
+                        {optionLabel}
+                      </Text>
+                    </Pressable>
+                  );
+                })
+              )}
+            </ScrollView>
+          ) : null}
         </View>
       );
     }
@@ -2676,7 +3065,7 @@ function StrandApp() {
       );
     }
 
-    if (isHabitatRange) {
+    if (isRangeRow) {
       const isStartField = field.id === 'start';
       return (
         <View key={field.id} style={styles.repeaterNestedBlock}>
@@ -2727,7 +3116,11 @@ function StrandApp() {
 
   function getRepeaterRowsForRender(field: BasicDataField) {
     const rows = getRepeaterRows(draft[field.id]);
-    return field.id === 'deponi_rows' ? normalizeDeponiRows(rows, basicData?.lists.deponi_kategorier ?? []) : rows;
+    if (field.id === 'deponi_rows') {
+      return normalizeDeponiRows(rows, basicData?.lists.deponi_kategorier ?? []);
+    }
+
+    return normalizeRowsForField(field, rows);
   }
 
   function getRepeaterRowTitle(field: BasicDataField, row: RepeaterRow, index: number) {
@@ -2736,16 +3129,27 @@ function StrandApp() {
       return categoryLabel || `Deponiobjekt ${index + 1}`;
     }
 
+    const code = getStringValue(row.kod);
+    const name = getStringValue(row.namn);
+    if (code || name) {
+      return code && name ? `${code} - ${name}` : code || name;
+    }
+
     return String(row.kategori ?? `Rad ${index + 1}`);
   }
 
   function renderRepeaterField(field: BasicDataField, fixed = false) {
     const rows = fixed ? ensureFixedRepeaterRows(field) : getRepeaterRowsForRender(field);
     const itemFields = getItemSchemaFields(field);
+    const fordynBounds = isFordynHabitatRowsField(field) ? getFordynHabitatBounds() : null;
+    const fordynDisabled = isFordynHabitatRowsField(field) && !fordynBounds;
 
     return (
       <View key={field.id} style={styles.fieldCard}>
         <Text style={styles.fieldLabel}>{field.label}</Text>
+        {fordynDisabled ? (
+          <Text style={styles.fieldHelp}>Fördynshabitat tänds när en habitatrad med kod 2100 har satts.</Text>
+        ) : null}
         {rows.length === 0 ? <Text style={styles.fieldHelp}>Inga rader tillagda ännu.</Text> : null}
         {rows.map((row, index) => (
           <View key={row.id} style={styles.repeaterRowCard}>
@@ -2760,7 +3164,7 @@ function StrandApp() {
             {itemFields.map(itemField => renderRepeaterRowField(field, row, itemField, index, rows))}
           </View>
         ))}
-        {!fixed ? (
+        {!fixed && !fordynDisabled ? (
           <Pressable onPress={() => addRepeaterRow(field)} style={styles.primaryButton}>
             <Text style={styles.primaryButtonText}>Lägg till rad</Text>
           </Pressable>
@@ -2946,6 +3350,47 @@ function StrandApp() {
     return columns.includes('namn') ? 'namn' : columns.includes('art') ? 'art' : columns[0] ?? 'art';
   }
 
+  function getArtOptionsForField(field: BasicDataField, category: string | null) {
+    const artRows = category ? artLists[category] ?? [] : [];
+    const categoryListId = typeof field.category_list_id === 'string' ? field.category_list_id : 'artkategorier';
+
+    if (categoryListId !== 'artkategorier') {
+      return artRows;
+    }
+
+    const wantedTable = category === 'trad' ? 'trad' : category === 'buskar' ? 'buskar' : 'arter';
+    return artRows.filter(art => !art.table || art.table === wantedTable);
+  }
+
+  function shouldPromptPhotoForAtlasArt(art: ArtResourceRow) {
+    const currentRuta = String(draft.ruta ?? '').trim();
+    const taxonId = art.taxonId.trim();
+    const atlasRows = datasets.atlasartlista_havsstrand ?? [];
+
+    if (!currentRuta || !taxonId || atlasRows.length === 0) {
+      return false;
+    }
+
+    return !atlasRows.some(row => {
+      if (row.taxonid !== taxonId) {
+        return false;
+      }
+
+      return row.trakter
+        .split('-')
+        .map(value => value.trim())
+        .includes(currentRuta);
+    });
+  }
+
+  function showAtlasPhotoPrompt(art: ArtResourceRow) {
+    const displayName = art.swedishName || art.scientificName || 'Arten';
+    Alert.alert(
+      'Ta foto av arten',
+      `${displayName} finns inte i atlaslistan för ruta ${ruta || '-'}. Ta ett foto kopplat till artobservationen.`,
+    );
+  }
+
   async function addArtRow(
     field: BasicDataField,
     art: ArtResourceRow,
@@ -2958,6 +3403,7 @@ function StrandApp() {
     const displayName = art.swedishName || art.scientificName;
     const isSpeciesObservation = entryMode === 'species_observation';
     const isPresenceObservation = entryMode === 'presence_observation';
+    const shouldPromptPhoto = shouldPromptPhotoForAtlasArt(art);
 
     const coordinateGps = isSpeciesObservation ? await refreshGps() : null;
     if (
@@ -2973,9 +3419,11 @@ function StrandApp() {
       {
         id: uuidv4(),
         artId: art.id,
+        taxonId: art.taxonId,
         family: art.family,
         scientificName: art.scientificName,
         swedishName: art.swedishName,
+        atlasPhotoRecommended: shouldPromptPhoto,
         zone: category ?? '',
         registrationMode: isPresenceObservation ? 'presence' : art.registrationMode,
         registrationCode: art.registrationCode,
@@ -3000,6 +3448,9 @@ function StrandApp() {
       },
     ]);
     setArtSearchByField(prev => ({...prev, [field.id]: ''}));
+    if (shouldPromptPhoto) {
+      showAtlasPhotoPrompt(art);
+    }
   }
 
   function updateArtRow(fieldId: string, rowId: string, column: string, value: string) {
@@ -3221,7 +3672,9 @@ function StrandApp() {
           return true;
         }
 
-        return [art.family, art.scientificName, art.swedishName].some(value => value.toLowerCase().includes(query));
+        return [art.family, art.scientificName, art.swedishName, art.taxonId].some(value =>
+          value.toLowerCase().includes(query),
+        );
       })
       .slice(0, 60);
 
@@ -3284,6 +3737,9 @@ function StrandApp() {
                     <Text style={styles.artSearchMeta}>
                       {[getStringValue(row.scientificName), getStringValue(row.zoneLabel)].filter(Boolean).join(' | ')}
                     </Text>
+                    {row.atlasPhotoRecommended ? (
+                      <Text style={styles.atlasPhotoHint}>Foto rekommenderas: arten saknas i atlaslistan för aktuell ruta.</Text>
+                    ) : null}
                   </View>
                   <Pressable onPress={() => removeArtRow(field.id, row.id)} style={styles.smallDangerButton}>
                     <Text style={styles.smallDangerButtonText}>Ta bort</Text>
@@ -3341,6 +3797,7 @@ function StrandApp() {
     const nameColumn = getArtNameColumn(columns);
     const displayName = art.swedishName || art.scientificName;
     const coordinateGps = entryMode === 'species_observation' ? await refreshGps() : gps;
+    const shouldPromptPhoto = shouldPromptPhotoForAtlasArt(art);
 
     if (
       entryMode === 'species_observation' &&
@@ -3353,9 +3810,11 @@ function StrandApp() {
     const nextArtRow: ArtTableRow = {
       id: uuidv4(),
       artId: art.id,
+      taxonId: art.taxonId,
       family: art.family,
       scientificName: art.scientificName,
       swedishName: art.swedishName,
+      atlasPhotoRecommended: shouldPromptPhoto,
       zone: category,
       registrationMode: art.registrationMode,
       registrationCode: art.registrationCode,
@@ -3388,6 +3847,9 @@ function StrandApp() {
       ),
     );
     setArtSearchByField(prev => ({...prev, [`${parentField.id}:${parentRow.id}:${field.id}`]: ''}));
+    if (shouldPromptPhoto) {
+      showAtlasPhotoPrompt(art);
+    }
   }
 
   function removeNestedArtRow(parentFieldId: string, parentRowId: string, nestedFieldId: string, rowId: string) {
@@ -3412,7 +3874,7 @@ function StrandApp() {
     const nameColumn = getArtNameColumn(columns);
     const rows = getArtTableRows(parentRow[field.id]);
     const searchKey = `${parentField.id}:${parentRow.id}:${field.id}`;
-    const artRows = category ? artLists[category] ?? [] : [];
+    const artRows = getArtOptionsForField(field, category);
     const query = artSearchByField[searchKey]?.trim().toLowerCase() ?? '';
     const filteredArtRows = artRows
       .filter(art => {
@@ -3420,7 +3882,9 @@ function StrandApp() {
           return true;
         }
 
-        return [art.family, art.scientificName, art.swedishName].some(value => value.toLowerCase().includes(query));
+        return [art.family, art.scientificName, art.swedishName, art.taxonId].some(value =>
+          value.toLowerCase().includes(query),
+        );
       })
       .slice(0, 60);
 
@@ -3474,6 +3938,9 @@ function StrandApp() {
                 <Text style={styles.artSearchMeta}>
                   {[getStringValue(row.scientificName), getStringValue(row.zoneLabel)].filter(Boolean).join(' | ')}
                 </Text>
+                {row.atlasPhotoRecommended ? (
+                  <Text style={styles.atlasPhotoHint}>Foto rekommenderas: arten saknas i atlaslistan för aktuell ruta.</Text>
+                ) : null}
               </View>
               <Pressable onPress={() => removeNestedArtRow(parentField.id, parentRow.id, field.id, row.id)} style={styles.smallDangerButton}>
                 <Text style={styles.smallDangerButtonText}>Ta bort</Text>
@@ -4076,6 +4543,7 @@ function StrandApp() {
     : overviewTab;
   const shouldShowSideTabs = hasSelectedPlot && visibleActiveTab.id !== overviewTab.id;
   const activeTabTitle = visibleActiveTab.id === 'substrat' ? 'Substratmatris' : visibleActiveTab.label;
+  const unreadServerMessageCount = serverMessages.filter(message => !message.read).length;
   const tabContent = (
     <View style={styles.tabContainer}>
       <Text style={styles.tabTitle}>{activeTabTitle}</Text>
@@ -4413,6 +4881,9 @@ function StrandApp() {
           </View>
 
           <ScrollView contentContainerStyle={styles.inventoryListContent}>
+            <Pressable onPress={startNewInventory} style={styles.primaryButton}>
+              <Text style={styles.primaryButtonText}>Starta ny inventering</Text>
+            </Pressable>
             {inventories.length === 0 ? (
               <View style={styles.mapEmptyState}>
                 <Text style={styles.fieldHelp}>Inga lokala inventeringar ännu.</Text>
@@ -4442,6 +4913,66 @@ function StrandApp() {
                     <Text style={styles.smallDangerButtonText}>Radera</Text>
                   </Pressable>
                 </View>
+              ))
+            )}
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
+
+      <Modal animationType="slide" onRequestClose={() => setShowMessagesModal(false)} visible={showMessagesModal}>
+        <SafeAreaView style={styles.mapScreen}>
+          <View style={styles.mapHeader}>
+            <View style={styles.photoPreviewMeta}>
+              <Text style={styles.modalTitle}>Meddelande</Text>
+              <Text style={styles.fieldHelp}>Textfiler från serverns messages-mapp.</Text>
+            </View>
+            <Pressable
+              accessibilityLabel="Stäng meddelanden"
+              onPress={() => setShowMessagesModal(false)}
+              style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>X</Text>
+            </Pressable>
+          </View>
+
+          <ScrollView contentContainerStyle={styles.inventoryListContent}>
+            <Pressable
+              onPress={() => refreshServerMessages(false).catch(() => undefined)}
+              style={styles.primaryButton}>
+              <Text style={styles.primaryButtonText}>Uppdatera meddelanden</Text>
+            </Pressable>
+            {serverMessages.length === 0 ? (
+              <View style={styles.mapEmptyState}>
+                <Text style={styles.fieldHelp}>Inga meddelanden hittades på servern.</Text>
+              </View>
+            ) : (
+              serverMessages.map(message => (
+                <Pressable
+                  key={message.key}
+                  onPress={() => {
+                    Alert.alert(message.fileName, message.text || 'Tomt meddelande.', [
+                      {
+                        text: 'OK',
+                        onPress: () => {
+                          markServerMessageRead(message).catch(() => undefined);
+                        },
+                      },
+                    ]);
+                  }}
+                  style={[styles.inventoryListItem, !message.read && styles.messageUnreadItem]}>
+                  <View style={styles.photoPreviewMeta}>
+                    <Text style={styles.inventoryListTitle}>
+                      {message.read ? '' : 'Ny: '}
+                      {message.fileName}
+                    </Text>
+                    <Text style={styles.inventoryListMeta}>
+                      {message.modifiedAt ? new Date(message.modifiedAt).toLocaleString('sv-SE') : 'Okänd tid'} ·{' '}
+                      {Math.round(message.size)} byte
+                    </Text>
+                    <Text numberOfLines={4} style={styles.photoPreviewText}>
+                      {message.text || 'Tomt meddelande.'}
+                    </Text>
+                  </View>
+                </Pressable>
               ))
             )}
           </ScrollView>
@@ -4565,6 +5096,17 @@ function StrandApp() {
                   }}
                   style={[styles.menuItem, isExporting && styles.menuItemDisabled]}>
                   <Text style={styles.menuItemText}>{isExporting ? 'Exporterar...' : 'Skapa JSON-export'}</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    setShowNavigationMenu(false);
+                    setShowMessagesModal(true);
+                    refreshServerMessages(false).catch(() => undefined);
+                  }}
+                  style={styles.menuItem}>
+                  <Text style={styles.menuItemText}>
+                    Meddelande{unreadServerMessageCount > 0 ? ` (${unreadServerMessageCount} nya)` : ''}
+                  </Text>
                 </Pressable>
                 <Pressable
                   onPress={() => {
@@ -5244,6 +5786,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 17,
   },
+  atlasPhotoHint: {
+    color: '#8a5b12',
+    fontSize: 12,
+    fontWeight: '700',
+    lineHeight: 16,
+    marginTop: 4,
+  },
   emptyPhotoSlot: {
     backgroundColor: '#f8f3eb',
     borderColor: '#e0d3c2',
@@ -5327,6 +5876,12 @@ const styles = StyleSheet.create({
   },
   repeaterListboxTextSelected: {
     color: '#ffffff',
+  },
+  repeaterListboxEmptyText: {
+    color: '#6c6257',
+    fontSize: 13,
+    paddingHorizontal: 12,
+    paddingVertical: 11,
   },
   matrixTable: {
     borderColor: '#e0d3c2',
@@ -5851,6 +6406,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
     padding: 12,
+  },
+  messageUnreadItem: {
+    backgroundColor: '#fff3cf',
+    borderColor: '#d8a734',
   },
   inventoryListTitle: {
     color: '#213127',

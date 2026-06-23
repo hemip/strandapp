@@ -81,10 +81,30 @@ function getCanonicalBasicDataFileCandidates() {
       `${publicPaths.basicDataDir}/basic_data/utlagg/data.csv`,
     ],
     artList: [
+      `${publicPaths.basicDataDir}/havsstrand_artlista.csv`,
+      `${publicPaths.basicDataDir}/artlistor/havsstrand_artlista.csv`,
+      `${publicPaths.basicDataDir}/basic_data/havsstrand_artlista.csv`,
+      `${publicPaths.basicDataDir}/basic_data/artlistor/havsstrand_artlista.csv`,
       `${publicPaths.basicDataDir}/strandinventering_arter_alla.csv`,
       `${publicPaths.basicDataDir}/artlistor/strandinventering_arter_alla.csv`,
-      `${publicPaths.basicDataDir}/basic_data/strandinventering_arter_alla.csv`,
-      `${publicPaths.basicDataDir}/basic_data/artlistor/strandinventering_arter_alla.csv`,
+    ],
+    atlasArtList: [
+      `${publicPaths.basicDataDir}/atlasartlista_havsstrand.csv`,
+      `${publicPaths.basicDataDir}/artlistor/atlasartlista_havsstrand.csv`,
+      `${publicPaths.basicDataDir}/basic_data/atlasartlista_havsstrand.csv`,
+      `${publicPaths.basicDataDir}/basic_data/artlistor/atlasartlista_havsstrand.csv`,
+    ],
+    dynCodes: [
+      `${publicPaths.basicDataDir}/dynkoder.json`,
+      `${publicPaths.basicDataDir}/basic_data/dynkoder.json`,
+      `${publicPaths.basicDataDir}/vardelistor/dynkoder.json`,
+      `${publicPaths.basicDataDir}/basic_data/vardelistor/dynkoder.json`,
+    ],
+    habitatCodes: [
+      `${publicPaths.basicDataDir}/habitatkoder.json`,
+      `${publicPaths.basicDataDir}/basic_data/habitatkoder.json`,
+      `${publicPaths.basicDataDir}/vardelistor/habitatkoder.json`,
+      `${publicPaths.basicDataDir}/basic_data/vardelistor/habitatkoder.json`,
     ],
   };
 }
@@ -104,6 +124,9 @@ export async function normalizeBasicDataDirectory() {
   const basicDataContent = await readFirstExistingTextFile(candidates.basicData);
   const dataContent = await readFirstExistingTextFile(candidates.data);
   const artListContent = await readFirstExistingTextFile(candidates.artList);
+  const atlasArtListContent = await readFirstExistingTextFile(candidates.atlasArtList);
+  const dynCodesContent = await readFirstExistingTextFile(candidates.dynCodes);
+  const habitatCodesContent = await readFirstExistingTextFile(candidates.habitatCodes);
 
   if (!basicDataContent) {
     throw new Error('Ingen basic_data-fil hittades i hämtad bundle.');
@@ -114,13 +137,24 @@ export async function normalizeBasicDataDirectory() {
   }
 
   if (!artListContent) {
-    throw new Error('Ingen strandinventering_arter_alla.csv hittades i hämtad bundle.');
+    throw new Error('Ingen havsstrand_artlista.csv hittades i hämtad bundle.');
+  }
+
+  if (!atlasArtListContent) {
+    throw new Error('Ingen atlasartlista_havsstrand.csv hittades i hämtad bundle.');
   }
 
   await resetBasicDataDirectory();
   await RNFS.writeFile(getBasicDataPath(), basicDataContent.replace(/^\uFEFF/, ''), 'utf8');
   await RNFS.writeFile(`${publicPaths.basicDataDir}/data.csv`, dataContent, 'utf8');
-  await RNFS.writeFile(`${publicPaths.basicDataDir}/strandinventering_arter_alla.csv`, artListContent, 'utf8');
+  await RNFS.writeFile(`${publicPaths.basicDataDir}/havsstrand_artlista.csv`, artListContent, 'utf8');
+  await RNFS.writeFile(`${publicPaths.basicDataDir}/atlasartlista_havsstrand.csv`, atlasArtListContent, 'utf8');
+  if (dynCodesContent) {
+    await RNFS.writeFile(`${publicPaths.basicDataDir}/dynkoder.json`, dynCodesContent.replace(/^\uFEFF/, ''), 'utf8');
+  }
+  if (habitatCodesContent) {
+    await RNFS.writeFile(`${publicPaths.basicDataDir}/habitatkoder.json`, habitatCodesContent.replace(/^\uFEFF/, ''), 'utf8');
+  }
 }
 
 export function getWorkingDraftPath() {
