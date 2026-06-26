@@ -48,6 +48,7 @@ import {
   InventoryListItem,
   deleteInventoryFromDevice,
   getInventoryIdFromDraft,
+  loadInventoryDraftSnapshot,
   loadInventoryIndex,
   markInventorySubmitted,
   saveInventoryDraftSnapshot,
@@ -966,6 +967,10 @@ function isFordynHabitatRowsField(field: BasicDataField | null | undefined) {
   return field?.special === 'fordyn_habitat_rows';
 }
 
+function isTransectDistanceField(field: BasicDataField | null | undefined) {
+  return field?.special === 'transect_distance';
+}
+
 function getZoneBoundaryOrder(field: BasicDataField) {
   const order = parseNumber(field.zone_order);
   return order ?? Number.MAX_SAFE_INTEGER;
@@ -1207,9 +1212,26 @@ function StrandApp() {
     return parseNumber(rows[index - 1]?.slut) ?? 0;
   }
 
+  function normalizeHabitatCodeAliases(row: RepeaterRow): RepeaterRow {
+    const code = getStringValue(row.kod) || getStringValue(row.habitat);
+    const name = getStringValue(row.namn) || getStringValue(row.habitatnamn);
+
+    if (!code && !name) {
+      return row;
+    }
+
+    return {
+      ...row,
+      kod: getStringValue(row.kod) || code,
+      namn: getStringValue(row.namn) || name,
+      habitat: getStringValue(row.habitat) || code,
+      habitatnamn: getStringValue(row.habitatnamn) || name,
+    };
+  }
+
   function normalizeHabitatRows(rows: RepeaterRow[]): RepeaterRow[] {
     return rows.map((row, index) => ({
-      ...row,
+      ...normalizeHabitatCodeAliases(row),
       start: formatMetersValue(getHabitatRowStart(rows, index)),
     }));
   }
@@ -1253,7 +1275,7 @@ function StrandApp() {
       const isLastRow = index === rows.length - 1;
       const rowEnd = isLastRow ? bounds.endMeters : parseNumber(row.slut);
       return {
-        ...row,
+        ...normalizeHabitatCodeAliases(row),
         start: formatMetersValue(startMeters),
         slut: formatMetersValue(rowEnd == null ? bounds.endMeters : Math.min(Math.max(rowEnd, startMeters), bounds.endMeters)),
       };
@@ -1561,6 +1583,20 @@ function StrandApp() {
       setDraft(prev => ({...prev, deponi_rows: normalizedRows}));
     }
   }, [basicData, draft.deponi_rows]);
+
+  useEffect(() => {
+    if (!basicData || !Array.isArray(draft.habitat_rows)) {
+      return;
+    }
+
+    const rows = getRepeaterRows(draft.habitat_rows);
+    const normalizedRows = normalizeHabitatRows(rows);
+    if (JSON.stringify(rows) !== JSON.stringify(normalizedRows)) {
+      setDraft(prev => ({...prev, habitat_rows: normalizedRows}));
+    }
+    // normalizeHabitatRows läser bara radinnehåll och ska köras när habitatrader ändras.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [basicData, draft.habitat_rows]);
 
   useEffect(() => {
     if (!basicData || !Array.isArray(draft.dynhabitat_rows)) {
@@ -2069,6 +2105,31 @@ function StrandApp() {
     setDeleteInventoryInput('');
   }
 
+  async function openInventory(item: InventoryListItem) {
+    try {
+      const inventoryDraft = await loadInventoryDraftSnapshot(item);
+      if (!inventoryDraft) {
+        Alert.alert('Inventeringen saknas', 'Den sparade inventeringsfilen hittades inte på telefonen.');
+        return;
+      }
+
+      setDraft(inventoryDraft);
+      setManualUuidInput(typeof inventoryDraft.inventering_uuid === 'string' ? inventoryDraft.inventering_uuid : '');
+      setLagnummerInput(typeof inventoryDraft.lagnummer === 'string' ? inventoryDraft.lagnummer : lagnummer);
+      setInventerareInput(typeof inventoryDraft.inventerare === 'string' ? inventoryDraft.inventerare : inventerare);
+      setActiveTabId('oversikt');
+      setShowInventoryListModal(false);
+      setOpenDatasetFieldId(null);
+      setOpenRepeaterDatasetKey(null);
+      setRepeaterDatasetSearch({});
+      setArtSearchByField({});
+      await saveWorkingDraft(inventoryDraft);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Kunde inte öppna inventeringen.';
+      Alert.alert('Öppningsfel', message);
+    }
+  }
+
   async function confirmDeleteInventory() {
     if (!deleteInventoryTarget || deleteInventoryInput !== 'RADERA') {
       showValidationToast('Skriv RADERA för att bekräfta radering.');
@@ -2411,6 +2472,10 @@ function StrandApp() {
         altitudeAccuracy: typeof gps.altitudeAccuracy === 'number' ? gps.altitudeAccuracy : null,
         accuracy: gps.accuracy,
       };
+      if (photoCaptureTarget.mode === 'repeater') {
+        entry.kommentar = '';
+        entry.tag = '';
+      }
 
       if (photoCaptureTarget.mode === 'artObservationPhoto' && photoCaptureTarget.observationId) {
         updateDraftValue(
@@ -2643,9 +2708,22 @@ function StrandApp() {
     );
   }
 
+  function getPhotoRepeaterTextFields(field: BasicDataField) {
+    const fields = getItemSchemaFields(field).filter(item => item.id === 'kommentar' || item.id === 'tag');
+    if (fields.length > 0) {
+      return fields;
+    }
+
+    return [
+      {id: 'kommentar', label: 'Kommentar', type: 'text'},
+      {id: 'tag', label: 'Tag', type: 'text'},
+    ] as BasicDataField[];
+  }
+
   function renderPhotoRepeaterField(field: BasicDataField) {
     const photos = getPhotoArray(draft[field.id]);
     const category = getPhotoCategory(field);
+    const textFields = getPhotoRepeaterTextFields(field);
 
     return (
       <View key={field.id} style={styles.fieldCard}>
@@ -2654,20 +2732,22 @@ function StrandApp() {
         {photos.map(photo => (
           <View key={photo.id} style={styles.photoRepeaterItem}>
             {renderPhotoPreview(photo, () => removePhoto(field.id, photo))}
-            <TextInput
-              onChangeText={text => updatePhotoRepeaterText(field.id, photo.id, 'kommentar', text)}
-              placeholder="Kommentar"
-              placeholderTextColor="#8e8579"
-              style={styles.input}
-              value={photo.kommentar ?? ''}
-            />
-            <TextInput
-              onChangeText={text => updatePhotoRepeaterText(field.id, photo.id, 'tag', text)}
-              placeholder="Tag"
-              placeholderTextColor="#8e8579"
-              style={styles.input}
-              value={photo.tag ?? ''}
-            />
+            {textFields.map(textField => {
+              const key = textField.id as 'kommentar' | 'tag';
+              return (
+                <View key={`${photo.id}-${textField.id}`} style={styles.repeaterNestedBlock}>
+                  <Text style={styles.repeaterFieldLabel}>{textField.label}</Text>
+                  <TextInput
+                    multiline={textField.id === 'kommentar'}
+                    onChangeText={text => updatePhotoRepeaterText(field.id, photo.id, key, text)}
+                    placeholder={textField.label}
+                    placeholderTextColor="#8e8579"
+                    style={[styles.input, textField.id === 'kommentar' && styles.multilineInput]}
+                    value={photo[key] ?? ''}
+                  />
+                </View>
+              );
+            })}
           </View>
         ))}
         <Pressable
@@ -2858,6 +2938,25 @@ function StrandApp() {
     showValidationToast(`Slut: ${formatMetersValue(meters)} m från startpunkten.`);
   }
 
+  async function setRepeaterTransectDistanceFromGps(parentField: BasicDataField, row: RepeaterRow, field: BasicDataField) {
+    const geometry = getTransectGeometry();
+    if (!geometry) {
+      showValidationToast('Sätt Startpunkt och Slutpunkt innan GPS kan användas för avstånd.');
+      return;
+    }
+
+    const nextGps = await refreshGps();
+    if (typeof nextGps.latitude !== 'number' || typeof nextGps.longitude !== 'number') {
+      showValidationToast(nextGps.message || 'Kunde inte läsa GPS-position.');
+      return;
+    }
+
+    const userPoint = latLonToRelativeMeters(geometry.startLat, geometry.startLon, nextGps.latitude, nextGps.longitude);
+    const meters = getDistanceAlongSegmentMeters(userPoint, geometry.start, geometry.end);
+    updateRepeaterRow(parentField.id, row.id, field.id, formatMetersValue(meters));
+    showValidationToast(`${field.label}: ${formatMetersValue(meters)} m från startpunkten.`);
+  }
+
   function renderRepeaterRowField(
     parentField: BasicDataField,
     row: RepeaterRow,
@@ -2927,7 +3026,14 @@ function StrandApp() {
       const searchKey = `${parentField.id}:${row.id}:${field.id}`;
       const selectedCode = getStringValue(row[targetValueField]);
       const selectedName = targetLabelField ? getStringValue(row[targetLabelField]) : '';
-      const selectedLabel = selectedCode && selectedName ? `${selectedCode} - ${selectedName}` : selectedCode || selectedName;
+      const selectedDatasetCode = getStringValue(row[valueKey]);
+      const selectedDatasetName = getStringValue(row[displayKey]);
+      const selectedLabel =
+        selectedCode && selectedName
+          ? `${selectedCode} - ${selectedName}`
+          : selectedDatasetCode && selectedDatasetName
+            ? `${selectedDatasetCode} - ${selectedDatasetName}`
+            : getStringValue(row[field.id]) || selectedCode || selectedName || selectedDatasetCode || selectedDatasetName;
       const searchText = repeaterDatasetSearch[searchKey] ?? selectedLabel;
       const normalizedSearch = searchText.trim().toLowerCase();
       const datasetRows = datasetId ? datasets[datasetId] ?? [] : [];
@@ -2971,10 +3077,15 @@ function StrandApp() {
                     <Pressable
                       key={`${searchKey}-${optionCode}-${optionIndex}`}
                       onPress={() => {
-                        const values: Record<string, unknown> = {[targetValueField]: optionCode};
+                        const values: Record<string, unknown> = {
+                          [field.id]: optionLabel,
+                          [targetValueField]: optionCode,
+                          [valueKey]: optionCode,
+                        };
                         if (targetLabelField) {
                           values[targetLabelField] = optionName;
                         }
+                        values[displayKey] = optionName;
                         updateRepeaterRowValues(parentField.id, row.id, values);
                         setRepeaterDatasetSearch(prev => ({...prev, [searchKey]: optionLabel}));
                         setOpenRepeaterDatasetKey(null);
@@ -3065,7 +3176,7 @@ function StrandApp() {
       );
     }
 
-    if (isRangeRow) {
+    if (isRangeRow || isTransectDistanceField(field)) {
       const isStartField = field.id === 'start';
       return (
         <View key={field.id} style={styles.repeaterNestedBlock}>
@@ -3082,10 +3193,13 @@ function StrandApp() {
             />
             {!isStartField ? (
               <Pressable
-                accessibilityLabel="Sätt habitatets slut med GPS"
+                accessibilityLabel={`Sätt ${field.label} med GPS`}
                 accessibilityRole="button"
                 onPress={() => {
-                  setHabitatRowEndFromGps(parentField, row).catch(error => {
+                  const action = isTransectDistanceField(field)
+                    ? setRepeaterTransectDistanceFromGps(parentField, row, field)
+                    : setHabitatRowEndFromGps(parentField, row);
+                  action.catch(error => {
                     showValidationToast(error instanceof Error ? error.message : 'Kunde inte läsa GPS-position.');
                   });
                 }}
@@ -3362,6 +3476,22 @@ function StrandApp() {
     return artRows.filter(art => !art.table || art.table === wantedTable);
   }
 
+  function getEffectiveArtRegistrationMode(art: ArtResourceRow, category: string | null, entryMode?: string) {
+    if (art.registrationMode === 'bush' || category === 'buskar' || art.table === 'buskar') {
+      return 'bush';
+    }
+
+    if (entryMode === 'presence_observation') {
+      return 'presence';
+    }
+
+    return art.registrationMode;
+  }
+
+  function shouldCaptureCoordinateForArt(entryMode: string | undefined, registrationMode: ArtResourceRow['registrationMode']) {
+    return entryMode === 'species_observation' || registrationMode === 'bush';
+  }
+
   function shouldPromptPhotoForAtlasArt(art: ArtResourceRow) {
     const currentRuta = String(draft.ruta ?? '').trim();
     const taxonId = art.taxonId.trim();
@@ -3403,11 +3533,13 @@ function StrandApp() {
     const displayName = art.swedishName || art.scientificName;
     const isSpeciesObservation = entryMode === 'species_observation';
     const isPresenceObservation = entryMode === 'presence_observation';
+    const registrationMode = getEffectiveArtRegistrationMode(art, category, entryMode);
+    const shouldCaptureCoordinate = shouldCaptureCoordinateForArt(entryMode, registrationMode);
     const shouldPromptPhoto = shouldPromptPhotoForAtlasArt(art);
 
-    const coordinateGps = isSpeciesObservation ? await refreshGps() : null;
+    const coordinateGps = shouldCaptureCoordinate ? await refreshGps() : null;
     if (
-      isSpeciesObservation &&
+      shouldCaptureCoordinate &&
       (!coordinateGps || typeof coordinateGps.latitude !== 'number' || typeof coordinateGps.longitude !== 'number')
     ) {
       showValidationToast(coordinateGps?.message || 'Kunde inte läsa GPS-position för artobservationen.');
@@ -3425,7 +3557,7 @@ function StrandApp() {
         swedishName: art.swedishName,
         atlasPhotoRecommended: shouldPromptPhoto,
         zone: category ?? '',
-        registrationMode: isPresenceObservation ? 'presence' : art.registrationMode,
+        registrationMode,
         registrationCode: art.registrationCode,
         zoneLabel: getArtCategoryOption(field)?.label ?? '',
         latitude: coordinateGps && typeof coordinateGps.latitude === 'number' ? String(coordinateGps.latitude) : '',
@@ -3436,11 +3568,13 @@ function StrandApp() {
         accuracy: coordinateGps && typeof coordinateGps.accuracy === 'number' ? String(coordinateGps.accuracy) : '',
         coordinateCapturedAt: new Date().toISOString(),
         ...(isSpeciesObservation
-          ? art.registrationMode === 'count'
+          ? registrationMode === 'count'
             ? {antal: ''}
-            : art.registrationMode === 'area'
+            : registrationMode === 'area'
               ? {m2: ''}
               : {finns: '1'}
+          : registrationMode === 'bush'
+            ? {langd: '', bredd: '', tathet: ''}
           : isPresenceObservation
             ? {finns: '1'}
           : {}),
@@ -3571,6 +3705,30 @@ function StrandApp() {
       );
     }
 
+    if (row.registrationMode === 'bush') {
+      return (
+        <View style={styles.artColumnRowCompact}>
+          {[
+            {key: 'langd', label: 'Längd'},
+            {key: 'bredd', label: 'Bredd'},
+            {key: 'tathet', label: 'Täthet'},
+          ].map(item => (
+            <View key={item.key} style={styles.artColumnInputGroup}>
+              <Text style={styles.repeaterFieldLabel}>{item.label}</Text>
+              <TextInput
+                keyboardType={item.key === 'tathet' ? 'default' : 'numeric'}
+                onChangeText={text => updateValue(item.key, text)}
+                placeholder={item.label}
+                placeholderTextColor="#8e8579"
+                style={styles.artValueInput}
+                value={getStringValue(row[item.key])}
+              />
+            </View>
+          ))}
+        </View>
+      );
+    }
+
     const present = getStringValue(row.finns) !== '0';
     return (
       <Pressable
@@ -3664,7 +3822,7 @@ function StrandApp() {
     const nameColumn = getArtNameColumn(columns);
     const rows = getArtTableRows(draft[field.id]);
     const visibleRows = isSpeciesObservation && category ? rows.filter(row => getStringValue(row.zone) === category) : rows;
-    const artRows = category ? artLists[category] ?? [] : [];
+    const artRows = getArtOptionsForField(field, category);
     const query = artSearchByField[field.id]?.trim().toLowerCase() ?? '';
     const filteredArtRows = artRows
       .filter(art => {
@@ -3713,7 +3871,15 @@ function StrandApp() {
                       {isPresenceObservation
                         ? ' | Finns'
                         : isSpeciesObservation
-                          ? ` | ${art.registrationMode === 'count' ? 'Antal' : art.registrationMode === 'area' ? 'm2' : 'Finns'}`
+                          ? ` | ${
+                              getEffectiveArtRegistrationMode(art, category, entryMode) === 'count'
+                                ? 'Antal'
+                                : getEffectiveArtRegistrationMode(art, category, entryMode) === 'area'
+                                  ? 'm2'
+                                  : getEffectiveArtRegistrationMode(art, category, entryMode) === 'bush'
+                                    ? 'Längd/bredd/täthet'
+                                    : 'Finns'
+                            }`
                           : ''}
                     </Text>
                   </Pressable>
@@ -3796,11 +3962,13 @@ function StrandApp() {
   ) {
     const nameColumn = getArtNameColumn(columns);
     const displayName = art.swedishName || art.scientificName;
-    const coordinateGps = entryMode === 'species_observation' ? await refreshGps() : gps;
+    const registrationMode = getEffectiveArtRegistrationMode(art, category, entryMode);
+    const shouldCaptureCoordinate = shouldCaptureCoordinateForArt(entryMode, registrationMode);
+    const coordinateGps = shouldCaptureCoordinate ? await refreshGps() : gps;
     const shouldPromptPhoto = shouldPromptPhotoForAtlasArt(art);
 
     if (
-      entryMode === 'species_observation' &&
+      shouldCaptureCoordinate &&
       (typeof coordinateGps.latitude !== 'number' || typeof coordinateGps.longitude !== 'number')
     ) {
       showValidationToast(coordinateGps.message || 'Kunde inte läsa GPS-position för artobservationen.');
@@ -3816,7 +3984,7 @@ function StrandApp() {
       swedishName: art.swedishName,
       atlasPhotoRecommended: shouldPromptPhoto,
       zone: category,
-      registrationMode: art.registrationMode,
+      registrationMode,
       registrationCode: art.registrationCode,
       zoneLabel: getArtCategoryOption(field)?.label ?? '',
       latitude: typeof coordinateGps.latitude === 'number' ? String(coordinateGps.latitude) : '',
@@ -3826,11 +3994,13 @@ function StrandApp() {
       accuracy: typeof coordinateGps.accuracy === 'number' ? String(coordinateGps.accuracy) : '',
       coordinateCapturedAt: new Date().toISOString(),
       ...(entryMode === 'species_observation'
-        ? art.registrationMode === 'count'
+        ? registrationMode === 'count'
           ? {antal: ''}
-          : art.registrationMode === 'area'
+          : registrationMode === 'area'
             ? {m2: ''}
             : {finns: '1'}
+        : registrationMode === 'bush'
+          ? {langd: '', bredd: '', tathet: ''}
         : {}),
       [nameColumn]: displayName,
     };
@@ -4890,7 +5060,7 @@ function StrandApp() {
               </View>
             ) : (
               inventories.map(item => (
-                <View key={item.id} style={styles.inventoryListItem}>
+                <Pressable key={item.id} onPress={() => openInventory(item).catch(() => undefined)} style={styles.inventoryListItem}>
                   <View style={styles.photoPreviewMeta}>
                     <Text style={styles.inventoryListTitle}>Ruta {item.ruta} · Provyta {item.provyta}</Text>
                     <Text style={styles.inventoryListMeta}>Filbas: {item.id}</Text>
@@ -4899,7 +5069,16 @@ function StrandApp() {
                     </Text>
                   </View>
                   <Pressable
-                    onPress={() =>
+                    onPress={event => {
+                      event.stopPropagation();
+                      openInventory(item).catch(() => undefined);
+                    }}
+                    style={styles.smallSecondaryButton}>
+                    <Text style={styles.smallSecondaryButtonText}>Öppna</Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={event => {
+                      event.stopPropagation();
                       Alert.alert(
                         'Radera inventering?',
                         'All data, JSON-export och alla foton för inventeringen raderas från telefonen.',
@@ -4907,12 +5086,12 @@ function StrandApp() {
                           {text: 'Avbryt', style: 'cancel'},
                           {text: 'Ja', style: 'destructive', onPress: () => openDeleteInventory(item)},
                         ],
-                      )
-                    }
+                      );
+                    }}
                     style={styles.smallDangerButton}>
                     <Text style={styles.smallDangerButtonText}>Radera</Text>
                   </Pressable>
-                </View>
+                </Pressable>
               ))
             )}
           </ScrollView>
@@ -5814,6 +5993,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 10,
     paddingVertical: 8,
+  },
+  smallSecondaryButton: {
+    backgroundColor: '#eef6ee',
+    borderColor: '#b7ccb9',
+    borderRadius: 10,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  smallSecondaryButtonText: {
+    color: '#24543a',
+    fontSize: 12,
+    fontWeight: '800',
   },
   smallDangerButtonText: {
     color: '#a63a2b',

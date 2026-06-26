@@ -720,7 +720,7 @@
               "item_schema": {
                 "fields": [
                   { "id": "driftnummer", "label": "Driftnr", "type": "text" },
-                  { "id": "position", "label": "Position", "type": "text" },
+                  { "id": "position", "label": "Position", "type": "decimal", "unit": "m", "special": "transect_distance" },
                   { "id": "bredd", "label": "Bredd", "type": "text" },
                   { "id": "hojd", "label": "Höjd", "type": "text" },
                   { "id": "langd", "label": "Längd", "type": "text" },
@@ -749,7 +749,7 @@
               "item_schema": {
                 "fields": [
                   { "id": "driftnummer", "label": "Driftnr", "type": "text" },
-                  { "id": "position", "label": "Position", "type": "text" },
+                  { "id": "position", "label": "Position", "type": "decimal", "unit": "m", "special": "transect_distance" },
                   { "id": "bredd", "label": "Bredd", "type": "text" },
                   { "id": "hojd", "label": "Höjd", "type": "text" },
                   { "id": "langd", "label": "Längd", "type": "text" },

@@ -12,7 +12,7 @@ export interface ArtResourceRow {
   family: string;
   scientificName: string;
   swedishName: string;
-  registrationMode: 'count' | 'area' | 'presence';
+  registrationMode: 'count' | 'area' | 'presence' | 'bush';
   registrationCode: string;
   metadata?: string;
 }
@@ -285,6 +285,9 @@ function parseCsvRecords(content: string) {
 
 function getRegistrationMode(registrationCode: string): ArtResourceRow['registrationMode'] {
   const normalizedCode = registrationCode.toLowerCase();
+  if (normalizedCode.includes('b')) {
+    return 'bush';
+  }
   if (normalizedCode.includes('r')) {
     return 'count';
   }

@@ -44,6 +44,10 @@ export async function loadInventoryIndex() {
   return (await readJsonFile<InventoryListItem[]>(inventoryIndexPath)) ?? [];
 }
 
+export async function loadInventoryDraftSnapshot(item: InventoryListItem) {
+  return readJsonFile<Record<string, unknown>>(getDraftPath(item.id));
+}
+
 async function saveInventoryIndex(items: InventoryListItem[]) {
   await writeJsonFile(
     inventoryIndexPath,
