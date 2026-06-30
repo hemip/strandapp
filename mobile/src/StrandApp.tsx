@@ -1285,12 +1285,10 @@ function StrandApp() {
 
     return rows.map((row, index) => {
       const startMeters = getFordynHabitatRowStart(rows, index, bounds) ?? bounds.startMeters;
-      const isLastRow = index === rows.length - 1;
-      const rowEnd = isLastRow ? bounds.endMeters : parseNumber(row.slut);
       return {
         ...normalizeHabitatCodeAliases(row),
         start: formatMetersValue(startMeters),
-        slut: formatMetersValue(rowEnd == null ? bounds.endMeters : Math.min(Math.max(rowEnd, startMeters), bounds.endMeters)),
+        slut: getStringValue(row.slut),
       };
     });
   }
