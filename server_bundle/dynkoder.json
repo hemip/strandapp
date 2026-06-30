@@ -1,0 +1,33 @@
+[
+  {
+    "habitat": "2120",
+    "habitatnamn": "vita dyner"
+  },
+  {
+    "habitat": "2130",
+    "habitatnamn": "grå dyner"
+  },
+  {
+    "habitat": "2140",
+    "habitatnamn": "risdyner"
+  },
+  {
+    "habitat": "2170",
+    "habitatnamn": "sandvide-dyner"
+  },
+  {
+    "habitat": "2180",
+    "habitatnamn": "trädklädda dyner"
+  },
+  {
+    "habitat": "2190",
+    "habitatnamn": "dynvåtmarker"
+  },
+  { "habitat": "2998",
+    "habitatnamn": "igenväxt dynvåtmark"
+  },
+  {
+    "habitat": "9999",
+    "habitatnamn": "ej habitat"
+  }  
+]

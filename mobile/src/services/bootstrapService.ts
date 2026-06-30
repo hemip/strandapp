@@ -34,7 +34,7 @@ export async function initializeApplication(): Promise<AppBootstrapResult> {
   if (saved && compareVersions(bundled.meta.version, saved.meta.version) > 0) {
     await saveBasicData(bundled);
     await downloadBootstrapResources(bundled);
-    await normalizeBasicDataDirectory();
+    await normalizeBasicDataDirectoryWithSftpFallback();
     await saveBootstrapMetadata({
       basicDataVersion: bundled.meta.version,
       bootstrappedAt: new Date().toISOString(),
@@ -50,8 +50,14 @@ export async function initializeApplication(): Promise<AppBootstrapResult> {
 
   try {
     await normalizeBasicDataDirectory();
-  } catch {
-    // Om en äldre installation saknar någon resurs fortsätter appen med det som finns.
+  } catch (error) {
+    try {
+      saved = await loadBasicDataFromSftpBundle(saved);
+    } catch {
+      // Om en äldre installation saknar någon resurs fortsätter appen med det som finns.
+      // Appen kan då uppdateras manuellt när nät/SFTP är tillgängligt.
+      void error;
+    }
   }
 
   const notices = ['Lokal konfiguration laddad.'];
@@ -79,6 +85,32 @@ export async function initializeApplication(): Promise<AppBootstrapResult> {
     updateCheck,
     source: 'bundled',
   };
+}
+
+async function normalizeBasicDataDirectoryWithSftpFallback() {
+  try {
+    await normalizeBasicDataDirectory();
+  } catch {
+    await resetBasicDataDirectory();
+    await downloadBasicDataBundleFromSftp();
+    await normalizeBasicDataDirectory();
+  }
+}
+
+async function loadBasicDataFromSftpBundle(base: BasicDataConfig) {
+  await resetBasicDataDirectory();
+  await downloadBasicDataBundleFromSftp();
+  await normalizeBasicDataDirectory();
+  const sftpConfig = (await loadSavedBasicData()) ?? base;
+
+  await saveBootstrapMetadata({
+    basicDataVersion: sftpConfig.meta.version,
+    bootstrappedAt: new Date().toISOString(),
+    lastUpdateCheckAt: new Date().toISOString(),
+    source: 'remote',
+  });
+
+  return sftpConfig;
 }
 
 export async function runManualBasicDataUpdate(currentConfig?: BasicDataConfig) {
@@ -142,11 +174,26 @@ async function bootstrapFirstLaunch(bundled: BasicDataConfig): Promise<AppBootst
 
   if (online) {
     try {
+      const sftpConfig = await loadBasicDataFromSftpBundle(bundled);
+      notices.push('Första uppstart klar. Grunddata hämtades från servern.');
+
+      return {
+        basicData: sftpConfig,
+        bootstrapMode: 'fresh',
+        notices,
+        updateCheck: {updateAvailable: false},
+        source: 'remote',
+      };
+    } catch {
+      notices.push('Första hämtningen från servern misslyckades. Försöker med annan källa.');
+    }
+
+    try {
       const remote = await fetchRemoteBasicData(bundled);
       if (remote) {
         await saveBasicData(remote);
         await downloadBootstrapResources(remote);
-        await normalizeBasicDataDirectory();
+        await normalizeBasicDataDirectoryWithSftpFallback();
         await saveBootstrapMetadata({
           basicDataVersion: remote.meta.version,
           bootstrappedAt: new Date().toISOString(),
@@ -173,7 +220,7 @@ async function bootstrapFirstLaunch(bundled: BasicDataConfig): Promise<AppBootst
 
   await saveBasicData(bundled);
   await downloadBootstrapResources(bundled);
-  await normalizeBasicDataDirectory();
+  await normalizeBasicDataDirectoryWithSftpFallback();
   await saveBootstrapMetadata({
     basicDataVersion: bundled.meta.version,
     bootstrappedAt: new Date().toISOString(),

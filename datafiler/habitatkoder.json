@@ -1,0 +1,46 @@
+[
+  {
+    "habitat": "1220",
+    "habitatnamn": "sten och grusvallar"
+  },
+  {
+    "habitat": "1230",
+    "habitatnamn": "havsklippor"
+  },
+  {
+    "habitat": "1239",
+    "habitatnamn": "klippstrand"
+  },
+  {
+    "habitat": "1310",
+    "habitatnamn": "glasörtsstränder"
+  },
+  {
+    "habitat": "1330",
+    "habitatnamn": "salta strandängar"
+  },
+  {
+    "habitat": "1630",
+    "habitatnamn": "strandängar vid Östersjön"
+  },
+  {
+    "habitat": "1640",
+    "habitatnamn": "sandstränder vid Östersjön"
+  },
+  {
+    "habitat": "1952",
+    "habitatnamn": "moränstrand"
+  },
+  {
+    "habitat": "2100",
+    "habitatnamn": "dynhabitat"
+  },
+  {
+    "habitat": "9030",
+    "habitatnamn": "landhöjningsskog"
+  },
+  {
+    "habitat": "9999",
+    "habitatnamn": "ej habitat"
+  }
+]

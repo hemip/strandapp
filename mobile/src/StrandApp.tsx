@@ -35,6 +35,8 @@ import {
   getUniqueDatasetOptions,
   loadConfiguredArtResources,
   loadConfiguredDatasets,
+  loadOldInventoryData,
+  OldInventoryDataRow,
 } from './services/datasetService';
 import {
   deleteFileIfExists,
@@ -69,6 +71,9 @@ const DISTANCE_INVENTORY_TAB_ID = 'hydro';
 const SIDE_TAB_LAST_IDS = new Set(['substrat']);
 const MESSAGE_READ_KEYS_STORAGE_KEY = '@strand/read-server-message-keys';
 const MESSAGE_POLL_INTERVAL_MS = 15 * 60 * 1000;
+const BLALAPP_TEXT_FIELD_ID = 'blalapp';
+const BLALAPP_PHOTO_FIELD_ID = 'blalapp_foto';
+const BLALAPP_MAX_LENGTH = 500;
 
 interface PhotoEntry {
   id: string;
@@ -113,6 +118,7 @@ interface ServerMessage {
 
 type RepeaterRow = Record<string, unknown> & {id: string};
 type ArtLists = Record<string, ArtResourceRow[]>;
+type OldInventoryDataMap = Record<string, OldInventoryDataRow>;
 type ArtTableRow = Record<string, unknown> & {id: string; artId: string};
 type TransectMapLayer = 'topo' | 'orto';
 type EditingFieldState = {
@@ -986,6 +992,7 @@ function StrandApp() {
   const [basicData, setBasicData] = useState<BasicDataConfig | null>(null);
   const [datasets, setDatasets] = useState<DatasetMap>({});
   const [artLists, setArtLists] = useState<ArtLists>({});
+  const [oldInventoryData, setOldInventoryData] = useState<OldInventoryDataMap>({});
   const [draft, setDraft] = useState<Record<string, unknown>>({});
   const [activeTabId, setActiveTabId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
@@ -999,6 +1006,7 @@ function StrandApp() {
   const [showUserModal, setShowUserModal] = useState(false);
   const [showNavigationMenu, setShowNavigationMenu] = useState(false);
   const [showScannerModal, setShowScannerModal] = useState(false);
+  const [showBlalappModal, setShowBlalappModal] = useState(false);
   const [inventories, setInventories] = useState<InventoryListItem[]>([]);
   const [deleteInventoryTarget, setDeleteInventoryTarget] = useState<InventoryListItem | null>(null);
   const [deleteInventoryInput, setDeleteInventoryInput] = useState('');
@@ -1013,6 +1021,7 @@ function StrandApp() {
   const [manualUuidInput, setManualUuidInput] = useState('');
   const [lagnummerInput, setLagnummerInput] = useState('');
   const [inventerareInput, setInventerareInput] = useState('');
+  const [blalappInput, setBlalappInput] = useState('');
   const transectMapLayerRef = useRef<TransectMapLayer>('topo');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [statusText, setStatusText] = useState('Förbereder appen...');
@@ -1020,6 +1029,7 @@ function StrandApp() {
   const [keyboardInset, setKeyboardInset] = useState(0);
   const [serverMessages, setServerMessages] = useState<ServerMessage[]>([]);
   const [readServerMessageKeys, setReadServerMessageKeys] = useState<Set<string>>(() => new Set());
+  const [serverMessageReadKeysLoaded, setServerMessageReadKeysLoaded] = useState(false);
   const photoCameraRef = useRef<CameraApi | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const promptShown = useRef(false);
@@ -1079,6 +1089,9 @@ function StrandApp() {
 
     return rows.find(row => row.ruta === ruta && row.provyta === provyta) ?? null;
   }, [datasets.provyteunderlag, provyta, ruta]);
+
+  const currentPyid = getStringValue(draft.pyid) || getStringValue(selectedPlotRow?.pyid);
+  const currentOldInventoryData = currentPyid ? oldInventoryData[currentPyid] ?? null : null;
 
   const currentExportPreview = useMemo(() => {
     if (!basicData) {
@@ -1426,9 +1439,11 @@ function StrandApp() {
       const updated = await runManualBasicDataUpdate(basicData ?? undefined);
       const updatedDatasets = await loadConfiguredDatasets(updated);
       const updatedArtLists = await loadConfiguredArtResources(updated);
+      const updatedOldInventoryData = await loadOldInventoryData();
       setBasicData(updated);
       setDatasets(updatedDatasets);
       setArtLists(updatedArtLists);
+      setOldInventoryData(updatedOldInventoryData);
       setUpdateVersion(null);
       Alert.alert('Klart', 'basic_data och tillhörande resurser uppdaterades.');
     } catch (error) {
@@ -1517,17 +1532,22 @@ function StrandApp() {
           setReadServerMessageKeys(new Set(parsed.filter((value): value is string => typeof value === 'string')));
         }
       })
-      .catch(() => undefined);
+      .catch(() => undefined)
+      .finally(() => setServerMessageReadKeysLoaded(true));
   }, []);
 
   useEffect(() => {
+    if (!serverMessageReadKeysLoaded) {
+      return undefined;
+    }
+
     refreshServerMessages(true).catch(() => undefined);
     const interval = setInterval(() => {
       refreshServerMessages(true).catch(() => undefined);
     }, MESSAGE_POLL_INTERVAL_MS);
 
     return () => clearInterval(interval);
-  }, [refreshServerMessages]);
+  }, [refreshServerMessages, serverMessageReadKeysLoaded]);
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', event => {
@@ -1684,12 +1704,14 @@ function StrandApp() {
       const savedDraft = await loadWorkingDraft();
       const loadedDatasets = await loadConfiguredDatasets(result.basicData);
       const loadedArtLists = await loadConfiguredArtResources(result.basicData);
+      const loadedOldInventoryData = await loadOldInventoryData();
       const loadedInventories = await loadInventoryIndex();
       const firstTabId = result.basicData.tabs[0]?.id ?? '';
 
       setBasicData(result.basicData);
       setDatasets(loadedDatasets);
       setArtLists(loadedArtLists);
+      setOldInventoryData(loadedOldInventoryData);
       setInventories(loadedInventories);
       setActiveTabId(firstTabId);
       setDraft(savedDraft ?? {});
@@ -2241,6 +2263,38 @@ function StrandApp() {
     setEditingField(null);
   }
 
+  function renderOldStrandtypDialogInfo(field: BasicDataField) {
+    if (field.id !== 'strandtyp' || !currentOldInventoryData?.strandtyp) {
+      return null;
+    }
+
+    return (
+      <View style={styles.oldInventoryInfoCard}>
+        <Text style={styles.oldInventoryInfoTitle}>Inventeringsdata 2021</Text>
+        <Text style={styles.oldInventoryInfoText}>Strandtyp: {currentOldInventoryData.strandtyp}</Text>
+      </View>
+    );
+  }
+
+  function renderOldHabitatDataCard() {
+    const habitat = currentOldInventoryData?.habitat ?? [];
+    if (habitat.length === 0) {
+      return null;
+    }
+
+    return (
+      <View style={styles.oldInventoryInfoCard}>
+        <Text style={styles.oldInventoryInfoTitle}>Inventeringsdata 2021</Text>
+        {habitat.map((item, index) => (
+          <Text key={`${item.kod}-${index}`} style={styles.oldInventoryInfoText}>
+            {item.kod}
+            {item.namn ? ` - ${item.namn}` : ''}
+          </Text>
+        ))}
+      </View>
+    );
+  }
+
   function renderDialogField(field: BasicDataField, value: unknown) {
     return (
       <Pressable
@@ -2278,6 +2332,32 @@ function StrandApp() {
     setLagnummerInput(lagnummer);
     setInventerareInput(inventerare);
     setShowUserModal(true);
+  }
+
+  function openBlalappModal() {
+    setBlalappInput(getStringValue(draft[BLALAPP_TEXT_FIELD_ID]).slice(0, BLALAPP_MAX_LENGTH));
+    setShowBlalappModal(true);
+  }
+
+  function saveBlalapp() {
+    updateDraftValue(BLALAPP_TEXT_FIELD_ID, blalappInput.slice(0, BLALAPP_MAX_LENGTH));
+    setShowBlalappModal(false);
+    showValidationToast('Blålapp sparad.');
+  }
+
+  function getBlalappPhoto() {
+    return isPhotoEntry(draft[BLALAPP_PHOTO_FIELD_ID]) ? draft[BLALAPP_PHOTO_FIELD_ID] : null;
+  }
+
+  function takeBlalappPhoto() {
+    openPhotoCapture({
+      fieldId: BLALAPP_PHOTO_FIELD_ID,
+      mode: 'single',
+      category: 'blalapp',
+      label: 'Blålapp',
+      typeValue: 'blalapp',
+      typeLabel: 'Blålapp',
+    }).catch(() => undefined);
   }
 
   function saveUserSettings() {
@@ -2572,6 +2652,11 @@ function StrandApp() {
             const current = {...getPhotoRecord(draft[fieldId])};
             delete current[setKey];
             updateDraftValue(fieldId, current);
+            return;
+          }
+
+          if (isPhotoEntry(draft[fieldId])) {
+            updateDraftValue(fieldId, null);
             return;
           }
 
@@ -4714,9 +4799,11 @@ function StrandApp() {
   const shouldShowSideTabs = hasSelectedPlot && visibleActiveTab.id !== overviewTab.id;
   const activeTabTitle = visibleActiveTab.id === 'substrat' ? 'Substratmatris' : visibleActiveTab.label;
   const unreadServerMessageCount = serverMessages.filter(message => !message.read).length;
+  const blalappPhoto = getBlalappPhoto();
   const tabContent = (
     <View style={styles.tabContainer}>
       <Text style={styles.tabTitle}>{activeTabTitle}</Text>
+      {visibleActiveTab.id === 'habitat' ? renderOldHabitatDataCard() : null}
       {visibleActiveTab.sections.map(section => {
         const sectionFields = section.fields.map(fieldOrId => {
             const field = resolveField(fieldOrId);
@@ -4878,6 +4965,7 @@ function StrandApp() {
             {editingField ? (
               <>
                 <Text style={styles.modalTitle}>{editingField.field.label}</Text>
+                {renderOldStrandtypDialogInfo(editingField.field)}
                 {editingField.field.type === 'select' || editingField.field.type === 'boolean_select' ? (
                   <ScrollView nestedScrollEnabled style={styles.dialogOptionScroll} contentContainerStyle={styles.dialogOptionList}>
                     {(editingField.field.list_id ? basicData.lists[editingField.field.list_id] ?? [] : []).map(option => {
@@ -5194,6 +5282,58 @@ function StrandApp() {
         </SafeAreaView>
       </Modal>
 
+      <Modal animationType="slide" onRequestClose={() => setShowBlalappModal(false)} visible={showBlalappModal}>
+        <SafeAreaView style={styles.mapScreen}>
+          <View style={styles.mapHeader}>
+            <View style={styles.photoPreviewMeta}>
+              <Text style={styles.modalTitle}>Blålapp</Text>
+              <Text style={styles.fieldHelp}>Fri text kopplad till aktuell ruta/provyta.</Text>
+            </View>
+            <Pressable
+              accessibilityLabel="Stäng blålapp"
+              onPress={() => setShowBlalappModal(false)}
+              style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>X</Text>
+            </Pressable>
+          </View>
+
+          <ScrollView contentContainerStyle={styles.inventoryListContent} keyboardShouldPersistTaps="handled">
+            <Text style={styles.fieldLabel}>Text</Text>
+            <TextInput
+              maxLength={BLALAPP_MAX_LENGTH}
+              multiline
+              onChangeText={text => setBlalappInput(text.slice(0, BLALAPP_MAX_LENGTH))}
+              placeholder="Skriv blålapp..."
+              placeholderTextColor="#8e8579"
+              style={[styles.input, styles.blalappInput]}
+              value={blalappInput}
+            />
+            <Text style={styles.fieldHelp}>
+              {blalappInput.length}/{BLALAPP_MAX_LENGTH} tecken
+            </Text>
+
+            <Text style={styles.fieldLabel}>Foto</Text>
+            {blalappPhoto
+              ? renderPhotoPreview(blalappPhoto, () => removePhoto(BLALAPP_PHOTO_FIELD_ID, blalappPhoto), 'Blålapp')
+              : <Text style={styles.fieldHelp}>Inget foto tillagt.</Text>}
+            <Pressable onPress={takeBlalappPhoto} style={blalappPhoto ? styles.secondaryButton : styles.primaryButton}>
+              <Text style={blalappPhoto ? styles.secondaryButtonText : styles.primaryButtonText}>
+                {blalappPhoto ? 'Ta om foto' : 'Ta foto'}
+              </Text>
+            </Pressable>
+
+            <View style={styles.modalActions}>
+              <Pressable onPress={() => setShowBlalappModal(false)} style={styles.secondaryButton}>
+                <Text style={styles.secondaryButtonText}>Avbryt</Text>
+              </Pressable>
+              <Pressable onPress={saveBlalapp} style={styles.primaryButton}>
+                <Text style={styles.primaryButtonText}>Spara</Text>
+              </Pressable>
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
+
       <Modal
         animationType="fade"
         onRequestClose={() => setDeleteInventoryTarget(null)}
@@ -5299,6 +5439,18 @@ function StrandApp() {
 
               <Text style={styles.menuSectionTitle}>Övrigt</Text>
               <View style={styles.menuList}>
+                <Pressable
+                  disabled={!hasSelectedPlot}
+                  onPress={() => {
+                    if (!hasSelectedPlot) {
+                      return;
+                    }
+                    setShowNavigationMenu(false);
+                    openBlalappModal();
+                  }}
+                  style={[styles.menuItem, !hasSelectedPlot && styles.menuItemDisabled]}>
+                  <Text style={styles.menuItemText}>Blålapp</Text>
+                </Pressable>
                 {menuTabs.length > 0 ? (
                   menuTabs.map(tab => {
                     const selected = tab.id === activeTab.id;
@@ -5693,6 +5845,26 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginBottom: 10,
   },
+  oldInventoryInfoCard: {
+    backgroundColor: '#eef6ee',
+    borderColor: '#a9c9b2',
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  oldInventoryInfoTitle: {
+    color: '#165d3c',
+    fontSize: 13,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  oldInventoryInfoText: {
+    color: '#213127',
+    fontSize: 13,
+    lineHeight: 19,
+  },
   nearestPlotCard: {
     backgroundColor: '#eef6ee',
     borderColor: '#9fc3a9',
@@ -5741,6 +5913,10 @@ const styles = StyleSheet.create({
   artCommentInput: {
     minHeight: 58,
     paddingVertical: 8,
+    textAlignVertical: 'top',
+  },
+  blalappInput: {
+    minHeight: 180,
     textAlignVertical: 'top',
   },
   inputDisabled: {

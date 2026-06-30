@@ -4,8 +4,8 @@ GitHub Actions bygger en signerad release-APK via `.github/workflows/android-rel
 
 ## När byggs APK?
 
-- Varje push till `main` bygger en signerad APK och sparar den som GitHub artifact.
-- Varje tagg som börjar med `v`, till exempel `v0.1.10`, bygger en signerad APK och laddar även upp den till SFTP om SFTP-secrets finns.
+- Vanliga pushar till `main` bygger ingen release-APK. De används bara för att dela kod.
+- Varje tagg som börjar med `v`, till exempel `v0.1.10`, bygger en signerad APK, sparar den som GitHub artifact och laddar även upp den till SFTP om SFTP-secrets finns.
 
 ## Skapa release-keystore
 
@@ -70,7 +70,7 @@ strand-0.1.10.apk
 strand-latest.apk
 ```
 
-På vanliga pushar till `main` får APK:n ett internt versionsnamn baserat på GitHub Actions-körningen.
+Vanliga pushar till `main` skapar ingen APK. Skapa och pusha en versionstagg när en APK ska publiceras.
 
 ## Lokal release-build
 

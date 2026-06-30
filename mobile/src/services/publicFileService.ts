@@ -106,6 +106,12 @@ function getCanonicalBasicDataFileCandidates() {
       `${publicPaths.basicDataDir}/vardelistor/habitatkoder.json`,
       `${publicPaths.basicDataDir}/basic_data/vardelistor/habitatkoder.json`,
     ],
+    oldData: [
+      `${publicPaths.basicDataDir}/gamla_data.json`,
+      `${publicPaths.basicDataDir}/basic_data/gamla_data.json`,
+      `${publicPaths.basicDataDir}/utlagg/gamla_data.json`,
+      `${publicPaths.basicDataDir}/basic_data/utlagg/gamla_data.json`,
+    ],
   };
 }
 
@@ -127,6 +133,7 @@ export async function normalizeBasicDataDirectory() {
   const atlasArtListContent = await readFirstExistingTextFile(candidates.atlasArtList);
   const dynCodesContent = await readFirstExistingTextFile(candidates.dynCodes);
   const habitatCodesContent = await readFirstExistingTextFile(candidates.habitatCodes);
+  const oldDataContent = await readFirstExistingTextFile(candidates.oldData);
 
   if (!basicDataContent) {
     throw new Error('Ingen basic_data-fil hittades i hämtad bundle.');
@@ -154,6 +161,9 @@ export async function normalizeBasicDataDirectory() {
   }
   if (habitatCodesContent) {
     await RNFS.writeFile(`${publicPaths.basicDataDir}/habitatkoder.json`, habitatCodesContent.replace(/^\uFEFF/, ''), 'utf8');
+  }
+  if (oldDataContent) {
+    await RNFS.writeFile(`${publicPaths.basicDataDir}/gamla_data.json`, oldDataContent.replace(/^\uFEFF/, ''), 'utf8');
   }
 }
 

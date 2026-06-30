@@ -1,4 +1,4 @@
-﻿{
+{
   "meta": {
     "id": "havsstrand-basic-data",
     "version": "0.1.8",
@@ -70,39 +70,11 @@
       { "value": "slut", "label": "6. SLUT - ovan transekten" }
     ],
     "marktyper": [
-      { "value": "10", "label": "Åker - Träda/ingen synbar markanv." },
-      { "value": "11", "label": "Åker- Nyligen markbearbetad/harvad/sådd" },
-      { "value": "12", "label": "Åker- Annuella grödor" },
-      { "value": "13", "label": "Åker- Slåttervall" },
-      { "value": "14", "label": "Åker- Betad vall" },
-      { "value": "15", "label": "Åker- Energiskog" },
-      { "value": "16", "label": "Åker- Frukt/Bärodling" },
-      { "value": "20", "label": "Anlagd - Ingen synbar markanv." },
-      { "value": "21", "label": "Anlagd - Kolonilottsodling" },
-      { "value": "22", "label": "Anlagd - Rekreation (anläggning)" },
-      { "value": "23", "label": "Anlagd - Bostadstomt Enskilt eller få (<= 5)" },
-      { "value": "24", "label": "Anlagd - Tätortsbebyggelse flera bostadshus (>5)" },
-      { "value": "25", "label": "Anlagd - Jordbruksbebyggelse Byggnader, gårdsplaner" },
-      { "value": "26", "label": "Anlagd - Industriverksamhet" },
-      { "value": "27", "label": "Anlagd - Transport" },
-      { "value": "28", "label": "Anlagd - Pågående exploatering/väg/bygge" },
-      { "value": "30", "label": "Skog - Pot. skogsbruk, inga avverkningsspår" },
-      { "value": "31", "label": "Skog - Skogsbruk" },
-      { "value": "32", "label": "Skog - Skogsbruk, hänsynsyta" },
-      { "value": "33", "label": "Skog - Hygge" },
-      { "value": "34", "label": "Skog - Fröplantage" },
-      { "value": "35", "label": "Skog - Kraftledningsgata" },
-      { "value": "36", "label": "Skog - Skogsbete (+skogsbruk)" },
-      { "value": "37", "label": "Skog - Rekreation (+skogsbruk)" },
-      { "value": "38", "label": "Skog - Nyligen skogsplanterad åker" },
-      { "value": "40", "label": "Övrig - Ingen synbar markanvändning" },
-      { "value": "41", "label": "Övrig - Djurhållnig, naturmark" },
-      { "value": "42", "label": "Övrig - Djurhållning, kultiverad/gödslad mark" },
-      { "value": "43", "label": "Övrig - Slåtter/gräsklippning" },
-      { "value": "44", "label": "Övrig - Rekreation" },
-      { "value": "45", "label": "Övrig - Bostadstomt" },
-      { "value": "46", "label": "Övrig - Täkt" },
-      { "value": "50", "label": "Vatten" }
+      { "value": "1", "label": "Ingen" },
+      { "value": "2", "label": "Konstruerad" },
+      { "value": "3", "label": "Intensiv" },
+      { "value": "4", "label": "Lättare" },
+      { "value": "5", "label": "Bete/slåtter" }
     ],
     "rekreationstyper": [
       { "value": "1", "label": "Badplats" },
@@ -148,7 +120,8 @@
       { "value": "1", "label": "Fastland" },
       { "value": "2", "label": "Öar (>2 ha)" },
       { "value": "3", "label": "Skär (<2 ha och >0,1 ha)" },
-      { "value": "4", "label": "Grund (<0,1 ha)" }
+      { "value": "4", "label": "Grund (<0,1 ha)" },
+      { "value": "5", "label": "Åsöar" }
     ],
     "tradforekomst": [
       { "value": "1", "label": "Trädlös" },
@@ -361,16 +334,9 @@
       "label": "Start & bilder",
       "sections": [
         {
-          "id": "riktning_och_startpunkt",
-          "label": "Riktning och startpunkt",
+          "id": "startpunkt",
+          "label": "Startpunkt",
           "fields": [
-            {
-              "id": "riktning",
-              "label": "Transektens riktning",
-              "type": "integer",
-              "unit": "grader",
-              "required": false
-            },
             {
               "id": "startpunkt",
               "label": "Startpunkt",
@@ -446,7 +412,6 @@
           "id": "geo_bas",
           "label": "Geolitoral",
           "fields": [
-            { "id": "lutninggeo", "label": "Lutning geolitoral", "type": "integer", "unit": "grader" },
             { "id": "marktypgeo", "label": "Marktyp", "type": "select", "list_id": "marktyper" },
             { "id": "vegtackningfaltgeo", "label": "Total fältskiktstäckning", "type": "integer", "unit": "%" },
             { "id": "tradtackninggeo", "label": "Total trädtäckning", "type": "integer", "unit": "%" },
@@ -463,7 +428,6 @@
           "id": "supra_bas",
           "label": "Supralitoral",
           "fields": [
-            { "id": "lutningsupra", "label": "Lutning supralitoral", "type": "integer", "unit": "grader" },
             { "id": "marktypsupra", "label": "Marktyp", "type": "select", "list_id": "marktyper" },
             { "id": "vegtackningfaltsupra", "label": "Total fältskiktstäckning", "type": "integer", "unit": "%" },
             { "id": "tradtackningsupra", "label": "Total trädtäckning", "type": "integer", "unit": "%" },
@@ -480,7 +444,6 @@
           "id": "extra_bas",
           "label": "Extralitoral",
           "fields": [
-            { "id": "lutningextra", "label": "Lutning extralitoral", "type": "integer", "unit": "grader" },
             { "id": "marktypextra", "label": "Marktyp", "type": "select", "list_id": "marktyper" },
             { "id": "vegtackningfaltextra", "label": "Total fältskiktstäckning", "type": "integer", "unit": "%" },
             { "id": "tradtackningextra", "label": "Trädtäckning extralitoral", "type": "integer", "unit": "%" },
@@ -505,10 +468,8 @@
               "item_schema": {
                 "fields": [
                   { "id": "habitatval", "label": "Habitat", "type": "dataset_search", "dataset": "habitatkoder", "value_key": "habitat", "display_key": "habitatnamn", "target_value_field": "kod", "target_label_field": "namn" },
-                  { "id": "utbredning", "label": "M.K.", "type": "text" },
                   { "id": "start", "label": "Start", "type": "decimal", "unit": "m" },
                   { "id": "slut", "label": "Slut", "type": "decimal", "unit": "m" },
-                  { "id": "kriterie", "label": "Kriterie", "type": "text" },
                   { "id": "fagelskramma", "label": "Fågelskrämma inom 50 m", "type": "boolean" },
                   { "id": "siktrojning", "label": "Siktröjning", "type": "boolean" },
                   { "id": "busktackning", "label": "Busktäckning", "type": "select", "list_id": "habitat_procent" },
@@ -535,10 +496,16 @@
               "item_schema": {
                 "fields": [
                   { "id": "dynhabitatval", "label": "Dynhabitat", "type": "dataset_search", "dataset": "dynkoder", "value_key": "habitat", "display_key": "habitatnamn", "target_value_field": "kod", "target_label_field": "namn" },
-                  { "id": "utbredning", "label": "M.K.", "type": "text" },
                   { "id": "start", "label": "Start", "type": "decimal", "unit": "m" },
                   { "id": "slut", "label": "Slut", "type": "decimal", "unit": "m" },
-                  { "id": "kriterie", "label": "Kriterie", "type": "text" },
+                  { "id": "fagelskramma", "label": "Fågelskrämma inom 50 m", "type": "boolean" },
+                  { "id": "siktrojning", "label": "Siktröjning", "type": "boolean" },
+                  { "id": "busktackning", "label": "Busktäckning", "type": "select", "list_id": "habitat_procent" },
+                  { "id": "krontackning", "label": "Krontäckning", "type": "select", "list_id": "habitat_procent" },
+                  { "id": "grov_dod_ved", "label": "Grov död ved", "type": "select", "list_id": "habitat_grov_dod_ved" },
+                  { "id": "skog_succession", "label": "Skogssuccession", "type": "select", "list_id": "habitat_skog_succession" },
+                  { "id": "betesregim", "label": "Betesregim", "type": "select", "list_id": "habitat_betesregim" },
+                  { "id": "betestryck", "label": "Betestryck", "type": "select", "list_id": "habitat_betestryck" },
                   { "id": "foto", "label": "Foto", "type": "photo_array", "storage_category": "fordynshabitat", "max_count": 1, "photo_name_prefix": "fordynshabitat" }
                 ]
               }

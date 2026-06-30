@@ -2,6 +2,8 @@
 
 När koden är klar och pushad till `main` kan en ny installerbar APK skapas genom att tagga versionen i Git.
 
+Vanlig `git push origin main` delar bara koden och skapar ingen APK. APK skapas bara när en versionstagg pushas, eller när workflowet startas manuellt i GitHub Actions.
+
 ## 1. Hämta senaste kod
 
 ```powershell
@@ -14,6 +16,7 @@ git pull origin main
 Välj nästa versionsnummer, till exempel `v0.1.0`, `v0.1.1` osv.
 
 ```powershell
+git push origin main
 git tag v0.1.0
 git push origin v0.1.0
 ```

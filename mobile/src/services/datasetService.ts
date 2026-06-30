@@ -17,12 +17,22 @@ export interface ArtResourceRow {
   metadata?: string;
 }
 
+export interface OldInventoryDataRow {
+  pyid: string;
+  strandtyp?: string;
+  habitat: Array<{
+    kod: string;
+    namn: string;
+  }>;
+}
+
 const DATASET_RESOURCE_DIRS = ['utlagg', 'vardelistor', 'artlistor'];
 
 const DATASET_FILE_ALIASES: Record<string, string[]> = {
   provyteunderlag: ['data.csv', 'provyteunderlag.csv'],
   atlasartlista_havsstrand: ['atlasartlista_havsstrand.csv'],
   dynkoder: ['dynkoder.json'],
+  gamla_data: ['gamla_data.json'],
   habitatkoder: ['habitatkoder.json'],
 };
 
@@ -116,6 +126,14 @@ async function loadDataset(datasetId: string, config: BasicDataConfig) {
   }
 
   const content = await RNFS.readFile(resource, 'utf8');
+  if (datasetId === 'gamla_data') {
+    return parseOldInventoryData(content).map(row => ({
+      pyid: row.pyid,
+      strandtyp: row.strandtyp ?? '',
+      habitat: row.habitat.map(item => `${item.kod} - ${item.namn}`).join('; '),
+    }));
+  }
+
   return resource.toLowerCase().endsWith('.json') ? parseJsonDataset(content) : parseCsv(content);
 }
 
@@ -164,6 +182,26 @@ async function findFirstExistingFile(candidates: string[]) {
   return null;
 }
 
+export async function loadOldInventoryData() {
+  const resource = await findFirstExistingFile([
+    `${publicPaths.basicDataDir}/gamla_data.json`,
+    `${publicPaths.root}/gamla_data.json`,
+    `${publicPaths.basicDataDir}/basic_data/gamla_data.json`,
+    `${publicPaths.basicDataDir}/utlagg/gamla_data.json`,
+    `${publicPaths.basicDataDir}/basic_data/utlagg/gamla_data.json`,
+  ]);
+
+  if (!resource) {
+    return {};
+  }
+
+  const content = await RNFS.readFile(resource, 'utf8');
+  return parseOldInventoryData(content).reduce<Record<string, OldInventoryDataRow>>((rowsByPyid, row) => {
+    rowsByPyid[row.pyid] = row;
+    return rowsByPyid;
+  }, {});
+}
+
 function collectDatasetIds(config: BasicDataConfig) {
   const datasetIds = new Set<string>();
 
@@ -198,6 +236,38 @@ function collectDatasetIds(config: BasicDataConfig) {
   config.tabs.forEach(tab => tab.sections.forEach(section => section.fields.forEach(visitField)));
 
   return Array.from(datasetIds);
+}
+
+function parseOldInventoryData(content: string): OldInventoryDataRow[] {
+  return content
+    .replace(/^\uFEFF/, '')
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(Boolean)
+    .map(line => line.replace(/,$/, ''))
+    .map(line => {
+      try {
+        return JSON.parse(line) as unknown;
+      } catch {
+        return null;
+      }
+    })
+    .filter((row): row is Record<string, unknown> => Boolean(row && typeof row === 'object' && !Array.isArray(row)))
+    .map(row => {
+      const habitatRows = Array.isArray(row.habitat) ? row.habitat : [];
+      return {
+        pyid: typeof row.pyid === 'string' ? row.pyid.trim() : '',
+        strandtyp: typeof row.strandtyp === 'string' ? row.strandtyp.trim() : undefined,
+        habitat: habitatRows
+          .filter((item): item is unknown[] => Array.isArray(item))
+          .map(item => ({
+            kod: item[0] == null ? '' : String(item[0]).trim(),
+            namn: item[1] == null ? '' : String(item[1]).trim(),
+          }))
+          .filter(item => item.kod || item.namn),
+      };
+    })
+    .filter(row => row.pyid);
 }
 
 function parseJsonDataset(content: string): DatasetRow[] {

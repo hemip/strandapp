@@ -2,8 +2,6 @@ name: Android release APK
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v*'
   workflow_dispatch:
