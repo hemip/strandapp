@@ -168,7 +168,6 @@ interface SessionQrPayload {
   uuid?: string;
   ruta?: string;
   provyta?: string;
-  lagnummer?: string;
   startpunkt?: CompactGpsPoint | StoredGpsPoint;
   slutpunkt?: CompactGpsPoint | StoredGpsPoint;
 }
@@ -177,7 +176,6 @@ interface ParsedSessionCode {
   uuid: string;
   ruta?: string;
   provyta?: string;
-  lagnummer?: string;
   startpunkt?: StoredGpsPoint;
   slutpunkt?: StoredGpsPoint;
 }
@@ -236,7 +234,6 @@ function createSessionQrPayload(sessionUuid: string, draft: Record<string, unkno
     uuid: sessionUuid,
     ruta: typeof draft.ruta === 'string' ? draft.ruta : undefined,
     provyta: typeof draft.provyta === 'string' ? draft.provyta : undefined,
-    lagnummer: typeof draft.lagnummer === 'string' ? draft.lagnummer : undefined,
     startpunkt: compactGpsPoint(draft.startpunkt),
     slutpunkt: compactGpsPoint(draft.slutpunkt),
   };
@@ -258,7 +255,6 @@ function parseSessionCode(rawValue: string): ParsedSessionCode | null {
         uuid: parsed.uuid,
         ruta: typeof parsed.ruta === 'string' ? parsed.ruta : undefined,
         provyta: typeof parsed.provyta === 'string' ? parsed.provyta : undefined,
-        lagnummer: typeof parsed.lagnummer === 'string' ? parsed.lagnummer : undefined,
         startpunkt: parseQrGpsPoint(parsed.startpunkt),
         slutpunkt: parseQrGpsPoint(parsed.slutpunkt),
       };
@@ -2419,9 +2415,6 @@ function StrandApp() {
     }
     if (sessionPayload.provyta) {
       nextValues.provyta = sessionPayload.provyta;
-    }
-    if (sessionPayload.lagnummer) {
-      nextValues.lagnummer = sessionPayload.lagnummer;
     }
     if (sessionPayload.startpunkt) {
       Object.assign(nextValues, getGpsCaptureValues('startpunkt', sessionPayload.startpunkt));
